@@ -2,7 +2,24 @@
 //!
 //! Random number generation and list creation with type support
 
-use crate::random::{random_f64, random_i64, random_bool};
+use rand::Rng;
+
+// Basic random generation functions - self-contained in math/random
+
+/// Generates a random f64 value between 0.0 and 1.0.
+fn random_f64() -> f64 {
+    rand::rng().random()
+}
+
+/// Generates a random i64 value.
+fn random_i64() -> i64 {
+    rand::rng().random()
+}
+
+/// Generates a random boolean value.
+fn random_bool() -> bool {
+    rand::rng().random()
+}
 
 pub fn random_range(min: f64, max: f64) -> f64 {
     min + random_f64() * (max - min)
@@ -28,7 +45,7 @@ pub fn random_list_string(list_type: &str, count: usize, range_str: Option<&str>
     match list_type.to_lowercase().as_str() {
         "bool" | "boolean" => {
             let bools = random_list_bool(count);
-            let as_ints: Vec<String> = bools.iter().map(|&b| if b { "1" } else { "0" }).collect();
+            let as_ints: Vec<String> = bools.iter().map(|&b| if b { "1".to_string() } else { "0".to_string() }).collect();
             Ok(as_ints.join(","))
         },
         "int" | "integer" => {

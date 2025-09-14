@@ -97,7 +97,7 @@ mod tests {
         assert_eq!(factors(12), vec![1, 2, 3, 4, 6, 12]);
         assert_eq!(factors(1), vec![1]);
         assert_eq!(factors(7), vec![1, 7]); // prime
-        assert_eq!(factors(0), vec![]);
+        assert_eq!(factors(0), vec![] as Vec<i64>);
         assert_eq!(factors(16), vec![1, 2, 4, 8, 16]);
 
         // Test with negative (should take absolute value)

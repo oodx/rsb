@@ -71,7 +71,7 @@ pub fn from_base(num_str: &str, base: u32) -> Result<i64, String> {
         .map_err(|_| format!("Could not parse '{}' as base-{} number", num_str, base))
 }
 
-pub fn base_convert(num_str: &str, from_base: u32, to_base: u32) -> Result<String, String> {
-    let decimal_value = from_base(num_str, from_base)?;
-    to_base(decimal_value, to_base)
+pub fn base_convert(num_str: &str, source_base: u32, target_base: u32) -> Result<String, String> {
+    let decimal_value = from_base(num_str, source_base)?;
+    to_base(decimal_value, target_base)
 }
