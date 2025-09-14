@@ -1,0 +1,79 @@
+CONTINUE — RSB ⇄ XStream Migration Session
+
+Updated: 2025-09-13
+
+Goal
+- Keep a crisp breadcrumb trail to resume work if the chat/session drops.
+
+Current Status
+- Reviewed RSB architecture and development rules:
+  - docs/tech/development/HOWTO_UPDATE_RSB.md
+  - docs/tech/development/MODULE_SPEC.md
+  - docs/tech/reference/RSB_ARCH.md, docs/tech/reference/REBEL.md
+  - docs/tech/features/* (strings, colors, cli, threads, etc.)
+- Reviewed RSB code touchpoints:
+  - src/streams.rs, src/streamable/*, src/xcls/{xsed.rs,xgrep.rs}, src/visual/colors/*
+  - src/_todo/dev_token/* (placeholders), src/_todo/dev_gx (empty)
+- Reviewed XStream repo (relative path: ../xstream):
+  - src/xstream/{types/*,fork.rs,merge.rs,gate.rs,gen.rs}
+  - src/{adapter.rs,colors.rs}
+  - RSB_INTEGRATION_STRATEGY.md, README.md, INTEGRATION.md
+- Produced canonical migration plan:
+  - RSB_XSTREAM_MIGRATION.txt  ← canonical summary & phased plan
+  - Session notes you can reference:
+    - .session/xstream/FUNCTION_ANALYSIS.txt
+    - .session/xstream/RSB_XSTREAM_ROADMAP.txt (alt version may have notes)
+
+Boundaries (Decided)
+- RSB: generic strings/streams, xsed/xgrep closures, streamable utils, optional visuals registry, generic generators, adapter traits (no concrete JSON/CSV), token‑agnostic errors.
+- XStream: token/namespace types + TokenBucket, fork/merge/gate, ceremonies/visual weaving, concrete adapters (JSON/CSV), token streamables.
+
+Consolidation Targets
+- Colors: Replace ../xstream/src/colors.rs uses with rsb::visual::colors (feature‑gated in XStream). Keep token→color mapping and ceremonies in XStream.
+- xsed/xgrep: Keep in RSB; add docs/tests; expose examples.
+
+RSB Gaps to Add (Generic)
+- Stream combinators: interleave, zip_lines, chunk, dedupe_any (uniq remains consecutive).
+- Generators module: rsb::gen with simple text/line generators (alpha/alnum/hex/uuid/range; count_from/repeat/cycle).
+- Adapter traits only: FormatHandler<T>, RecoveryStrategy, AdapterError (no JSON/CSV in RSB).
+- Token substrate (optional): minimal validate/format/parse helpers under src/_todo/dev_token (no namespaces; off prelude).
+
+Immediate Next Step (choose one)
+1) M1 — Visuals consolidation (low risk, quick win)
+   - In XStream: add Cargo feature (e.g., rsb-visuals). Swap color helpers to:
+     use rsb::visual::colors::{get_color, colorize, color_mode, color_enable_with};
+   - Keep a no‑color fallback; do not require visuals by default.
+   - Add README note in XStream that visuals depend on RSB features.
+
+2) M2 — RSB stream combinators + gen module
+   - Add to RSB:
+     - src/streams.rs: interleave, zip_lines, chunk, dedupe_any (+ unit tests under tests/)
+     - src/gen/{mod.rs,utils.rs}: basic generators + tests, docs/tech/features/FEATURES_GEN.md
+
+How to Resume Quickly
+- Read: RSB_XSTREAM_MIGRATION.txt (repo root) for full plan and checklists.
+- If continuing M1 (Visuals): open ../xstream/src/colors.rs and replace usages with rsb::visual::colors APIs; leave token‑mapping logic intact. Guard under a new Cargo feature.
+- If continuing M2 (Combinators/Gen): implement small, isolated functions in RSB with unit tests; keep names generic and token‑agnostic; do not alter prelude.
+
+Verification Commands
+- In RSB:
+  - cargo test
+  - cargo test --features visuals
+- In XStream:
+  - cargo test
+  - cargo run --bin xstream-gen (if needed for UAT)
+
+Design Guardrails (RSB)
+- Do not expand prelude with optional subsystems.
+- Use module‑owned macros; logic in helpers; orchestrate via mod.rs.
+- Add a FEATURES_*.md for any “complete” feature.
+- Keep additions additive; avoid breaking existing APIs.
+
+Key Files Index (for quick open)
+- RSB: src/streams.rs; src/xcls/xsed.rs; src/xcls/xgrep.rs; src/streamable/*; src/visual/colors/*
+- RSB docs: docs/tech/development/HOWTO_UPDATE_RSB.md; docs/tech/development/MODULE_SPEC.md; docs/tech/reference/RSB_ARCH.md; docs/tech/reference/REBEL.md
+- XStream: src/xstream/types/*; src/adapter.rs; src/colors.rs; RSB_INTEGRATION_STRATEGY.md
+
+Next Action Suggestion
+- Proceed with M1 (Visuals consolidation) unless you prefer to start with RSB combinators (M2). Both are independent and safe.
+

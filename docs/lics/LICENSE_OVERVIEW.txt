@@ -1,0 +1,22 @@
+RSB Framework – Licensing Overview
+Copyright (c) 2025 Dr. Vegajunk Hackware
+All rights reserved.
+
+RSB Framework is offered under three distinct licenses. You must select one, comply with its terms, and meet all eligibility requirements for the license you choose.
+
+1. Open Source License (AGPL-3.0)
+   - For open-source projects that agree to release their own source code under the GNU Affero General Public License version 3.
+   - You must comply fully with the AGPL when distributing the software or providing it as a network service.
+
+2. Community Edition License
+   - For personal, educational, or academic research use only.
+   - Available only to individuals acting in a personal capacity or to accredited academic or research institutions.
+   - Not available to companies, organizations, or any individual, contractor, or consultant acting for the benefit of a company, employer, client, or other commercial entity.
+   - Use inside any business, organization, or paid service is not permitted under the Community Edition License.
+
+3. Commercial License
+   - For any other use, including closed-source products, hosted services, SaaS deployments, internal business use, or for users who do not meet the Community Edition criteria.
+   - Requires a signed commercial agreement with Dr. Vegajunk Hackware.
+
+Acceptance and Eligibility
+By downloading, installing, linking to, or otherwise using the RSB Framework, you accept the terms of one of the licenses above and represent that you meet all eligibility requirements for the license you have chosen.

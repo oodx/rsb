@@ -1,0 +1,280 @@
+# XStream → RSB Integration Planning
+Generated: 2025-09-12
+Purpose: Map feature boundaries between RSB (generic stream processing) and XStream (token specialization)
+
+## ANALYSIS CRITERIA
+- **RSB-appropriate**: Generic, broadly applicable, foundational stream processing
+- **XStream-specific**: Token-aware, namespace-semantic, configuration-specialized
+
+## FEATURE BOUNDARY ANALYSIS
+
+### TIER 1: IMMEDIATE INTEGRATION CANDIDATES
+
+#### 1.1 Visual Stream Processing Framework 🌟
+**XStream Version**: Color-coded token streams, namespace ceremonies
+**RSB Integration Decision**: ✅ **BRING TO RSB** (Generic Visual Framework)
+**Rationale**: 
+- Visual feedback benefits ALL stream processing, not just tokens
+- RSB already has visual/ module foundation (colors, glyphs, prompts)
+- Generic ceremony/demonstration patterns apply universally
+
+**RSB Implementation**:
+```rust
+// src/visual/ceremonies.rs (new)
+pub trait StreamCeremony {
+    fn demonstrate(&self, operation: &str) -> VisualDemo;
+    fn ceremony(&self, title: &str) -> CeremonyOutput;
+}
+
+// Integrates with existing visual/colors/, visual/glyphs/
+```
+
+**XStream Specialization**:
+```rust
+// xstream keeps token-specific visual enhancements
+impl TokenStream {
+    fn ceremony_with_namespaces(&self, operation: &str) -> Self;
+    fn demonstrate_token_flow(&self) -> TokenVisualDemo;
+}
+```
+
+#### 1.2 Stream Generation Framework ⚡
+**XStream Version**: Token-aware generation, namespace patterns
+**RSB Integration Decision**: ✅ **BRING TO RSB** (Generic Generation Framework)
+**Rationale**:
+- Test data generation is universally needed
+- Generic patterns (RandomAlnum, FromList, Sequential, UUID) apply broadly
+- Performance testing and load generation are generic needs
+
+**RSB Implementation**:
+```rust
+// src/generators/ (new package - addresses our future rand/ planning)
+pub mod generators {
+    pub enum ValueType {
+        RandomAlnum(usize),
+        FromList(Vec<String>), 
+        Sequential(String, usize),
+        Timestamp,
+        UUID,
+    }
+    
+    pub enum StreamPattern {
+        Simple,
+        Nested { depth: usize },
+        Mixed { types: Vec<ValueType>, ratio: f32 },
+    }
+}
+```
+
+**XStream Specialization**:
+```rust
+// xstream keeps token-specific generation
+impl TokenGenerator {
+    fn generate_with_namespaces(pattern: TokenPattern) -> TokenStream;
+    fn generate_config_tokens(config_type: ConfigType) -> TokenStream;
+}
+```
+
+#### 1.3 Integration Adapter Patterns 🔗
+**XStream Version**: Token-aware JSON/XML adapters with namespace handling
+**RSB Integration Decision**: 🔄 **SPLIT INTEGRATION** (Generic Adapters + Token Specialization)
+**Rationale**:
+- Basic JSON/CSV/XML parsing is generic utility
+- Token-aware namespace processing stays in XStream
+- Error recovery patterns are universally valuable
+
+**RSB Implementation**:
+```rust
+// src/adapters/ (new package - impacts our json_dict_random.rs split)
+pub mod adapters {
+    pub trait FormatAdapter<T> {
+        fn from_format(&self, input: &str) -> Result<String, AdapterError>;
+        fn to_format(&self, stream: &str) -> Result<String, AdapterError>;
+    }
+    
+    pub struct JsonAdapter;
+    pub struct CsvAdapter;
+    
+    pub enum RecoveryStrategy {
+        FailFast,
+        SkipErrors, 
+        DefaultValue(String),
+    }
+}
+```
+
+**XStream Specialization**:
+```rust
+// xstream keeps token-semantic awareness
+impl TokenAdapter {
+    fn from_json_with_namespaces(&self, json: &str) -> Result<TokenStream, TokenError>;
+    fn validate_config_structure(&self) -> ConfigValidation;
+}
+```
+
+### TIER 2: SELECTIVE INTEGRATION
+
+#### 2.1 Enhanced Stream Operations 🔄
+**XStream Version**: Token-aware merge strategies, namespace priority handling  
+**RSB Integration Decision**: 🔄 **SPLIT INTEGRATION** (Generic Operations + Token Logic)
+**Rationale**:
+- Basic merge strategies (Interleave, Priority, Dedupe) are generic
+- Token-specific merge logic (namespace priority) stays in XStream
+- Gate conditions have generic utility
+
+**RSB Implementation**:
+```rust
+// src/streams.rs (enhance existing Stream)
+impl Stream {
+    pub fn merge_with_strategy(self, other: Stream, strategy: MergeStrategy) -> Self;
+    pub fn gate_with_condition(self, condition: GateCondition) -> Self;
+    pub fn fork_by_pattern(self, patterns: Vec<String>) -> Vec<Stream>;
+}
+
+pub enum MergeStrategy {
+    Concat,
+    Interleave, 
+    Priority(Vec<String>), // Generic priority by string patterns
+    Dedupe,
+}
+```
+
+**XStream Specialization**:
+```rust
+// xstream keeps token-semantic merge logic
+impl TokenStream {
+    fn merge_by_namespace_priority(self, other: TokenStream, ns_order: Vec<String>) -> Self;
+    fn gate_by_token_validity(self) -> Self;
+    fn fork_by_config_sections(self) -> HashMap<String, TokenStream>;
+}
+```
+
+#### 2.2 User-Friendly Macro Framework 🏗️
+**XStream Version**: Token-specific testing and pipeline macros
+**RSB Integration Decision**: ✅ **BRING TO RSB** (Generic Macro Patterns)
+**Rationale**:
+- Testing macros benefit all stream processing
+- Pipeline builder patterns are generically useful  
+- RSB already has strong macro infrastructure
+
+**RSB Implementation**:
+```rust
+// src/macros/streams.rs (new - split from streams_exec.rs per our restruct.txt)
+macro_rules! test_stream {
+    ($input:expr, $expected:expr, |$stream:ident| $ops:expr) => { /* generic */ };
+}
+
+macro_rules! stream_pipeline {
+    ($input:expr => $($op:ident($($args:expr),*))+) => { /* generic */ };
+}
+```
+
+**XStream Specialization**:
+```rust
+// xstream keeps token-specific macros
+macro_rules! test_token_stream {
+    ($input:expr, $expected_tokens:expr, |$ts:ident| $ops:expr) => { /* token-aware */ };
+}
+```
+
+### TIER 3: STAY IN XSTREAM
+
+#### 3.1 Token-Specific Intelligence ❌ **STAY IN XSTREAM**
+**Features**:
+- Namespace semantic validation
+- Configuration structure analysis  
+- Token relationship mapping
+- Context-aware token processing
+
+**Rationale**: These are fundamentally token-domain concepts, not generic stream processing
+
+#### 3.2 Configuration Management ❌ **STAY IN XSTREAM** 
+**Features**:
+- Config file parsing with token awareness
+- Hierarchical configuration validation
+- Environment-specific configuration processing
+
+**Rationale**: Configuration semantics are application-domain specific, not stream-processing generic
+
+## IMPACT ON CURRENT RSB2 PLANNING
+
+### ✅ CONFIRMED GOOD DECISIONS
+- **string/** package: Aligns with adapter framework needs
+- **visual/** module: Foundation for ceremony/demonstration features
+- **threads/** package: Execution context separate from stream processing
+
+### 🔄 PLANNING ADJUSTMENTS NEEDED
+
+#### Generators vs Rand Package
+**Current Plan**: Separate rand/ package for xstream generators
+**Adjustment**: Plan generators/ package instead - broader scope including:
+- Stream generation (from XStream)
+- Random value generation (current rand functionality)  
+- Test data generation
+- Load testing patterns
+
+#### JSON Processing Strategy
+**Current Plan**: Split json_dict_random.rs → json.rs + dict.rs + rand.rs
+**Adjustment**: Consider adapters/ package for JSON processing:
+- Generic JSON adapter (from XStream integration)
+- Dict operations (current functionality)
+- Random generation → generators/ package
+
+#### Enhanced Stream Operations
+**Current Plan**: Focus on macro reorganization  
+**Addition**: Consider planning enhanced stream operations:
+- Advanced merge strategies
+- Gate conditions
+- Fork patterns
+
+## RECOMMENDED NEXT STUB MODULES
+
+### generators_dev/ (High Priority)
+Based on XStream integration needs:
+```
+src/generators_dev/
+├── mod.rs              # Package coordinator
+├── values.rs           # Value generation (RandomAlnum, FromList, UUID, etc.)
+├── streams.rs          # Stream generation patterns
+├── testing.rs          # Test data generation helpers  
+└── macros.rs          # Generation macros
+```
+
+### adapters_dev/ (Medium Priority)  
+For JSON/CSV integration:
+```
+src/adapters_dev/
+├── mod.rs              # Package coordinator
+├── json.rs             # JSON format adapter
+├── csv.rs              # CSV format adapter
+├── recovery.rs         # Error recovery strategies
+└── macros.rs          # Adapter macros
+```
+
+### ceremonies_dev/ (Low Priority)
+Visual enhancements to existing visual/:
+```
+src/visual/ceremonies_dev/
+├── mod.rs              # Ceremony framework
+├── demonstrations.rs   # Operation demonstrations  
+└── output.rs          # Ceremony output formatting
+```
+
+## TIMELINE COORDINATION
+
+### Phase 1 (Next 1-2 months)
+- RSB2 macro reorganization (current focus)
+- generators_dev/ stub creation
+- Visual foundation for ceremonies
+
+### Phase 2 (Months 3-4)  
+- XStream integration begins
+- adapters_dev/ implementation
+- Enhanced stream operations
+
+### Phase 3 (Months 5-6)
+- Full integration testing
+- Performance optimization
+- Documentation and examples
+
+This coordination ensures RSB2 module planning aligns with incoming XStream features while maintaining clear boundaries between generic stream processing (RSB) and token specialization (XStream).

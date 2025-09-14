@@ -1,0 +1,4 @@
+# Environment variables for tests
+[env]
+CARGO_TEST = "1"
+RUST_TEST_TIMEOUT = "30"

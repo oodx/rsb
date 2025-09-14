@@ -1,0 +1,784 @@
+RSB Work Queue (Fake Tickets)
+Owner: rsb framework / prontodb enablement
+Last-Updated: 2025-09-12
+Last-Updated: 2025-09-13 (module realignment, bash/threads)
+
+Legend
+- Status: TODO | IN-PROGRESS | BLOCKED | DONE
+- Size: XS/S/M/L/XL
+
+Template
+- ID: RSB-XXX
+- Title: <short action>
+- Status: TODO
+- Size: M
+- Why: <problem to solve / stakeholder outcome>
+- Scope: <what's in / what's out>
+- Deliverables: <code/tests/docs>
+- Acceptance: <objective checks to verify>
+- Notes/Deps: <links, dependencies>
+
+----------------------------------------------------------------
+ID: RSB-001
+Title: Gate examples and visual UATs behind features
+Status: DONE
+Size: S
+Why: Prevent default builds/tests from failing when visuals are disabled
+Scope: Gate example showcase and tests using cfg(feature = "visual"), set example required-features
+Deliverables: Cargo example stanza; test cfg gates
+Acceptance: `cargo test` (default) passes; `cargo test --features visuals` passes
+Notes/Deps: Completed in this session
+
+ID: RSB-002
+Title: Color registry completeness and defaults
+Status: IN-PROGRESS
+Size: S
+Why: Ensure robust color experience for apps; cover named/status/simple sets
+Scope: Verify `get_all_colors()` >= 90 when named+status+simple enabled; document color_enable defaults
+Deliverables: Tests, doc notes in README/quick ref
+Acceptance: Sanity tests pass with counts; doc shows enable patterns (simple|status|named|all)
+Notes/Deps: Depends on visual package
+
+ID: RSB-002A
+Title: Case-insensitive color name lookup
+Status: DONE
+Size: XS
+Why: Reduce surprises; accept "RED" same as "red"
+Scope: Normalize lookup to lowercase in registry
+Deliverables: Code change + UAT coverage
+Acceptance: UAT shows equality for upper/lower cases
+Notes/Deps: Part of color tightening
+
+ID: RSB-002B
+Title: colored! macro single-arg behavior
+Status: DONE
+Size: S
+Why: Inline tags should not conflict with Rust formatting braces
+Scope: Add single-arg macro arm to bypass format!
+Deliverables: Macro update; UAT test `uat_colors_macros.rs`
+Acceptance: `colored!("{red}x{reset}")` works; format form still works
+Notes/Deps: Visuals feature
+
+ID: RSB-002C
+Title: Visual UATs for color functions and macros
+Status: DONE
+Size: S
+Why: Prove colored!/color/colorize/bg/colored() behavior end-to-end
+Scope: Add tests for functions and macros, including backgrounds and glyph tags
+Deliverables: tests/uat_colors_macros.rs (feature-gated)
+Acceptance: `cargo test --features visuals` passes
+Notes/Deps: Uses glyphs if enabled
+
+ID: RSB-003
+Title: Named colors remain in global registry (no enum)
+Status: DONE
+Size: S
+Why: Stakeholder direction: named palette must live in HashMap registry
+Scope: Ensure named.rs continues map-based definitions; keep legacy names; avoid enum conversion
+Deliverables: Brief doc note + code comment guards; sanity test coverage
+Acceptance: Named lookups flow through registry; no enum introduced
+Notes/Deps: Completed — `visual/colors/registry.rs` maintains REGISTRY (HashMap) and `named.rs` provides map-based palette. Simple/status sets use enums internally but are merged into the registry at runtime. No enum for named colors.
+
+ID: RSB-PARAM-001
+Title: Negative substring support in param!
+Status: DONE
+Size: S
+Why: Bash-like relative indexing ergonomics
+Scope: Add sub_rel; allow negative start/len via macro
+Deliverables: Helpers + tests
+Acceptance: `param!("FOO", sub: -3)` works; tests green
+
+ID: RSB-PARAM-002
+Title: param! `${VAR:+alt}` and `${VAR:?msg}`
+Status: DONE
+Size: M
+Why: Fill remaining bash patterns (ISSUE-004)
+Scope: Implement alt-if-set, error-if-unset behaviors; tests
+Deliverables: Macro branches + tests
+Acceptance: Behavior matches spec; tests pass
+Notes/Deps: Implemented via `alt:` and `require:` arms; UAT and feature tests added
+
+ID: RSB-PARAM-003
+Title: Wildcard prefix/suffix coverage
+Status: DONE
+Size: S
+Why: Ensure wildcard removal matches expectations
+Scope: Add tests for prefix/suffix with wildcards; verify longest/shortest
+Deliverables: Tests; minor fixes if needed
+Acceptance: Tests green; examples added
+
+ID: RSB-TEST-001
+Title: Sanity package visible demos
+Status: DONE
+Size: S
+Why: Human-friendly baseline outputs
+Scope: Add baseline.rs and wrapper; wire into runner
+Deliverables: tests/sanity/baseline.rs; sanity_main.rs; runner mappings
+Acceptance: `./bin/test.sh run sanity` prints expected sections
+
+ID: RSB-004
+Title: Prompts MVP finalize (confirm/ask/select)
+Status: TODO
+Size: M
+Why: Provide ergonomic interactive prompts for prontodb workflows
+Scope: Respect opt_yes/opt_quiet; non-TTY fallback; minimal styling via color tags
+Deliverables: Tests (quiet/auto-yes/non-tty); docs; examples
+Acceptance: Deterministic behavior in CI; docs include usage + feature flags
+Notes/Deps: Needs visuals (colors-simple) and prompts feature
+
+ID: RSB-005
+Title: Prelude and feature-gating policy review
+Status: DONE
+Size: S
+Why: Prevent accidental pulls of optional features; clarify what prelude exports
+Scope: Audit prelude exports; ensure visual macros gated; document policy
+Deliverables: prelude.rs changes; docs
+Acceptance: `cargo test` default passes; visuals isolated behind flags
+Notes/Deps: Completed in feature/prelude-dispatch-improvements branch
+
+ID: RSB-006
+Title: Dispatch/pre_dispatch ergonomics + examples
+Status: DONE
+Size: M
+Why: Make CLI lifecycle predictable for prontodb; validate macros
+Scope: Confirm arg forwarding; add concise example tests; error handling on unknown commands
+Deliverables: tests/dispatch.rs; docs snippet
+Acceptance: Examples compile with visuals; unit/integration pass
+Notes/Deps: Completed in feature/prelude-dispatch-improvements branch
+
+ID: RSB-007
+Title: Macro coverage audit and fixes (fs/text/time/random)
+Status: TODO
+Size: M
+Why: Fill gaps found during prontodb integration; ensure “just works”
+Scope: Validate/require/test!/case!/with_lock!/sleep!/meta_keys!/path_* and friends
+Deliverables: Missing macro implementations; focused tests; quick refs
+Acceptance: Macro suite tests green; docs list behavior/edge-cases
+Notes/Deps: See SESSION.md + RSB_FIXED.md
+
+ID: RSB-008
+Title: Streamable contracts + ops sanity
+Status: TODO
+Size: M
+Why: Guarantee stable chaining API for pipelines used in prontodb
+Scope: traits.rs returns; streams.rs ops (grep/sed/cut/sort/uniq/tee)
+Deliverables: Unit tests; minor corrections if found
+Acceptance: Existing pipelines compile/run; added tests pass
+Notes/Deps: Low-risk validation
+
+ID: RSB-009
+Title: Package/folder reorg plan (non-code RFC)
+Status: TODO
+Size: S
+Why: Current package layout inconsistent; define staged reorg plan
+Scope: Propose target tree: core/, macros/, streamable/, visual/, xcls/, ref/
+Deliverables: short RFC doc + migration steps; no code move yet
+Acceptance: Stakeholder sign-off on plan before execution
+Notes/Deps: Blocks subsequent renames
+
+ID: RSB-010
+Title: Folder reorg execution (phase 1: docs/tests only)
+Status: TODO
+Size: M
+Why: Start consolidation without breaking builds
+Scope: Move docs; adjust tests/paths; keep src stable
+Deliverables: Moves; CI passes
+Acceptance: `cargo test` all profiles green
+Notes/Deps: After RSB-009 approval
+
+ID: RSB-011
+Title: Docs refresh for visuals + lifecycle
+Status: TODO
+Size: S
+Why: Reduce confusion; show feature gating, lifecycle macros, examples
+Scope: README, QUICK_REFERENCE, TACTICAL_GUIDE updates
+Deliverables: Updated docs; links to rebel docs
+Acceptance: Clear steps to enable visuals; sample code compiles
+Notes/Deps: After RSB-005 policy
+
+ID: RSB-012
+Title: Test runner enhancements (bin/test.sh)
+Status: DONE
+Size: M
+Why: Visibility into coverage areas; CI artifact
+Scope: Boxed sections; JSON export optional; XDG_TMP handling
+Deliverables: script updates; new suites wired (threads, bash); stubs for legacy entries
+Acceptance: `./bin/test.sh list` shows ✅ for mapped tests; wrappers run via cargo
+Notes/Deps: See SESSION.md
+
+ID: RSB-013
+Title: CI feature matrix
+Status: TODO
+Size: S
+Why: Prevent regressions across feature sets used by prontodb
+Scope: Matrix: default, visuals, colors-all+glyphs, prompts
+Deliverables: CI config (GH Actions or alt), CONTRIBUTING note
+Acceptance: Matrix green; fast lanes preserved
+Notes/Deps: Coordinates with repo CI
+
+ID: RSB-014
+Title: Stdopts expansion polish
+Status: TODO
+Size: S
+Why: Ergonomic flags (opt_d → opt_debug) for prompts and logging
+Scope: Expand short flags; unit tests; doc examples
+Deliverables: code/tests/docs
+Acceptance: Flags expand consistently; no conflicts
+Notes/Deps: Optional feature flag
+
+ID: RSB-015
+Title: Error/logging macros behavior w/o visuals
+Status: TODO
+Size: S
+Why: Ensure info!/warn!/error!/fatal!/debug!/trace! degrade gracefully
+Scope: Non-visual stdout/stderr styling; exit codes
+Deliverables: tests; doc note
+Acceptance: Same semantics with/without visuals
+Notes/Deps: Prelude policy (RSB-005)
+
+ID: RSB-016
+Title: Archive adapters reliability (tar/zip/pack/unpack)
+Status: TODO
+Size: M
+Why: Stable packaging for prontodb distributions
+Scope: Mock when binaries absent; list/create/extract flows
+Deliverables: Tests; conditional paths; docs
+Acceptance: Works with/without zip; tests green
+Notes/Deps: Existing macros in fs_data
+
+ID: RSB-017
+Title: Prontodb integration spike (consumer demo)
+Status: TODO
+Size: M
+Why: Validate end-to-end usage from a consumer
+Scope: Minimal prontodb command using rsb lifecycle, streams, visuals
+Deliverables: example code (in prontodb), notes back to rsb
+Acceptance: Builds and runs with desired UX; feeds issues back
+Notes/Deps: After key fixes (RSB-002/3/4/5/6)
+
+----------------------------------------------------------------
+ID: RSB-GLOBAL-001
+Title: Add rsb::global and rsb::host alias surfaces
+Status: DONE
+Size: S
+Why: Establish stable, non-breaking import paths before migration
+Scope: Add `src/global/` surface (core-only) and export via prelude; `host` alias deferred by scope
+Deliverables: global module; prelude export; short doc note
+Acceptance: cargo test green; imports `rsb::global::*` work
+Notes/Deps: Host alias/backfill is backlogged per scope decision
+
+ID: RSB-GLOBAL-002
+Title: Move registries and config from context → dev_global
+Status: DONE
+Size: M
+Why: Purify global state layer and reduce context.rs scope
+Scope: Move CallFrame/registries (functions/colors/glyphs), config I/O (parse/load/save/export) into dev_global; re-export via rsb::global
+Deliverables: code moves; updated uses; docs
+Acceptance: cargo test green; public surface unchanged via rsb::global
+Notes/Deps: After RSB-GLOBAL-001
+
+ID: RSB-GLOBAL-003
+Title: Split RSB_COLORS: host read env, global apply
+Status: BACKLOG
+Size: S
+Why: Keep host discovery in host; registry updates in global
+Scope: host::read_rsb_colors_env() and global::apply_rsb_colors(spec); update bootstrap to use split
+Deliverables: functions; bootstrap wiring; docs
+Acceptance: Colors/glyphs configurable via env; tests unchanged
+Notes/Deps: Bootstrap remains in cli
+
+ID: RSB-GLOBAL-004
+Title: Move XDG/script/modes to host; cli orchestrates
+Status: BACKLOG
+Size: M
+Why: Enforce separation: host discovers, cli orchestrates
+Scope: Move setup_xdg_paths/setup_rsb_paths/ensure_xdg_directories/setup_script_awareness/setup_standard_modes into dev_host; expose via rsb::host; cli bootstrap calls host
+Deliverables: code moves; updated calls; docs
+Acceptance: cargo test green; same behavior; context.rs shrinks
+Notes/Deps: After RSB-GLOBAL-001
+
+ID: RSB-GLOBAL-005
+Title: Move store/expansion to dev_global; point rsb::global to it
+Status: DONE
+Size: M
+Why: Complete context → global migration per Module Spec
+Scope: Move Context/CTX/set/get/has/unset/expand to dev_global; keep context as temporary re-export; add deprecation note
+Deliverables: code moves; re-exports; docs
+Acceptance: cargo test green; imports via rsb::global work; context still works during transition
+Notes/Deps: After earlier splits
+
+ID: RSB-GLOBAL-006
+Title: Retire legacy context imports; update docs
+Status: IN-PROGRESS
+Size: S
+Why: Finish migration and avoid duplicate surfaces
+Scope: Remove context re-exports; update README, FEATURES_PARAMS, QUICK_REFERENCE
+Deliverables: cleanup; docs updated
+Acceptance: No references to context in public docs; prelude exposes global/host
+Notes/Deps: Final step after adoption window
+
+ID: RSB-GLOBAL-008
+Title: Global adapter helpers (env/config simple + host)
+Status: DONE
+Size: S
+Why: Provide ergonomic hydration of Global from env and config without forcing host dependency; also offer host-enhanced path
+Scope: `global::adapter::{apply_env_simple, import_env_simple, hydrate_simple, apply_env, apply_config_files, hydrate_env_and_files}`; tests and docs
+Deliverables: Code + tests (adapter_global.rs, adapter_global_light.rs) + FEATURES_GLOBAL.md updates
+Acceptance: cargo test green; examples in docs; sanity demo added
+Notes/Deps: Host-enhanced path composes `dev_host::env` (modes only for now)
+
+ID: RSB-GLOBAL-009
+Title: Global namespacing utilities (NS__KEY / NS::KEY)
+Status: DONE
+Size: S
+Why: Allow organized overlays on flat Global without structural changes
+Scope: `global::ns` with dunder/colon support; overlay helpers plain<->ns
+Deliverables: Code + tests (global_ns.rs) + doc notes in FEATURES_GLOBAL.md
+Acceptance: Tests pass; helpers available via rsb::global
+Notes/Deps: Host ns_* re-export to core global
+
+----------------------------------------------------------------
+ID: RSB-GLOBAL-TEST-001
+Title: Global core tests and UAT wrappers
+Status: DONE
+Size: S
+Why: Validate global store/expansion/helpers independently
+Scope: Add features and UAT wrappers for `rsb::global` (set/get/has/unset, expand_vars, is_true/is_false, is_token_stream)
+Deliverables: tests/features_global.rs, tests/features/global/core.rs, tests/uat_global.rs, tests/uat/global.rs
+Acceptance: cargo test green; wrappers discoverable via test runner
+Notes/Deps: Core-only; no visuals/env/cli
+ID: RSB-GLOBAL-007
+Title: Update macros to use rsb::global/host surfaces
+Status: BACKLOG
+Size: M
+Why: Remove tight coupling to context.rs during migration
+Scope: macros/core.rs (get_env!, bootstrap! to cli), macros/stderr.rs (expand_vars), macros/control_validation.rs (set_var/expand_vars/export/load), macros/dispatch.rs (registries). Point to rsb::global::* and rsb::host::* where appropriate.
+Deliverables: macro updates; no behavior changes
+Acceptance: cargo test green; no context::* in macros except temporary bootstrap path
+Notes/Deps: After alias surfaces are available
+
+ID: RSB-HOST-001
+Title: Move XDG/script/modes/RSB_COLORS env to host
+Status: BACKLOG
+Size: M
+Why: Keep host discovery in host module per spec
+Scope: setup_xdg_paths/setup_rsb_paths/ensure_xdg_directories/setup_script_awareness/setup_standard_modes; host::read_rsb_colors_env(); global::apply_rsb_colors(spec)
+Deliverables: functions moved; cli bootstrap calls host/global
+Acceptance: cargo test green; same env/modes/paths visible in context/global
+Notes/Deps: Aligns with RSB-GLOBAL-003/004
+
+ID: RSB-HOST-ENV-002
+Title: Host env bootstrap + import/sync helpers
+Status: DONE
+Size: S
+Why: Provide a clean, testable entry to import environment and set standard modes before CLI
+Scope: `env_bootstrap()` orchestrates `import_environment()`, `setup_standard_modes()`; add helpers `get_env_var/set_env_var/has_env_var`, and optional sync `env_to_global/global_to_env`
+Deliverables: Code + unit tests for helpers; minimal docs
+Acceptance: After `env_bootstrap()`, global has env vars and DEBUG/DEV/QUIET/TRACE modes set (integer semantics)
+Notes/Deps: Stubs present in src/dev_host/env.rs
+
+ID: RSB-HOST-XDG-003
+Title: XDG paths + ensure dirs
+Status: TODO
+Size: S
+Why: Establish standard directories deterministically across environments
+Scope: Implement `setup_xdg_paths()` and `ensure_xdg_directories()` in host (xdg_path.rs); respect existing env; derive XDG_HOME and friends
+Deliverables: Code + tests (using temp dirs); doc snippet
+Acceptance: Keys set: XDG_CONFIG_HOME/XDG_CACHE_HOME/XDG_DATA_HOME/XDG_HOME/XDG_LIB_HOME/XDG_ETC_HOME/XDG_BIN_HOME/XDG_TMP; ensure dirs creates all non-empty
+Notes/Deps: See stubs in src/dev_host/xdg_path.rs
+
+ID: RSB-HOST-RSB-004
+Title: RSB namespaced paths
+Status: TODO
+Size: S
+Why: Provide conventional RSB_* paths for tools (lib/etc/data/bin)
+Scope: Implement `setup_rsb_paths()` and helpers `rsb_tool_path/config_path/data_path/cache_path`
+Deliverables: Code + tests + docs
+Acceptance: RSB_LIB_HOME/RSB_ETC_HOME/RSB_DATA_HOME/RSB_BIN_HOME derived from XDG_*; helpers return expected paths
+Notes/Deps: See stubs in src/dev_host/rsb_path.rs
+
+ID: RSB-HOST-SHELL-005
+Title: Script awareness → setup_execution_context
+Status: TODO
+Size: XS
+Why: Move/rename script metadata extraction from context into host
+Scope: Implement `setup_execution_context(args)` to set SCRIPT_NAME/PATH/DIR/PWD
+Deliverables: Code + tests
+Acceptance: Keys set correctly from argv[0] and current_dir
+Notes/Deps: Stub in src/dev_host/shell.rs
+
+ID: RSB-CLI-001
+Title: Create cli::bootstrap and route bootstrap! macro
+Status: BACKLOG
+Size: S
+Why: Keep orchestration in CLI layer
+Scope: Add src/cli/bootstrap.rs: rsb_bootstrap(args) calling host/global; update bootstrap! macro to call cli function
+Deliverables: cli module; macro updated; docs note
+Acceptance: cargo test green; no behavior change
+Notes/Deps: After alias surfaces
+
+Backlog Notes
+- Additional color categories: pastels/dim variants: evaluate scope creep
+- Token generation utilities from xstream: scope and feature flag
+- Visual spinners/progress (bashfx braille): optional feature later
+
+Proposed Initial Order
+1) RSB-005 (policy) → 2) RSB-002 (completeness) → 3) RSB-003 (enum) → 4) RSB-004 (prompts) → 5) RSB-006 (dispatch) → 6) RSB-007 (macro audit) → 7) RSB-009 (reorg plan)
+
+----------------------------------------------------------------
+ID: RSB-STR-010
+Title: ASCII filter utilities (strip/sanitize)
+Status: TODO
+Size: S
+Why: Provide basic ASCII filtering for filenames/configs and prep for streaming
+Scope: `string::utils::filter_ascii_strip(&str) -> String`, `filter_ascii_sanitize(&str, marker: &str) -> String` (default marker `#INV#`)
+Deliverables: Code + tests + docs (ASCII-SAFE)
+Acceptance: Helpers behave as specified; tests cover mixed ASCII/Unicode
+Notes/Deps: Align with asc100 marker conventions; default `#INV#`. Reference: ../asc100/README.md (Invalid Character Handling: Strip/Sanitize), markers section (#SSX#, #ESX#, #EOF#, #NL#). Consider parity with asc100 ExtensionsStrategy::sanitize().
+
+ID: RSB-STREAM-011
+Title: Stream per-line ASCII filters
+Status: TODO (BLOCKED)
+Size: S
+Why: Enable line-wise ASCII cleanup in pipelines
+Scope: Add `Stream::ascii_strip()` and `Stream::ascii_sanitize(marker)`
+Deliverables: Code + tests + doc example
+Acceptance: Streaming transforms pass tests; examples added
+Notes/Deps: Reference ../asc100/README.md: strategy patterns; ensure default marker `#INV#` and document interactions with other stream ops (grep/sed/etc.). BLOCKED by stream module reorg plan (RSB-STREAM-020) or RSB-008.
+
+ID: RSB-STREAM-020
+Title: Stream module reorg plan
+Status: TODO
+Size: M
+Why: Clarify structure and naming for streamables and pipelines before adding more methods
+Scope: Propose target structure, naming and method groups; align with string’s per-line wrappers pattern
+Deliverables: Short RFC doc; mapping from current to future layout; no code moves yet
+Acceptance: Plan reviewed; subsequent stream tasks unblocked
+
+ID: RSB-ASC-012
+Title: asc100 interop and marker alignment (investigation)
+Status: TODO
+Size: M
+Why: Reuse proven strategies/markers from asc100 where helpful
+Scope: Evaluate light optional dependency or pattern borrowing; ensure `#INV#`, `#SSX#`, `#ESX#` semantics align; consider `features = ["asc100"]`
+Deliverables: Findings doc; decision notes; potential feature gate plan
+Acceptance: Clear decision and plan captured; no regressions
+Notes/Deps: Repo: ../asc100. References: README.md "Invalid Character Handling Strategies" (Strict/Strip/Sanitize), "Extension Markers" table, charset versions (V1_STANDARD, V4_URL). Capture trade-offs of code reuse vs duplication in RSB.
+
+ID: RSB-DOC-022
+Title: Document ASCII filter patterns and asc100 reference
+Status: DONE
+Size: XS
+Why: Make ASCII policy and markers discoverable; point to asc100
+Scope: Update FEATURES_STRINGS.md with filter examples and mention asc100; link to asc100 README
+Deliverables: Docs
+Acceptance: Docs updated and cross-linked
+Notes/Deps: Add a short "Related" section linking asc100’s README sections and version used (note if planned as optional dep).
+
+----------------------------------------------------------------
+ID: RSB-ARCH-023
+Title: Consolidate low-level string validation with asc100 (roll-back candidate)
+Status: TODO
+Size: M
+Why: Avoid redundant logic; leverage asc100’s mature strategies/markers
+Scope: Identify overlapping helpers (validation, sanitization, markers). Propose delegation to asc100 behind a `features = ["asc100"]` flag or thin adapter layer. Keep RSB ASCII filters available without the dep by default.
+Deliverables: Short RFC in docs/development (trade-offs, perf, UX), migration plan, follow-up tasks
+Acceptance: RFC reviewed; clear go/no-go recorded; no change to default behavior until approved
+Notes/Deps: Repo ../asc100; reference README sections noted above. Consider CI feature matrix for with/without asc100.
+ID: RSB-DATE-001
+Title: UTC and milliseconds date variants
+Status: DONE
+Size: S
+Why: Common needs for UTC timestamps and ms precision
+Scope: Add helpers `current_timestamp_millis()`, `format_time_utc()`, and macro variants `date!(utc_iso)`, `date!(epoch_ms)`
+Deliverables: Code + unit tests + UAT prints
+Acceptance: Helpers/macro variants return expected UTC/ms values; tests pass
+
+ID: RSB-DATE-002
+Title: Parsing robustness and typed errors
+Status: DONE
+Size: M
+Why: Improve reliability across common input formats and error handling
+Scope: Support more formats (no tz, fractional seconds); return `Result<i64, DateError>`; expand `parse_date_string`
+Deliverables: Code, typed error enum, tests (success/error cases)
+Acceptance: New formats parse correctly; errors are typed; docs updated
+
+ID: RSB-DATE-003
+Title: Duration formatting modes
+Status: TODO
+Size: S
+Why: Better UX for humanized durations
+Scope: Add compact/verbose modes, optional weeks; pluralization control
+Deliverables: Helper(s) + tests + doc examples
+Acceptance: Mode outputs match spec; tests pass
+
+ID: RSB-DATE-004
+Title: Date arithmetic helpers
+Status: TODO
+Size: S
+Why: Simplify common shifts without manual chrono usage
+Scope: `add_seconds/minutes/hours/days(ts)`, `shift_time(ts, Duration)`, `start_of_day`, `end_of_day`
+Deliverables: Helpers + tests
+Acceptance: Helpers produce correct timestamps across boundaries
+
+ID: RSB-DATE-005
+Title: Date docs and examples
+Status: TODO
+Size: XS
+Why: Discoverability and quick adoption
+Scope: README/HOWTO/FEATURES updates with date macro and helpers; examples
+Deliverables: Docs
+Acceptance: Clear guide; links from HOWTO and README
+
+----------------------------------------------------------------
+ID: RSB-018
+Title: expand_vars policy vs bash-like patterns
+Status: TODO
+Size: M
+Why: Old TODO notes report broken bash-style default/alt expansion in Context::expand; decide whether to support these in expand_vars or defer to param!.
+Scope: Evaluate Context::expand behavior; either implement ${VAR:-d}, ${VAR:+a}, ${VAR:?m}, ${VAR%/%/##/} (possibly via syntax engine) or document and enforce using param! instead; audit call sites; add tests (including nested: ${XDG_CACHE:-${HOME}/.cache}).
+Deliverables: Code and/or docs; tests; audit notes
+Acceptance: Decision documented; tests pass or guidance adopted; no regressions creating malformed paths
+Notes/Deps: Align with FEATURES_PARAMS.md; consider ../syntax/ integration if implemented
+
+ID: RSB-PARAM-004
+Title: Pattern case transforms (${VAR^pat}/${VAR,pat})
+Status: DONE
+Size: S
+Why: Fill remaining bash compatibility gaps for param!
+Scope: Add macro arms and helpers for first-match case transform conditioned on pattern; tests
+Deliverables: Code + tests + docs
+Acceptance: Examples pass per bash semantics; docs updated
+Notes/Deps: Build on existing upper: first / lower: first
+
+ID: RSB-STR-002
+Title: Grapheme-aware string operations (optional)
+Status: TODO
+Size: M
+Why: Provide user-perceived character safety for substring and prefix/suffix
+Scope: Add `string-graphemes` feature using unicode-segmentation; implement grapheme variants or switchable behavior; tests and docs updates
+Deliverables: Feature-gated code, tests, doc notes in FEATURES_STRINGS.md
+Acceptance: Tests for combining marks/emoji sequences; default behavior unchanged
+Notes/Deps: Document trade-offs; keep default scalar-based for performance
+
+----------------------------------------------------------------
+ID: RSB-STR-003
+Title: Case conversion helpers and macros
+Status: DONE
+Size: M
+Why: Provide standard case transforms for strings and integrate with param!
+Scope: Implement to_{snake,kebab,dot,space,camel}_case; value/var macros; param!(case: ...)
+Deliverables: Code + tests + docs
+Acceptance: Helpers/macros/param DSL tested and documented
+
+ID: RSB-STR-004
+Title: Case transform line-size guard
+Status: DONE
+Size: S
+Why: Prevent heavy transforms on large buffers; encourage streaming
+Scope: Add 64 KiB limit; centralized StringError logging; return input unchanged if exceeded
+Deliverables: Code + docs note
+Acceptance: Guard in helpers; tests pass; docs updated
+
+ID: RSB-STR-005
+Title: Slug ASCII transliteration (feature)
+Status: TODO
+Size: S
+Why: Produce ASCII-only slugs when needed
+Scope: Optional feature flag to strip diacritics (unicode-normalization or deunicode)
+Deliverables: Feature-gated code + tests + docs
+Acceptance: Examples covered; default remains Unicode-preserving
+
+ID: RSB-STR-006
+Title: Additional cases (PascalCase/Title Case)
+Status: TODO
+Size: S
+Why: Expand case coverage for common naming schemes
+Scope: Implement helpers/macros; param!(case: pascal|title); tests
+Deliverables: Code + tests + docs
+Acceptance: Examples pass; docs updated
+
+ID: RSB-STR-007
+Title: Centralize string error handling
+Status: IN-PROGRESS
+Size: S
+Why: Remove ad-hoc messages; unify via StringError
+Scope: Use StringError for regex compile failures in prefix/suffix and other helpers
+Deliverables: Error wiring + tests (invalid patterns)
+Acceptance: Errors logged consistently; behavior unchanged
+Notes/Deps: See STRING_ERROR_PLAN.md for design and integration plan
+
+ID: RSB-STR-008
+Title: Stream per-line case transforms
+Status: DONE
+Size: S
+Why: Encourage line-wise processing for large inputs
+Scope: Add Stream::snake/kebab/slug/dot/space/camel/lower/upper
+Deliverables: Code + tests + docs example
+Acceptance: Stream methods tested via features suite
+
+ID: RSB-PARAM-005
+Title: param! generalized case DSL
+Status: DONE
+Size: S
+Why: Provide unified interface for case transforms via param!
+Scope: Add case: snake|camel|kebab|slug|dot|space|lower|upper
+Deliverables: Macro arms + tests + docs
+Acceptance: Tests pass; docs reflect new DSL
+
+ID: RSB-019
+Title: Document expand_vars vs param! policy (RSB-018)
+Status: DONE
+Size: XS
+Why: Clarify that expand_vars does simple substitution; complex expansions via param!
+Scope: Add note to FEATURES_PARAMS.md/README; audit call sites later
+Deliverables: Docs + a TODO list of call sites to review
+Acceptance: Docs updated; audit task tracked
+
+----------------------------------------------------------------
+ID: RSB-ARCH-020
+Title: Helper exposure paradigm (spec + audit)
+Status: TODO
+Size: M
+Why: Ensure consistent, predictable low-level helper exposure across modules; reduce ad‑hoc APIs and make prelude/imports clean.
+Scope:
+- Define standard pattern per module:
+  - Helpers live under `src/<module>/helpers.rs` (or submodules) and are private by default.
+  - Orchestrator `src/<module>/mod.rs` re‑exports the curated public surface.
+  - Module‑owned macros in `src/<module>/macros.rs` with value and var forms where applicable.
+  - Crate‑level macro DSLs (e.g., `param!`) delegate to module helpers; avoid business logic in macros.
+  - Prelude exports: minimal, user‑facing only (Amendment A compliance); internal modules import via `use crate::<module>`.
+  - Error enums per module (e.g., `StringError`) to centralize messages.
+  - Guard pattern: central guard helpers (size/time) used by public helpers to avoid repeated strings.
+  - Stream integration: per‑line wrappers for heavy transforms (naming consistency across modules).
+  - Policy: ASCII‑first for naming/case transforms; document exceptions.
+- Audit modules: string, param, date, fs, streams, xcls, visual (feature gating review).
+Deliverables: Spec doc (docs/development/RSB_HELPER_EXPOSURE.md), module audit checklist with findings, refactor plan per module, follow‑up tasks.
+Acceptance: Spec doc present; audit list captured; at least one module (string/param) conforms; tests green; prelude remains curated.
+
+----------------------------------------------------------------
+ID: RSB-STR-009
+Title: ASCII-only normalization for case helpers (default)
+Status: TODO
+Size: S
+Why: Align case/slug transforms with ASCII-first policy for filenames/configs
+Scope: Make `to_{snake,kebab,slug,dot,space,camel}_case` normalize to ASCII-only; adjust tests and docs
+Deliverables: Code changes, updated tests, FEATURES_STRINGS.md notes
+Acceptance: Helpers emit ASCII-only; all tests updated and green; docs reflect policy
+
+ID: RSB-PARAM-006
+Title: Add param::utils and align param module to spec
+Status: DONE
+Size: S
+Why: Mirror string::utils; clarify curated helper surface for param
+Scope: Introduce `src/param/utils.rs` re-exporting stable helpers; update mod.rs docs; minimize direct basic/advanced usage
+Deliverables: Code, docs, minor refactors if needed
+Acceptance: param::utils available; prelude remains curated; tests green
+
+ID: RSB-DOC-021
+Title: Document ASCII-SAFE / UNICODE-SAFE policy and optional registry
+Status: TODO
+Size: XS
+Why: Make safety characteristics discoverable and searchable
+Scope: Add a section to MODULE_SPECIFICATION.md and FEATURES_STRINGS.md/FEATURES_PARAMS.md; optionally add a static registry listing
+Deliverables: Docs; optional `string::safety_registry` skeleton
+Acceptance: Docs updated; if registry added, compiles and is referenced minimally
+ID: RSB-020
+Title: String fail-fast policy + try_* diagnostics
+Status: DONE
+Size: S
+Why: Align with RS fail-immediately approach
+Scope: Default helpers exit(1) on error; try_* return Result without logging
+Deliverables: code changes in string::{helpers,case,error}; tests adjusted
+Acceptance: cargo test green; invalid glob tests use try_*; substring try_* asserts
+
+ID: RSB-021
+Title: MODULE_SPEC alignment (helpers→utils) for string/cli/date/hosts
+Status: DONE
+Size: M
+Why: Curated surfaces; hide internals
+Scope: helpers internal; add utils.rs; re-export curated; hosts curated utils
+Deliverables: src/{string,cli,date}/utils.rs; src/hosts/utils.rs; mod changes
+Acceptance: Builds; prelude updated; tests pass
+
+ID: RSB-022
+Title: New threads module (jobs/events/traps)
+Status: DONE
+Size: M
+Why: Own job control + traps per MODULE_SPEC
+Scope: threads::{utils,macros}; job!/event!/trap! moved from macros/jobs_events.rs
+Deliverables: src/threads/{utils.rs,macros.rs,mod.rs}; tests (sanity+UAT)
+Acceptance: cargo test green; runner executes threads suites
+
+ID: RSB-023
+Title: New bash module (curl/archive) + safe quoting
+Status: DONE
+Size: M
+Why: Group bash-style commands; secure shell arguments
+Scope: bash::{utils,macros}; string::utils::shell_single_quote; os delegates
+Deliverables: src/bash/{utils.rs,macros.rs,mod.rs}; FEATURES_BASH.md; tests
+Acceptance: cargo test green; curl!/tar!/zip!/pack! work; UAT shows outputs
+
+ID: RSB-024
+Title: Dev stubs archive (_todo)
+Status: DONE
+Size: S
+Why: Keep src tidy while preserving notes
+Scope: Move/remove src/dev_*; add src/_todo/README.md and placeholders
+Deliverables: archived files; deletions in src/dev_*
+Acceptance: cargo test green; no references to dev_* remain
+
+ID: RSB-025
+Title: Process helpers relocation
+Status: TODO
+Size: M
+Why: Move pid_of/kill_* from os to a proper module (threads or bash)
+Scope: Create threads::process or bash::process; keep os shims
+Deliverables: module + tests; docs update
+Acceptance: tests pass; macros reference new home
+
+ID: RSB-026
+Title: Event registry migration to threads
+Status: TODO
+Size: M
+Why: Centralize events/traps under threads
+Scope: Move EVENT_HANDLERS + signal handlers; adjust macros
+Deliverables: code move + tests
+Acceptance: UAT demos still work; no os coupling
+
+ID: RSB-027
+Title: Prelude cleanup (alias utils names)
+Status: DONE
+Size: S
+Why: Avoid ambiguous glob re-exports
+Scope: date_utils, string_utils aliases; lift common string helpers into prelude
+Deliverables: prelude.rs changes; tests updated
+Acceptance: cargo test green; no ambiguity warnings
+
+ID: RSB-028
+Title: Dummy CLI + examples (minimal)
+Status: DONE
+Size: S
+Why: Provide working sample for CI and docs
+Scope: src/dummy_cli.rs [[bin]]; examples/{minimal_cli,strings,threads}.rs
+Deliverables: code + runner mapping via examples/ and bin
+Acceptance: cargo build --bin dummy-cli; examples run
+
+ID: RSB-029
+Title: Docs additions for bash/threads
+Status: DONE
+Size: S
+Why: Discoverability and architecture clarity
+Scope: FEATURES_BASH.md, FEATURES_THREADS.md; CONTINUE.md updated
+Deliverables: docs files + links
+Acceptance: referenced in CONTINUE.md; content reflects code
+
+ID: RSB-030
+Title: XStream integration - use RSB token module
+Status: TODO
+Size: L
+Why: Eliminate duplicate token implementation; XStream should import RSB's newly ported token functionality
+Scope: Update XStream to use RSB's token module (Token, Namespace, TokenBucket, collect_tokens, format helpers) instead of maintaining separate implementation; remove duplicate code from XStream; ensure compatibility
+Deliverables: XStream code updates; removal of duplicate token types/functions; integration tests; compatibility verification
+Acceptance: XStream imports from RSB token module; no duplicate token code; all XStream functionality preserved; tests pass in both projects
+Notes/Deps: Follows completion of RSB token migration (SESSION_02); XStream located in sibling directory

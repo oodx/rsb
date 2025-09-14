@@ -1,0 +1,51 @@
+RSB Framework – Commercial License
+Copyright (c) 2025 Dr. Vegajunk Hackware
+All rights reserved.
+
+This Agreement governs the use of the RSB Framework under a paid commercial license. By installing, linking to, or otherwise using the Software under this Agreement, Licensee agrees to the terms below.
+
+1. Grant of License
+   - Dr. Vegajunk Hackware (“Licensor”) grants Licensee a non-exclusive, non-transferable license to use, modify, and distribute the RSB Framework as part of Licensee’s proprietary products or services.
+   - The license covers internal business use, redistribution in closed-source products, and operation as part of hosted or software-as-a-service offerings.
+   - This license does not convey ownership of the Software; it grants only the rights expressly stated.
+
+2. Fees and Payment
+   - Use under this Agreement requires payment of the license fee or subscription as agreed between Licensor and Licensee.
+   - Continued use is conditioned on timely payment of all fees.
+
+3. Restrictions
+   - Licensee may not sublicense, sell, or transfer the Software except as part of Licensee’s own products or services.
+   - Licensee may not remove or obscure copyright or trademark notices.
+   - Reverse engineering, decompilation, or disassembly of the Software is not permitted except where required by law.
+
+4. Support and Updates
+   - Support, maintenance, or updates are provided only if included in a separate support agreement or as stated in an order form.
+
+5. Government Use
+   - If Licensee is a government agency or is acquiring the Software on behalf of a government, use, reproduction, and disclosure of the Software are subject to the restrictions set forth in this Agreement.
+   - Any rights not expressly granted are reserved by Licensor.
+   - Government users acknowledge that the Software is “Commercial Computer Software” and “Commercial Computer Software Documentation,” and that their rights are limited to those described in this Agreement.
+
+6. Warranty Disclaimer
+   - The Software is provided “AS IS” without warranties of any kind, express or implied, including but not limited to merchantability or fitness for a particular purpose.
+
+7. Limitation of Liability
+   - To the maximum extent permitted by law, Licensor shall not be liable for any indirect, incidental, or consequential damages arising from the use of the Software.
+   - Licensor’s total liability shall not exceed the amounts paid by Licensee for the license.
+
+8. Term and Termination
+   - This Agreement is effective upon payment and remains in force until terminated.
+   - Licensor may terminate this Agreement if Licensee breaches its terms and fails to cure the breach within 30 days of notice.
+   - Upon termination, Licensee must cease using the Software and destroy all copies.
+
+9. Trademarks
+   - “RSB Framework,” “REBEL,” and associated logos are trademarks of Dr. Vegajunk Hackware.
+   - Licensee may use the official logos to indicate compatibility or integration only with phrases such as “Powered by RSB Framework” or “Using RSB Framework,” provided the use does not imply endorsement or sponsorship unless separately authorized.
+
+10. Governing Law
+   - This Agreement is governed by the laws of [choose jurisdiction], excluding its conflict-of-laws rules.
+
+11. Entire Agreement
+   - This Agreement constitutes the entire understanding between Licensor and Licensee regarding the subject matter and supersedes any prior agreements.
+
+For pricing, support, or additional terms, contact licensing@vegajunk.com.

@@ -1,0 +1,78 @@
+RSB ⇄ XStream Roadmap
+
+Date: 2025-09-13
+
+Objective
+- Integrate reusable, generic capabilities into RSB and keep XStream focused on token/namespace specializations.
+- Remove duplication (esp. visuals/colors and generic generators) while preserving backward compatibility.
+
+Milestones
+- M0: Planning & tracking scaffolding
+- M1: Visuals consolidation (XStream uses RSB visuals)
+- M2: RSB stream combinators + baseline generators (gx)
+- M3: RSB adapter traits + errors; XStream ports to them
+- M4: Token substrate in RSB (dev_token v1 core)
+- M5: XStream cleanup/deprecations + migration notes
+
+Workstreams and PRs
+- WS0: Tracking
+  - PR0 (Infra): Create issues for M1–M5; ensure CI lanes: `cargo test` and `cargo test --features visuals`.
+  - Convert FUNCTION_ANALYSIS.txt and RSB_XSTREAM_MIGRATION.txt into living checklists.
+
+- WS1: Visuals consolidation (non‑breaking)
+  - PR1 (XStream): Replace `colors.rs` usage with `rsb::visual::colors::{get_color,colorize,color_mode,color_enable_with,...}` behind an `rsb-visuals` feature. Keep no‑color fallback.
+  - PR2 (RSB docs): Add a brief “consumer usage” note in `FEATURES_COLORS.md`. No prelude changes.
+  - Acceptance: Ceremonies match output with visuals enabled; builds clean with visuals disabled.
+
+- WS2: Stream combinators + generators in RSB
+  - PR3 (RSB): Add `Stream::{interleave, zip_lines, chunk}` + unit tests. Keep names generic and token‑agnostic.
+  - PR4 (RSB): Introduce `rsb::gen` module:
+    - Trait `Generator { fn next(&mut self) -> String; fn take(&mut self, n) -> Vec<String> }`
+    - Adapters backed by existing `rand_alpha/alnum/hex/uuid/range`
+    - Optional dictionary source (graceful fallback)
+    - Unit tests only (feature guide later)
+  - Acceptance: New APIs are additive; tests green.
+
+- WS3: Adapter traits + unified errors
+  - PR5 (RSB): Add `adapters/{traits.rs,error.rs}` with `FormatHandler<T>`, `RecoveryStrategy`, `AdapterError` (format‑agnostic). Include small demo impl tests.
+  - PR6 (XStream): Implement `JsonHandler` and `CsvHandler` using RSB traits; adapt `XStreamAdapter` to consume them; remove local duplicated AdapterError.
+  - Acceptance: XStream adapter tests pass; unified error surface.
+
+- WS4: Token substrate (dev_token v1)
+  - PR7 (RSB): Implement `TokenRules`, `ValidationError`, `is_identifier`, `validate_token_format`, and basic format helpers (`quote_token`, `escape_token`, `join_tokens`, `trim_token`). Reuse `rsb::string::helpers`.
+  - PR8 (RSB): Add minimal parsers `parse_key_value`, `parse_quoted` + unit tests. Keep module optional and off prelude.
+  - Acceptance: Unit tests for each helper; no namespace semantics.
+
+- WS5: XStream cleanup and deprecations
+  - PR9 (XStream): Remove duplicated color constants/APIs; use RSB visuals. Keep token‑specific displays/ceremonies.
+  - PR10 (XStream): Remove generic generators replaced by `rsb::gen`; keep namespace/visual token generators.
+  - Docs: Add migration notes and deprecation entries.
+  - Acceptance: No behavior change for consumers; duplication removed.
+
+Acceptance Criteria per Milestone
+- M1: Build passes with/without visuals; ceremony outputs unchanged (visual mode).
+- M2: New RSB APIs covered by tests; no regressions in existing suites.
+- M3: XStream compiles against RSB adapter traits; adapter tests green; errors unified.
+- M4: dev_token helpers tested; module remains optional (not in prelude).
+- M5: XStream duplication removed; migration docs in place.
+
+Timeline (indicative)
+- Week 0: WS0 + PR1/PR2
+- Week 1: PR3/PR4
+- Week 2: PR5/PR6
+- Week 3: PR7/PR8
+- Week 4: PR9/PR10 + docs/migration polish
+
+Risk & Mitigation
+- Visual coupling: Feature‑gate RSB visuals in XStream; maintain no‑color fallback and test both paths.
+- API drift: Keep additions additive; no prelude exposure until stable; use trait indirection in XStream.
+- Test coverage: Add focused unit tests per PR; validate both default and visuals feature profiles.
+
+Branching & CI
+- Small PRs mapped to steps above; CI runs `cargo test` and `cargo test --features visuals` for both repos.
+- Optional nightly benches if needed (non‑blocking).
+
+Tracking Artifacts
+- Update FUNCTION_ANALYSIS.txt and RSB_XSTREAM_MIGRATION.txt as work progresses (checklists).
+- Create GitHub issues for each PR with the acceptance criteria above.
+

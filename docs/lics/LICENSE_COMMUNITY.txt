@@ -1,0 +1,24 @@
+RSB Framework – Community Edition License
+
+Copyright (c) 2025 Dr. Vegajunk Hackware
+All rights reserved.
+
+Permission is granted to individuals for personal, educational, or academic research use of the RSB Framework, subject to the following terms.
+
+1. Eligibility
+   - You are an individual acting in a personal capacity, or an accredited academic or research institution.
+   - You are not a company, organization, or any other entity using the Software for commercial advantage or on behalf of a business.
+   - You are not acting as an individual, contractor, or consultant for the benefit of any company, employer, client, or other commercial entity, even if you use your own equipment or accounts.
+   - You do not provide the Software as part of a paid product, service, or software-as-a-service offering.
+
+2. License Grant
+   - You may use, study, and modify the Software solely for non-commercial personal or academic purposes.
+   - Redistribution is permitted only in accordance with these terms and must retain this notice in full.
+
+3. Exclusions
+   - Business, organizational, or commercial use of any kind is not permitted under this license.
+   - Hosting, offering, or selling access to the Software is not permitted.
+   - For any commercial, business, or software-as-a-service use, a Commercial License from Dr. Vegajunk Hackware is required.
+
+4. Reservation of Rights
+   - All rights not expressly granted in this Community Edition License are reserved by Dr. Vegajunk Hackware.

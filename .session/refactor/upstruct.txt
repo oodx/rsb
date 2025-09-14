@@ -1,0 +1,430 @@
+# RSB Module Organization - Iterative Decisions
+Generated: 2025-09-12
+Purpose: Track iterative module organization decisions before implementation
+
+## APPROACH: Stub/Scaffold Strategy
+- NO files moved or changed during planning phase
+- New modules created as `dev_name/` folders (dev prefix for easy scanning during planning)
+- Inside stub folders: normal file structure but with comments only
+- Comments indicate: where functions will move from + what they do
+- This allows structure confirmation before actual implementation
+- Once confirmed, rename `dev_name/` → `name/` and implement actual moves
+
+## ITERATION 1: Date Package
+
+### Decision: Sleep/Benchmark NOT Part of Date
+- **date/**: Pure date/time operations (date!, time formatting, parsing)
+- **sleep/benchmark**: Belongs in execution/threading context, NOT date/time
+- This keeps date focused on calendar/clock operations only
+
+### Planned `dev_date/` Structure:
+```
+src/dev_date/
+├── mod.rs              # Package coordinator + re-exports
+├── core.rs             # Core date/time functions (from src/time.rs)
+├── macros.rs           # Date macros: date! (from macros/time_math.rs)
+└── prelude.rs          # Date macro bundle: pub use crate::date::macros::*;
+```
+
+### Functions to Move:
+- **FROM src/time.rs TO dev_date/core.rs**:
+  - current_timestamp, format_time, parse_time
+- **FROM macros/time_math.rs TO dev_date/macros.rs**:
+  - date! macro (ISO, epoch, custom format support)
+- **EXCLUDE from date (keep in original locations for now)**:
+  - sleep! (execution control, not date/time)
+  - benchmark! (performance measurement, not date/time)
+  - math! (mathematical operations, not date/time)
+
+### Import Pattern:
+```rust
+use rsb::date::prelude::*;  // Gets date! macro
+// OR
+use rsb::date::core::*;     // Gets functions only  
+// OR  
+use rsb::date::macros::*;   // Gets macros only
+```
+
+---
+## ITERATION 2: Threads Package
+
+### Decision: Execution-Related Features in threads/
+- **threads/**: Sleep, benchmarking, job control, performance measurement
+- Makes sense with existing jobs suite of features
+- Execution context (not date/time context)
+
+### Planned `dev_threads/` Structure:
+```
+src/dev_threads/
+├── mod.rs              # Package coordinator + re-exports  
+├── sleep.rs            # Sleep operations (from macros/time_math.rs: sleep!)
+├── bench.rs            # Performance measurement (from macros/time_math.rs: benchmark!)
+├── jobs.rs             # Job control (from macros/jobs_events.rs: job!)
+├── events.rs           # Event handling (from macros/jobs_events.rs: trap!)
+├── macros.rs           # All thread-related macros bundled
+└── prelude.rs          # Thread macro bundle: pub use crate::threads::macros::*;
+```
+
+### Functions to Move:
+- **FROM macros/time_math.rs TO dev_threads/sleep.rs + macros.rs**:
+  - sleep! macro (ms/seconds sleep operations)
+- **FROM macros/time_math.rs TO dev_threads/bench.rs + macros.rs**:
+  - benchmark! macro (execution time measurement)
+- **FROM macros/jobs_events.rs TO dev_threads/jobs.rs + macros.rs**:
+  - job! macro (background job control)
+- **FROM macros/jobs_events.rs TO dev_threads/events.rs + macros.rs**:
+  - trap! macro (event handling system)
+
+### Import Pattern:
+```rust
+use rsb::threads::prelude::*;  // Gets sleep!, benchmark!, job!, trap!
+// OR
+use rsb::threads::sleep::*;    // Gets sleep operations only
+use rsb::threads::bench::*;    // Gets benchmarking only  
+use rsb::threads::jobs::*;     // Gets job control only
+```
+
+---
+## ITERATION 3: String Package (IMPLEMENTED by Codex)
+
+### Decision: Centralize String Operations
+- **string/**: Core string helper functions previously scattered in utils/param
+- **Text Macros**: Keep string macros in macros/text.rs (they're macro-based, not function-based)
+- **Clean Separation**: Functions in string/, macros in macros/text.rs
+
+### Implemented `string/` Structure:
+```
+src/string/
+├── mod.rs              # String helper functions + Unicode-safe improvements
+└── macros.rs           # String macros (moved from macros/text.rs)
+```
+
+### Functions MOVED by Codex:
+- **FROM src/utils.rs + src/param/basic.rs TO string/mod.rs**:
+  - str_sub() - substring operations
+  - str_prefix() - prefix removal with wildcard support (Unicode-safe)
+  - str_suffix() - suffix removal with wildcard support (Unicode-safe)
+  - str_replace() - first/all occurrence replacement
+  - str_upper() - uppercase operations
+  - str_lower() - lowercase operations
+
+### String Macros MOVED to string/macros.rs:
+- str_in! - contains check  
+- str_explode! - split string into array
+- str_trim! - trim variable content
+- str_len! - get string length
+- str_line! - repeat character N times
+
+### Conversion Macros REMAIN in macros/text.rs:
+- to_number! - parse text to number (numeric conversion, not string manipulation)
+
+### Additional String-Related Macros (Future Consideration):
+- **macros/json_dict_random.rs**: rand_string! - random string generation
+  - NOTE: Will be addressed when dedicated `rand/` package is created
+
+### Import Pattern:
+```rust
+use rsb::string::*;           // Gets string helper functions + macros
+// OR
+use rsb::string::macros::*;   // Gets string macros only
+```
+
+---
+## STATUS UPDATE (2025-09-12):
+
+### COMPLETED STUB MODULES:
+- ✅ **dev_date/**: 3 files (mod.rs, core.rs, macros.rs)
+- ✅ **dev_threads/**: 7 files (mod.rs, sleep.rs, bench.rs, jobs.rs, events.rs, macros.rs, prelude.rs)  
+- ✅ **dev_token/**: 7 files (mod.rs, helpers.rs, validate.rs, parse.rs, format.rs, types.rs, transform.rs, macros.rs)
+- ✅ **dev_global/**: 5 files (mod.rs, store.rs, expansion.rs, config.rs, registry.rs, macros.rs) - Pure state management
+- ✅ **dev_host/**: 9 files (mod.rs, env.rs, paths.rs, xdg_path.rs, rsb_path.rs, host_path.rs, virt_path.rs, shell.rs, system.rs, macros.rs) - Host environment discovery  
+- ✅ **dev_cli/**: 7 files (mod.rs, helpers.rs, dispatch.rs, args.rs, help.rs, bootstrap.rs, options.rs, macros.rs)
+- ✅ **dev_math/**: 9 files (mod.rs, eval.rs, convert.rs, ops.rs, integers.rs, complex.rs, bash_math.rs, constants.rs, format.rs, macros.rs) - Mathematical operations and number processing
+- ✅ **dev_logic/**: 6 files (mod.rs, control.rs, loops.rs, guards.rs, validation.rs, config.rs, macros.rs) - Logic, control flow, and validation
+
+### IMPLEMENTED MODULES (by Codex):
+- ✅ **string/**: 2 files (mod.rs + macros.rs) - complete string package with functions + macros
+- 🔄 **param/**: Updated basic.rs (string functions moved to string/)
+- 🔄 **macros/text.rs**: Now focused on numeric conversions only (to_number!)
+
+---
+## ITERATION 4: Token Package (Foundational Utility)
+
+### Decision: Generic Token Processing Foundation
+- **token/**: Foundational token processing utilities for ALL projects
+- **Scope**: Lexical analysis, validation, parsing, formatting (NOT semantic processing)
+- **Rationale**: Every child project needs token processing - pull up from XStream to RSB2
+- **Export Strategy**: XStream imports from RSB2, adds domain-specific semantics on top
+
+### Planned `dev_token/` Structure:
+```
+src/dev_token/
+├── mod.rs              # Package coordinator + re-exports
+├── validate.rs         # Token validation (is_name, is_identifier, etc.)
+├── parse.rs            # Token parsing and splitting
+├── format.rs           # Token formatting and joining  
+├── patterns.rs         # Pattern matching and regex validation
+├── types.rs            # Token type classification
+├── transform.rs        # Generic token transformations
+└── macros.rs           # Token processing macros
+```
+
+### Functions to Move:
+- **FROM string/mod.rs TO dev_token/validate.rs**:
+  - is_name() - token name validation
+  - str_matches() - pattern matching utility
+  - str_equals() - comparison utility
+- **FROM xstream/src/xstream/types.rs TO dev_token/types.rs**:
+  - Core token type definitions (excluding streamable.rs functionality)
+  - Generic token classification and validation types
+- **FROM xstream color functions TO dev_token/format.rs**:
+  - Token-specific coloring functions (non-stream related)
+  - Generic token formatting utilities
+- **NEW functionality**:
+  - tokenize(), parse_delimited(), classify_token()
+  - quote_token(), join_tokens(), escape_token()
+
+### Child Project Benefits:
+- **XStream**: `use rsb::token::*` + adds namespace semantics
+- **Future Projects**: Get token processing without reinventing
+- **Consistency**: Unified token handling across ecosystem
+
+### Import Pattern:
+```rust
+use rsb::token::*;           // Gets all token utilities
+// OR
+use rsb::token::validate::*; // Just validation functions
+```
+
+---
+## ITERATION 5: Architecture Refinement (Host + Global Split)
+
+### Decision: Separate Host Discovery from State Management  
+- **host/**: Host/shell environment discovery and interaction
+- **global/**: Pure state management and storage  
+- **Rationale**: Clean separation - host discovers, global stores, no mixed concerns
+
+### Planned `dev_host/` Structure:
+```
+src/dev_host/
+├── mod.rs              # Clean orchestrator + re-exports
+├── env.rs              # Environment variable discovery (import_environment)
+├── paths.rs            # General path algebra and manipulation
+├── xdg_path.rs         # XDG Base Directory Specification paths
+├── rsb_path.rs         # RSB-specific paths and namespacing
+├── host_path.rs        # Host-specific paths (home, temp, current)
+├── virt_path.rs        # Virtualized test/home environments
+├── shell.rs            # Shell detection, interaction, execution context
+├── system.rs           # System info (user, hostname, process info)
+└── macros.rs           # Host interaction macros
+```
+
+### Planned `dev_global/` Structure (Refined):
+```
+src/dev_global/
+├── mod.rs              # Clean orchestrator + re-exports  
+├── store.rs            # Core get/set/has/unset operations (pure storage)
+├── expansion.rs        # Variable expansion ($VAR, ${VAR})
+├── config.rs           # Configuration file parsing & management
+├── registry.rs         # Function registry, call stack, colors/glyphs
+└── macros.rs           # Global state macros
+```
+
+### Functions Split:
+- **FROM context.rs TO dev_host/env.rs**:
+  - import_environment(), env_bootstrap() - environment discovery
+- **FROM context.rs TO dev_host/xdg_path.rs**:
+  - setup_xdg_paths(), ensure_xdg_directories() - XDG path setup
+- **FROM context.rs TO dev_host/rsb_path.rs**:
+  - setup_rsb_paths() - RSB path setup
+- **FROM context.rs TO dev_host/shell.rs**:
+  - setup_execution_context(), parse_rsb_colors() - shell/script interaction
+- **FROM context.rs TO dev_global/store.rs**:
+  - Context struct, set_var(), get_var() - pure storage
+- **FROM context.rs TO dev_global/expansion.rs**:
+  - expand_vars() - variable expansion using stored state  
+- **FROM context.rs TO dev_global/config.rs**:
+  - parse_config_content(), load_config_file() - config management
+- **FROM context.rs TO dev_global/registry.rs**:
+  - FUNCTION_REGISTRY, COLORS, GLYPHS - registries
+
+### Clean Architecture Benefits:
+- **host/**: "How do I discover environment?" (env vars, XDG paths, shell type)
+- **global/**: "How do I store/access data?" (pure state management)  
+- **cli/**: "How do I build CLI apps?" (dispatch, args, help)
+
+### Import Pattern:
+```rust
+use rsb::host::env;           // Environment discovery
+use rsb::global::*;           // State management  
+use rsb::cli::*;              // CLI building
+// OR
+use rsb::*;                   // Core functions at crate root
+```
+
+---
+## ITERATION 6: CLI Package (Foundational Utility)
+
+### Decision: Command Line Interface Building
+- **cli/**: Foundational CLI building utilities for ALL command-line projects
+- **Scope**: Command dispatch, argument parsing, help system, options processing  
+- **Rationale**: Every CLI application needs these utilities - centralize in RSB2
+- **Bootstrap Split**: CLI-specific bootstrap separate from environment bootstrap
+
+### Planned `dev_cli/` Structure:
+```
+src/dev_cli/
+├── mod.rs              # Clean orchestrator + re-exports
+├── helpers.rs          # General CLI utilities (command validation, flag processing)
+├── dispatch.rs         # Command routing (dispatch!, pre_dispatch!)
+├── args.rs             # Argument processing (Args struct from args.rs)
+├── help.rs             # Help system display (show_help, show_functions)
+├── bootstrap.rs        # Script awareness (SCRIPT_NAME, SCRIPT_PATH, PWD)
+├── options.rs          # Option parsing (options!, args! macros)
+└── macros.rs           # CLI building macros
+```
+
+### Functions to Move:
+- **FROM macros/dispatch.rs TO dev_cli/dispatch.rs + macros.rs**:
+  - dispatch!(), pre_dispatch!() - command routing macros
+- **FROM macros/core.rs TO dev_cli/options.rs + macros.rs**:
+  - options!(), args!() - argument and option parsing macros
+- **FROM args.rs TO dev_cli/args.rs**:
+  - Args struct and all methods (get, get_or, has, has_pop, etc.)
+- **FROM context.rs TO dev_cli/help.rs**:
+  - show_help(), show_functions(), show_call_stack() - help system display
+- **FROM context.rs TO dev_cli/bootstrap.rs**:
+  - setup_execution_context() - script-related variable setup
+
+### Bootstrap Integration Pattern:
+- **host/env.rs**: `env()` - environment discovery only  
+- **host/**: Full host environment discovery (env + paths + shell + system)
+- **cli/bootstrap.rs**: `cli_bootstrap()` - CLI apps use host discovery + CLI setup
+- **Benefit**: Clean separation - host discovers, global stores, CLI builds interfaces
+
+### Child Project Benefits:
+- **CLI Applications**: `use rsb::cli::*` + `use rsb::host::*` for complete toolkit
+- **Libraries**: `use rsb::host::env` + `use rsb::global::*` for environment + state
+- **Pure State**: `use rsb::global::*` for just variable storage/expansion
+- **Maximum Reuse**: Clean separation enables targeted imports
+
+### Import Pattern:
+```rust
+use rsb::host::env;           // Environment discovery
+use rsb::global::*;           // State storage & expansion  
+use rsb::cli::*;              // CLI building utilities
+```
+
+---
+## ITERATION 7: Generators Package (XStream Integration)
+
+### Decision: Stream & Data Generation Framework  
+- **generators/**: Comprehensive generation framework (replaces "rand" concept)
+- **Scope**: Stream generation, test data, random values, load testing
+- **Source**: XStream sophisticated generation patterns + current random functionality
+- **Timing**: When XStream integration begins (Phase 1)
+
+---
+## ITERATION 7: Math Package (Comprehensive Number Processing)
+
+### Decision: Centralize All Mathematical Operations
+- **dev_math/**: Complete mathematical operations and number processing
+- **Scope**: Expression evaluation, number conversion, arithmetic, integer ops, complex numbers, bash-like math
+- **Rationale**: Math operations scattered across math.rs, macros/time_math.rs, macros/text.rs need consolidation
+
+### Planned `dev_math/` Structure:
+```
+src/dev_math/
+├── mod.rs              # Clean orchestrator + re-exports
+├── eval.rs             # Expression evaluation (evaluate_expression from math.rs, parsers, RPN)
+├── convert.rs          # Number conversion (to_number! logic, base conversion, smart parsing)
+├── ops.rs              # Basic math operations (add, subtract, round, clamp, string-first interfaces)
+├── integers.rs         # Integer operations (GCD, LCM, prime, factors, bitwise, sequences)
+├── complex.rs          # Complex number operations (arithmetic, polar, trigonometric functions)
+├── bash_math.rs        # Bash-like math (variable assignment, numeric comparisons, arithmetic expansion)
+├── constants.rs        # Mathematical constants (PI, E, PHI, lookup system)
+├── format.rs           # Number formatting (precision, currency, scientific notation, units)
+└── macros.rs           # Math macros (math!, to_number!, calc!, bash macros)
+```
+
+### Functions to Move:
+- **FROM math.rs TO dev_math/eval.rs**:
+  - evaluate_expression(), parse_math_tokens(), shunting_yard(), evaluate_rpn(), get_precedence()
+- **FROM macros/time_math.rs TO dev_math/macros.rs**:
+  - math! macro (mathematical expression evaluation)
+- **FROM macros/text.rs TO dev_math/convert.rs + macros.rs**:
+  - to_number! macro logic (string to number conversion)
+- **FROM macros/control_validation.rs TO dev_math/bash_math.rs**:
+  - Numeric comparison support for test! macro (-eq, -lt, -gt, etc.)
+
+### New Functionality Added:
+- **Integer-specific operations**: Prime testing, factorization, GCD/LCM, bitwise operations
+- **Complex number support**: Full complex arithmetic, polar coordinates, trigonometric functions
+- **Bash-like math**: Variable assignment operators (+=, -=, *=, /=), arithmetic expansion
+- **Advanced formatting**: Currency, scientific notation, unit conversion, locale support
+- **Mathematical constants**: PI, E, TAU, PHI with string lookup system
+
+### Import Pattern:
+```rust
+use rsb::math::*;           // Gets all mathematical functions + macros
+// OR
+use rsb::math::eval::*;     // Expression evaluation only
+use rsb::math::integers::*; // Integer operations only  
+use rsb::math::complex::*;  // Complex numbers only
+```
+
+---
+## ITERATION 8: Logic Package (Control Flow and Validation)
+
+### Decision: Centralize Logic and Control Flow Operations  
+- **dev_logic/**: Complete control flow, validation, and configuration management
+- **Scope**: Loops, guards (conditionals), validation, config loading, control flow utilities
+- **Rationale**: macros/control_validation.rs mixes many unrelated concepts - need clean separation
+
+### Planned `dev_logic/` Structure:
+```
+src/dev_logic/
+├── mod.rs              # Clean orchestrator + re-exports
+├── control.rs          # Control flow utilities (pattern matching, flow state)
+├── loops.rs            # Loop constructs (for_in! support, array iteration, directory iteration)
+├── guards.rs           # Guards and conditional testing (test! macro support, RSB terminology)
+├── validation.rs       # Validation and requirement checking (validate!, require_* macros)
+├── config.rs           # Configuration loading and exporting (src!, load_config!, export!)
+└── macros.rs           # Logic macros (for_in!, test!, case!, file_in!, validate!, config macros)
+```
+
+### Functions to Move:
+- **FROM macros/control_validation.rs TO dev_logic/macros.rs**:
+  - for_in!, test!, case!, file_in! (loop and control macros)
+  - validate!, require_file!, require_dir!, require_command!, require_var! (validation macros)
+  - export!, src!, load_config! (configuration macros)
+- **FROM utils.rs TO dev_logic/loops.rs**:
+  - get_array() - array utilities for for_in! macro
+- **FROM context.rs TO dev_logic/config.rs**:
+  - load_config_file(), parse_config_content(), export_vars() - configuration functions
+
+### Key RSB Terminology:
+- **guards.rs**: RSB terminology for conditional testing (not "conditions")
+- **Guards**: Test predicates and conditional logic used by test! macro
+- **Validation**: Requirement checking with proper exit codes and test environment detection
+
+### New Functionality Added:
+- **Advanced guard utilities**: Custom guard registration, guard expression evaluation
+- **Loop control**: Break/continue flags, nested loop support, range iteration  
+- **Configuration formats**: TOML, JSON, YAML, .env file support with merging/layering
+- **Validation reporting**: Validation summaries, pass/fail counts, custom validators
+
+### Import Pattern:
+```rust
+use rsb::logic::*;           // Gets all logic functions + macros
+// OR  
+use rsb::logic::guards::*;   // Guard testing only
+use rsb::logic::validation::*; // Validation utilities only
+use rsb::logic::config::*;   // Configuration handling only
+```
+
+---
+## NEXT ITERATIONS (TBD):
+- JSON/dict splitting approach (random will have dedicated package)
+- Stream creation vs execution split?
+- When to implement actual moves from dev_* stubs to real modules?

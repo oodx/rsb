@@ -1,0 +1,260 @@
+# RSB Source Code Restructuring Plan (REVISED)
+Generated: 2025-09-12
+Analysis of 48 Rust files - Respecting Existing Intentional Design
+
+## Current Intentional Design (GOOD - Keep These)
+
+### Well-Organized Modules
+- **xcls/**: Closure-supported functions (xsed vs sed, xgrep vs grep, xfilter vs filter)
+- **param/**: Progressive enhancement (basic.rs, advanced.rs) with clear API boundaries
+- **streamable/**: Unix-style function pipelines (traits, functions, filters, detectors)  
+- **visual/**: Feature-flagged visual enhancements (colors, glyphs, prompts) with clear documentation
+
+### Good Progressive Enhancement
+- Visual features properly feature-gated and not in prelude
+- Param module with basic/advanced separation
+- Clear documentation of feature flags and usage
+
+## ACTUAL Problems Identified (Focus Areas)
+
+### Macro Organization Issues (THE REAL PROBLEM)
+- **macros/json_dict_random.rs**: Mixes JSON + dictionaries + random generation (3 unrelated concepts)
+- **macros/time_math.rs**: Mixes time operations + math operations (2 unrelated concepts)
+- **macros/fs_data.rs**: Mixes filesystem operations + metadata extraction (unclear naming)
+- **macros/control_validation.rs**: Long name, mixes control flow + validation + config loading
+- **macros/streams_exec.rs**: Mixes stream creation + command execution (unclear boundary)
+
+### Flat Root Issues (MINOR - But Could Improve)
+- Root src/ has 12 individual files when some could be grouped
+- No clear separation between "core always-on" vs "enhanced features"
+
+## Proposed Focused Restructuring (Keep Good Structure, Fix Real Problems)
+
+### KEEP AS-IS (Well-Designed Modules)
+```
+src/
+├── xcls/                           # ✅ KEEP - Closure-supported functions (xsed, xgrep, xfilter)
+├── param/                          # ✅ KEEP - Progressive enhancement (basic/advanced)  
+├── streamable/                     # ✅ KEEP - Unix-style pipelines (traits/functions/filters/detectors)
+├── visual/                         # ✅ KEEP - Feature-flagged enhancements (colors/glyphs/prompts)
+└── [other individual files]        # ✅ MOSTLY KEEP - args.rs, context.rs, fs.rs, os.rs, etc.
+```
+
+### MACRO REORGANIZATION (The Real Problem)
+
+#### Current Chaos:
+```
+macros/
+├── json_dict_random.rs            # ❌ BAD: JSON + Dict + Random (3 concepts)
+├── time_math.rs                   # ❌ BAD: Time + Math (2 concepts) 
+├── fs_data.rs                     # ❌ BAD: Filesystem + Metadata (unclear naming)
+├── control_validation.rs          # ❌ BAD: Long name, mixes control + validation + config
+├── streams_exec.rs                # ❌ BAD: Stream creation + execution (unclear boundary)
+├── stderr.rs                      # ✅ OK: Clear purpose
+├── visual.rs                      # ✅ OK: Clear purpose
+├── core.rs                        # ✅ OK: Bootstrap essentials
+├── dispatch.rs                    # ✅ OK: Clear purpose
+├── param.rs                       # ✅ OK: Clear purpose
+├── text.rs                        # ✅ OK: Clear purpose  
+├── jobs_events.rs                 # ⚠️ OKAY: Related concepts
+└── test_helpers.rs                # ✅ OK: Clear purpose
+```
+
+#### Proposed Macro Restructuring:
+```
+macros/
+├── core.rs                        # ✅ KEEP: bootstrap!, args!, appref!
+├── dispatch.rs                    # ✅ KEEP: dispatch!, pre_dispatch!
+├── param.rs                       # ✅ KEEP: param! macro
+├── text.rs                        # ✅ KEEP: text expansion macros
+├── stderr.rs                      # ✅ KEEP: output macros
+├── visual.rs                      # ✅ KEEP: visual macros (feature-gated)
+├── test_helpers.rs                # ✅ KEEP: mock helpers
+├── jobs_events.rs                 # ✅ KEEP: trap!, job! (related concepts)
+│
+├── stream.rs                      # 🔄 RENAME from streams_exec.rs: Stream creation macros (cat!, cmd!, pipe!)  
+├── exec.rs                        # 🔄 SPLIT from streams_exec.rs: Command execution macros (run!, shell!)
+│
+├── check.rs                       # 🔄 RENAME from control_validation.rs: Validation (validate!, require_*)
+├── flow.rs                        # 🔄 SPLIT from control_validation.rs: Control flow (test!, case!, for_in!)  
+├── config.rs                      # 🔄 SPLIT from control_validation.rs: Config loading (src!, load_config!)
+│
+├── json.rs                        # 🔄 SPLIT from json_dict_random.rs: JSON macros only
+├── dict.rs                        # 🔄 SPLIT from json_dict_random.rs: Dictionary macros only  
+├── rand.rs                        # 🔄 SPLIT from json_dict_random.rs: Random generation macros only
+│
+├── time.rs                        # 🔄 SPLIT from time_math.rs: Time/date macros (date!, sleep!, benchmark!)
+├── math.rs                        # 🔄 SPLIT from time_math.rs: Math macros (math!)
+│
+├── fs.rs                          # 🔄 RENAME from fs_data.rs: Filesystem macros  
+└── meta.rs                        # 🔄 SPLIT from fs_data.rs: Metadata extraction macros
+```
+
+## Optional: Minor Root Organization (Low Priority)
+
+If we wanted to group some root files (but this is optional):
+```
+src/
+├── lib.rs                         # ✅ KEEP
+├── prelude.rs                     # ✅ KEEP  
+├── core/                          # 🤔 OPTIONAL: Group core files
+│   ├── mod.rs                     # Re-export coordinator
+│   ├── args.rs                    # from src/args.rs
+│   ├── context.rs                 # from src/context.rs  
+│   └── deps.rs                    # from src/deps.rs
+├── sys/                           # 🤔 OPTIONAL: Group system files
+│   ├── mod.rs                     # Re-export coordinator
+│   ├── fs.rs                      # from src/fs.rs
+│   ├── os.rs                      # from src/os.rs
+│   ├── time.rs                    # from src/time.rs
+│   └── xdg.rs                     # from src/xdg.rs
+├── text/                          # 🤔 OPTIONAL: Group text processing
+│   ├── mod.rs                     # Re-export coordinator
+│   ├── streams.rs                 # from src/streams.rs
+│   └── utils.rs                   # from src/utils.rs (text-related parts)
+│
+├── macros/                        # ✅ KEEP (but reorganize contents per above)
+├── xcls/                          # ✅ KEEP (well-designed)
+├── param/                         # ✅ KEEP (well-designed)
+├── streamable/                    # ✅ KEEP (well-designed)
+├── visual/                        # ✅ KEEP (well-designed)
+├── math.rs                        # ✅ KEEP (individual file is fine)
+└── random.rs                      # ✅ KEEP (individual file is fine)
+```
+
+### Keep Current Feature Flag Strategy (It's Good!)
+- **visual**: Base visual features
+- **colors-simple**: Basic colors  
+- **colors-named**: Extended colors
+- **colors-status**: Status colors
+- **colors-all**: All colors
+- **glyphs**: Unicode glyphs
+- **prompts**: Interactive prompts  
+- **stdopts**: Short flag expansion
+
+## Benefits of Focused Restructuring
+
+### 1. **Respect Existing Good Design**
+- Keep xcls/ (closure-supported functions) - this is excellent naming and organization
+- Keep param/ (progressive enhancement pattern) - well-thought-out structure  
+- Keep streamable/ (Unix-style pipelines) - comprehensive and well-organized
+- Keep visual/ (feature-gated enhancements) - proper progressive enhancement
+
+### 2. **Fix Real Problems**
+- Split macro files that mix unrelated concepts
+- Use clear, single-purpose names for macro files
+- Maintain short Unix-style names where they make sense
+
+### 3. **Minimal Breaking Changes**
+- Most existing code continues to work
+- Only macro import paths change (internal implementation)
+- Feature flags remain the same (visual, colors-*, etc.)
+
+### 4. **Better Maintenance**
+- Each macro file has a clear, single purpose
+- Related functionality grouped logically
+- Easier to find and modify specific macro sets
+
+## Recommended Implementation
+
+### Priority 1: Macro Reorganization (High Impact, Low Risk)
+1. Split `macros/json_dict_random.rs` → `json.rs`, `dict.rs`, `rand.rs`
+2. Split `macros/time_math.rs` → `time.rs`, `math.rs`  
+3. Split `macros/control_validation.rs` → `check.rs`, `flow.rs`, `config.rs`
+4. Split `macros/streams_exec.rs` → `stream.rs`, `exec.rs`
+5. Rename `macros/fs_data.rs` → `fs.rs` and `meta.rs`
+
+### Priority 2: Optional Root Grouping (Low Priority, Optional)
+- Only if you want to reduce root-level file count
+- Group `args.rs`, `context.rs`, `deps.rs` into `core/`
+- Group `fs.rs`, `os.rs`, `time.rs`, `xdg.rs` into `sys/`
+- Group `streams.rs`, `utils.rs` into `text/`
+
+### Priority 3: Testing & Validation
+- Ensure all existing macros still work
+- Update internal imports in macro files
+- Test feature flag combinations still work
+
+## Migration Notes
+
+### Breaking Changes (Minimal)
+- Internal macro imports may change (but end-users typically don't import these directly)
+- File names change but public API remains the same
+
+### Backward Compatibility  
+- All public macros work exactly the same (bootstrap!, dispatch!, cat!, etc.)
+- Feature flags unchanged (visual, colors-simple, etc.)
+- Prelude unchanged
+
+### Performance Impact
+- Smaller macro compilation units should improve build times
+- No runtime impact (macros are compile-time)
+- Same binary size and feature flag behavior
+
+This focused restructuring fixes the real organization problems (mixed-concept macro files) 
+while respecting the existing good architecture decisions (xcls/, param/, streamable/, visual/).
+
+---
+
+# COMPLETE FEATURE INVENTORY BY FILE/MODULE
+
+## Root Files
+- **lib.rs**: Module declarations, feature gates
+- **prelude.rs**: Public re-exports (Args, context functions, fs, os, streamable traits, Stream, time, utils, xcls)
+- **args.rs**: Args struct, argument parsing (get, get_or, has, has_pop, has_val, get_kv, get_array, remaining)
+- **context.rs**: Global context (set_var, get_var, has_var, unset_var, expand_vars, export_vars, rsb_bootstrap, load_config_file, parse_config_content, save_config_file, is_token_stream)
+- **fs.rs**: File system operations (read_file, write_file, append_file, mkdir_p, rm_rf, copy_file, move_file, chmod_file, file_exists, dir_exists, cleanup_temp_files, path helpers)
+- **os.rs**: OS operations (run_cmd, run_cmd_with_status, shell_exec, get_output, hostname, user, home_dir, current_dir, pid_of, process_exists, json_get, json_get_file, EventData, trap system)
+- **streams.rs**: Stream struct, stream operations (from_file, from_files, from_cmd, from_string, from_var, grep, sed, cut, sort, unique, head, tail, tee, to_file, count, collect, each)
+- **time.rs**: Time operations (current_timestamp, format_time, parse_time, sleep_ms)  
+- **utils.rs**: Utilities (should_print_level, expand_colors_unified, glyph_stderr, array operations, StringExt trait)
+- **math.rs**: Math operations (evaluate_expression, basic arithmetic)
+- **random.rs**: Random generation (rand_range_usize, generate_random_string, generate_uuid)
+- **deps.rs**: Re-exported dependencies (base64, regex, serde_json, url, uuid, chrono)
+- **xdg.rs**: XDG path compliance (get_xdg_config_home, get_xdg_data_home, get_xdg_cache_home)
+
+## Macro Files (macros/)
+- **core.rs**: bootstrap!, args!, appref!, get_env!, options! (bootstrap macros)
+- **dispatch.rs**: dispatch!, pre_dispatch! (command routing)
+- **param.rs**: param! (parameter expansion with defaults, prefix/suffix, substitution, case operations)
+- **text.rs**: str_explode!, str_in!, str_trim!, str_len!, str_line!, to_number! (text manipulation)
+- **stderr.rs**: info!, okay!, warn!, error!, fatal!, debug!, trace!, echo!, printf!, clear!, line!, colored! (output macros)
+- **visual.rs**: Feature-gated versions of stderr macros (info!, okay!, warn!, error!, fatal!, debug!, trace!) 
+- **streams_exec.rs**: cat!, cmd!, pipe!, stream!, run!, shell! (stream creation + command execution)
+- **control_validation.rs**: for_in!, test!, case!, file_in!, export!, src!, load_config!, validate!, require_file!, require_dir!, require_command!, require_var! (control flow + validation + config)
+- **json_dict_random.rs**: json_get!, json_get_file!, dict!, rand_dict!, gen_dict!, rand_alnum!, rand_alpha!, rand_hex!, rand_string!, rand_uuid!, rand_range! (JSON + dictionaries + random)
+- **time_math.rs**: benchmark!, date!, math!, sleep! (time + math operations)
+- **fs_data.rs**: sed_around!, sed_lines!, sed_template!, sed_insert_file!, sed_replace_file!, path_canon!, path_split!, meta_key!, meta_keys! (filesystem + metadata)
+- **jobs_events.rs**: job!, trap! (job control + event handling)
+- **test_helpers.rs**: mock_cmd! (testing utilities)
+
+## Organized Modules
+
+### xcls/ (Closure-Supported Functions)
+- **mod.rs**: Re-exports (xsed, XSed, ToXSed, xgrep, XGrep, xfilter, XFilter)
+- **xsed.rs**: XSed struct, enhanced sed operations with closure support (replace, transform, filter, chain operations)
+- **xgrep.rs**: XGrep struct, enhanced grep operations with closure support
+- **xfilter.rs**: XFilter struct, enhanced filtering operations with closure support
+
+### param/ (Parameter Expansion)
+- **mod.rs**: Module documentation, progressive enhancement pattern
+- **basic.rs**: Core parameter expansion functions (substring, prefix/suffix removal, replace, case operations)
+- **advanced.rs**: Reserved for future complex expansions (currently minimal)
+
+### streamable/ (Unix-Style Pipelines)
+- **mod.rs**: Re-exports (Streamable trait, StreamApply trait, functions, filters, detectors)
+- **traits.rs**: Streamable trait, StreamApply trait, core streaming interfaces
+- **functions.rs**: Basic transforms (Replace, UpperCase, LowerCase, Trim, Reverse, Length), encoding (Base64Encode/Decode, UrlEncode/Decode), Unix-style (Head, Tail, Grep, Sort, Unique, WordCount), RSB integration (Sed, SedLines)
+- **filters.rs**: Filtering operations (FilterLines, FilterEmpty, FilterByLength, FilterRegex, FilterNotContains, FilterDuplicates, FilterStartsWith, FilterEndsWith, TakeLines, SkipLines)
+- **detectors.rs**: Detection operations (DetectEmpty, DetectPattern, DetectBinary, DetectRegex, DetectDuplicates, DetectEncoding, CountPattern, CountLines, CountWords, DetectAllMatch, DetectAnyMatch)
+
+### visual/ (Visual Enhancements - Feature Gated)
+- **mod.rs**: Feature gates, re-exports based on enabled features, comprehensive documentation
+- **prompts.rs**: Interactive prompts (feature: prompts)
+- **colors/mod.rs**: Color package coordinator, registry management
+- **colors/simple.rs**: Basic 8-16 colors (red, green, blue, etc.) with bright variants (feature: colors-simple)
+- **colors/named.rs**: Extended named colors (crimson, azure, emerald, 90+ comprehensive palette) (feature: colors-named)  
+- **colors/status.rs**: Status-specific colors with enum pattern (magic, trace, note, silly, error, success, etc.) (feature: colors-status)
+- **colors/registry.rs**: Color registry system, runtime enablement (color_enable_with, color_mode, color, colorize, bg, colorize_bg, colored)
+- **colors/util.rs**: Color utilities, ANSI code transformations
+- **glyphs/mod.rs**: Unicode glyphs system, lightweight lookup with inline tag support ({g:name}) (feature: glyphs)
