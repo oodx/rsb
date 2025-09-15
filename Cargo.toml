@@ -3,7 +3,7 @@ name = "rsb"
 version = "0.2.19"
 description = "The official implementation of REBEL philosophy of developer ergonomics and productivity focus, framework/library"
 license = "AGPL-3.0"                 
-repository = "https://github.com/oodx/rsb-framework"
+repository = "https://github.com/oodx/rsb"
 edition = "2021"
 
 [features]

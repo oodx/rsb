@@ -11,7 +11,7 @@
 //!
 //! # Usage
 //! ```rust
-//! use cage::progress::{ProgressManager, ProgressStyle};
+//! use rsb::progress::{ProgressManager, ProgressStyle};
 //!
 //! let mut progress = ProgressManager::new();
 //! let task = progress.start_task("Processing files", ProgressStyle::Bar { total: 10 });
