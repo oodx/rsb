@@ -98,6 +98,7 @@ Index of Feature Modules
 | **Tokens** | Token generation and parsing utilities | [`FEATURES_TOKENS.md`](docs/tech/features/FEATURES_TOKENS.md) |
 | **Options** | Configuration options and feature flags | [`FEATURES_OPTIONS.md`](docs/tech/features/FEATURES_OPTIONS.md) |
 | **Progress** | Modular progress indicators (spinner/bar/bytes) | [`FEATURES_PROGRESS.md`](docs/tech/features/FEATURES_PROGRESS.md) |
+| **FS** | File system operations and helpers | [`FEATURES_FS.md`](docs/tech/features/FEATURES_FS.md) |
 
 ## Cargo Features
 

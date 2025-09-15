@@ -11,6 +11,8 @@ Completed
 - [x] Remove stashed `set_var!`/`get_var!` macros; use function API in tests/docs
 - [x] Implement grouped + per-dependency `rsb::deps` surface; add `deps::prelude` (optional)
 - [x] Validate tests: core, visuals, and progress builds
+- [x] FS moduleization: move fs helpers into `src/fs/utils.rs`, macros into `src/fs/macros.rs`, orchestrate via `src/fs/mod.rs`; add `FEATURES_FS.md`; update README/INDEX
+- [x] Dev PTY: add `dev-pty` feature and `rsb::dev::pty`; add PTY sanity test; update HOWTO_TEST
 
 Planned / Next
 - [ ] Legacy macro migration: move remaining legacy macros in `src/macros/` into module-owned `macros.rs`; update `prelude::macros`
@@ -18,6 +20,7 @@ Planned / Next
 - [ ] Optional CI: add lanes for smoke, visuals, progress
 - [ ] Keep README and docs index in sync when adding new features/modules
 - [ ] RFC guideline: require brief discussion before changing user-visible output defaults (e.g., progress formatting)
+- [ ] Split `json_dict_random` macros: move `rand_*` and `rand_range!` under `gx`; curate `json`/`dict` macros and re-export at crate root
 
 Notes
 - Visuals are opt-in; default builds print plain text with color tags stripped.

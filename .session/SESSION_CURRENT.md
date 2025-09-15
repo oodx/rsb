@@ -1,22 +1,26 @@
-# Session: Progress Integration, CLI Dispatch, Colors/Docs, Deps Surface
+# Session: FS Moduleization, PTY Dev Utils, Progress/Visuals Stable
 
 Date: 2025-09-15
 Repo: rsb (canonical), branch `main`
 
 ## Summary
-- Logger rename: internal `glyph_stderr` → `stderrx`; all call sites updated; shim retained for compatibility.
-- CLI macros: `pre_dispatch!` enhanced to auto‑register handlers and accept `desc:"..."` (mirrors `dispatch!`).
-- Progress module integrated behind `progress` feature; added `FEATURES_PROGRESS.md`; fixed tests and preserved rate formatting behavior.
-- Colors docs aligned (MODERN + SPEC_ALIGNED) and help/inspect use unified color expansion.
-- Deps surface: added per‑dependency and umbrella features with gated re‑exports in `rsb::deps` plus optional `deps::prelude`.
-- README and docs index refreshed: tables, relative links, Cargo feature map, feature index includes Progress.
-- Removed stashed `set_var!` / `get_var!` macros to prevent defects; use function API.
+- FS: Migrated to MODULE_SPEC structure
+  - Added `src/fs/mod.rs` (orchestrator), `src/fs/utils.rs` (impl), `src/fs/macros.rs` (module‑owned macros).
+  - Removed legacy `src/macros/fs_data.rs`. All macros exported at crate root remain available.
+  - Added `docs/tech/features/FEATURES_FS.md` and linked from README and docs index.
+- Dev PTY: Added optional `dev-pty` feature and wrapper
+  - `rsb::dev::pty` provides a light PTY session for interactive/TTY tests.
+  - Added `tests/dev_pty.rs` sanity; updated HOWTO_TEST.
+- Progress: Fixed doctest import; visuals/progress lanes remain green.
+- Host/Streams macros migration: host info/path macros live under `hosts::macros`; streams macros under `streams::macros`; OS pid/lock macros under `os::macros`.
+- Test runner: Added timeout wrapper (`timeout`/`gtimeout`) via `RSB_TEST_TIMEOUT`.
 
 ## Status
 - Tests
   - `cargo test`: PASS
   - `cargo test --features visuals`: PASS
   - `cargo test --features progress`: PASS
+  - `cargo test --features dev-pty --test dev_pty`: PASS
 - Policy checks
   - Prelude policy: compliant (no optional visual/log exports via prelude).
   - Progress rate formatting: two‑mode behavior (>=1.0 → 1 decimal, <1.0 → 2 decimals) preserved.
@@ -30,10 +34,12 @@ Repo: rsb (canonical), branch `main`
 - Docs landing: `README.md` and `docs/tech/INDEX.md` use table layout and relative links.
 
 ## Next Actions
-1) Optional: convert remaining math `random_list!` error paths to `stderrx` for uniform logging.
-2) Legacy macro migration pass: move remaining legacy items in `src/macros/` into module‑owned `macros.rs` per MODULE_SPEC; update `prelude::macros`.
-3) Optional CI: add smoke + visuals + progress lanes.
-4) Keep README/INDEX in sync when adding modules or features; add RFC notes for any behavior changes.
+1) Split `json_dict_random` legacy macros:
+   - Move `rand_*` and `rand_range!` under `gx` (string/id/collection).
+   - Keep `json_*`/`dict!`/`gen_dict!`/`rand_dict!` curated; consider `json` helper or place under `gx`.
+   - Re‑export macros at crate root for compatibility.
+2) Optional CI lanes: smoke, visuals, progress (document in HOWTO_TEST if added).
+3) Continue legacy macro migration audit; ensure prelude policy compliance.
 
 ## Notes
 - The deps surface now supports both per‑dependency opt‑in (e.g., `deps-chrono`) and a full umbrella (`deps`/`deps-all`).
