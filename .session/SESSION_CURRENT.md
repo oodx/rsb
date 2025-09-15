@@ -17,6 +17,7 @@ Repo: rsb (new canonical), branch `main`
 - Strings concept: UAT added (`tests/uat/string.rs` + wrapper) and verified via targeted test run. Plan marked Completed.
 - Tokens concept: existing sanity, feature, and UAT tests all passing; plan marked Completed.
 - Global concept: feature, core, and adapter tests passing; plan marked Completed.
+- Date concept: feature + UAT tests passing; plan marked Completed.
 
 ## Next Actions
 1) Choose next concept (e.g., GLOBAL or DATE) and repeat: analyze, fill gaps, add/adjust tests, update PLAN, commit.
