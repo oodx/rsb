@@ -5,14 +5,7 @@ pub use crate::{job, event, trap, hostname, user, home_dir, current_dir, pid_of,
 // Legacy hook aliases (removed to avoid macro name conflicts)
 
 // --- System Info, Network, Process, Locking Macros ---
-#[macro_export]
-macro_rules! hostname { () => { $crate::os::get_hostname() }; }
-#[macro_export]
-macro_rules! user { () => { $crate::os::get_username() }; }
-#[macro_export]
-macro_rules! home_dir { () => { $crate::os::get_home_dir() }; }
-#[macro_export]
-macro_rules! current_dir { () => { $crate::os::get_current_dir() }; }
+// Host info/path macros migrated to `hosts::macros` per MODULE_SPEC.
 
 // curl!/get! moved to bash::macros
 

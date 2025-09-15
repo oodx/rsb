@@ -1,5 +1,17 @@
 // --- String Macros (owned by string module) ---
 
+/// Convert a string slice to an `i32`, trimming whitespace.
+/// Returns 0 on parse error unless a `default:` is provided.
+#[macro_export]
+macro_rules! to_number {
+    ($text:expr) => {{
+        $text.trim().parse::<i32>().unwrap_or(0)
+    }};
+    ($text:expr, default: $default:expr) => {{
+        $text.trim().parse::<i32>().unwrap_or($default)
+    }};
+}
+
 #[macro_export]
 macro_rules! str_in {
     ($needle:expr, in: $haystack:expr) => { $haystack.contains($needle) };

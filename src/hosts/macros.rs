@@ -1,14 +1,7 @@
 //! Host Interaction Macros
 //! 
-//! Macros to be moved FROM macros/core.rs:
-//! - get_env!() -> Import environment variables
-//! - bootstrap!() (host parts) -> host_bootstrap!()
-//! 
-//! Macros to be moved FROM macros/jobs_events.rs:
-//! - hostname!() -> hostname!()
-//! - user!() -> user!()  
-//! - home_dir!() -> home_dir!()
-//! - current_dir!() -> current_dir!()
+//! Curated host-related macros. These wrap the `hosts` module utilities
+//! and provide a stable, user-friendly surface aligned with MODULE_SPEC.
 
 // Import environment variables into Global via Host layer
 #[macro_export]
@@ -20,26 +13,16 @@ macro_rules! get_env {
 #[macro_export]
 macro_rules! host_bootstrap { () => { $crate::hosts::bootstrap_from_env(); } }
 
-// TODO: Move hostname!() from macros/jobs_events.rs
-// #[macro_export]
-// macro_rules! hostname { 
-//     () => { crate::host::system::get_hostname() }; 
-// }
+// Host/system info wrappers
+#[macro_export]
+macro_rules! hostname { () => { $crate::hosts::get_hostname() }; }
 
-// TODO: Move user!() from macros/jobs_events.rs
-// #[macro_export]
-// macro_rules! user { 
-//     () => { crate::host::system::get_username() }; 
-// }
+#[macro_export]
+macro_rules! user { () => { $crate::hosts::get_username() }; }
 
-// TODO: Move home_dir!() from macros/jobs_events.rs
-// #[macro_export]
-// macro_rules! home_dir { 
-//     () => { crate::host::host_path::get_home_dir() }; 
-// }
+// Host path wrappers
+#[macro_export]
+macro_rules! home_dir { () => { $crate::hosts::host_path::get_home_dir() }; }
 
-// TODO: Move current_dir!() from macros/jobs_events.rs
-// #[macro_export]
-// macro_rules! current_dir { 
-//     () => { crate::host::host_path::get_current_dir() }; 
-// }
+#[macro_export]
+macro_rules! current_dir { () => { $crate::hosts::host_path::get_current_dir() }; }

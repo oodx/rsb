@@ -3,7 +3,6 @@ pub mod streams_exec;
 pub mod stderr;
 #[cfg(feature = "visual")]
 pub mod visual;
-pub mod text;
 pub mod math;
 pub mod fs_data;
 pub mod control_validation;
