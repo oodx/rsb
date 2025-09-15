@@ -7,9 +7,16 @@ RSB is designed for the "too big for bash, too small for Rust" sweet spot — to
 
 ## Start Here
 
-- Docs Index: docs/tech/INDEX.md
-- Developer Guides: docs/tech/development/HOWTO_UPDATE_RSB.md, docs/tech/development/MODULE_SPEC.md, docs/tech/development/HOWTO_TEST.md
-- Reference: docs/tech/reference/RSB_ARCH.md, docs/tech/reference/REBEL.md
+- Docs Index: [docs/tech/INDEX.md](docs/tech/INDEX.md)
+- Developer Guides:
+  - [HOWTO_UPDATE_RSB.md](docs/tech/development/HOWTO_UPDATE_RSB.md)
+  - [MODULE_SPEC.md](docs/tech/development/MODULE_SPEC.md)
+  - [HOWTO_TEST.md](docs/tech/development/HOWTO_TEST.md)
+- Reference:
+  - [RSB_ARCH.md](docs/tech/reference/RSB_ARCH.md)
+  - [REBEL.md](docs/tech/reference/REBEL.md)
+- Latest Session Notes (what changed, how to resume):
+  - [.session/SESSION_05_progress_integration_and_deps.md](.session/SESSION_05_progress_integration_and_deps.md)
 
 ## The REBEL Philosophy
 
