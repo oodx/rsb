@@ -70,3 +70,61 @@ Notes
 - Prefer `#[cfg(feature = "...")]` guards for feature‑gated areas to keep default profile clean.
 - When reorganizing, wrappers let you change folder contents without updating `test.sh`.
  - For macro E2E coverage, see `tests/sh/cli_macros_e2e.sh` which drives `examples/cli_e2e.rs`.
+
+
+# HOWTO: Run and Add Tests in RSB
+
+Updated: 2025-09-15
+
+Purpose
+- Provide a quick, reliable way to run core and feature-gated tests.
+- Explain the test layout and how to add new suites without editing scripts.
+
+Test Layout
+- Wrappers live at `tests/*.rs` and organize real tests under subfolders:
+  - Sanity: `tests/sanity_main.rs` includes `tests/sanity/*.rs`
+  - Features: `tests/features_<module>.rs` includes `tests/features/<module>/*.rs`
+  - UAT: `tests/uat_main.rs` includes `tests/uat/*.rs`
+  - Shell tests: `tests/sh/*.sh`
+- Keep tests small and visible. Prefer helper functions in modules over heavy test logic.
+
+Runner Usage (`bin/test.sh`)
+- `./bin/test.sh list` — list mapped and auto-discovered wrappers
+- `./bin/test.sh run smoke` — fast checks (core; skips visuals)
+- `./bin/test.sh run all` — full checks (enables visuals where needed)
+- Targeted runs (examples):
+  - `./bin/test.sh run sanity`
+  - `./bin/test.sh run param`
+  - `./bin/test.sh run colors`
+  - `./bin/test.sh run uat-colors`
+  - `./bin/test.sh run uat-visual`
+- Flags:
+  - `--verbose` — pass `-- --nocapture` to cargo where applicable
+  - `--comprehensive` — hint for broader runs (informational)
+
+Cargo Equivalents
+- Default core tests (no visuals):
+  - `cargo test`
+- With visuals umbrella (colors + glyphs + prompts):
+  - `cargo test --features visuals`
+- Individual wrappers:
+  - `cargo test --test sanity_main`
+  - `cargo test --features visuals --test features_colors`
+  - `cargo test --features visuals --test uat_main -- --nocapture`
+
+Visual Tests and Env
+- Visual suites require feature flags. The runner enables them; with cargo, add `--features visuals`.
+- Useful env vars (set before running):
+  - `RSB_COLOR=always|auto|never` — color policy
+  - `RSB_COLORS=simple,status,named[,bg]` — enable color sets and optional backgrounds
+- Glyphs and prompts are part of `visuals`. Use the umbrella unless optimizing footprint.
+
+Adding New Suites
+- Create a wrapper: `tests/<module>_<suite>.rs` (e.g., `tests/features_string.rs`).
+- Place tests in `tests/<module>/<suite>/*.rs` (e.g., `tests/features/string/*.rs`).
+- The runner will auto-discover wrappers; no changes to `bin/test.sh` needed.
+
+Conventions
+- Always add a minimal sanity test for each module.
+- For visual components, add a UAT that prints sample output; gate via features.
+- Keep module docs in `docs/tech/features/FEATURES_<NAME>.md` in sync with tests.

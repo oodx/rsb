@@ -50,6 +50,8 @@ Users should be able to trust that `use rsb::prelude::*` will not:
 - Math functions: `math::*`
 - Random generators: `random::*`
 
+Note: RSB intentionally re-exports some curated helpers (e.g., select items from `string` and `utils`) to keep the core prelude ergonomic. Avoid expanding this set unless it benefits a broad majority of users.
+
 ## What's Excluded from Prelude
 
 ### Visual Components (Feature-Gated)
@@ -91,12 +93,19 @@ pub mod visual;
 ```toml
 [features]
 default = []
-# Base feature
+
+# Visual base and components
 visual = []
-# Hierarchical features
 colors-simple = ["visual"]
 colors-named = ["visual", "colors-simple"]
-colors-all = ["visual", "colors-simple", "colors-named", "colors-status"]
+colors-status = ["visual"]
+glyphs = ["visual"]
+prompts = ["visual", "colors-simple"]
+
+# Umbrellas and convenience
+colors = ["visual", "colors-simple"]
+visuals = ["visual", "colors-simple", "colors-named", "colors-status", "glyphs", "prompts"]
+stdopts = []
 ```
 
 ## Usage Patterns
@@ -120,6 +129,20 @@ use rsb::string::utils::*;  // Access full module utilities
 use rsb::date::*;           // Access full date module
 ```
 
+## Companion Preludes
+
+Two additional convenience surfaces exist for development and rapid prototyping. These are not replacements for the core prelude and should not be used in libraries meant for reuse without care.
+
+### `rsb::prelude_ez::*`
+- Purpose: Fast prototyping. Re-exports the standard prelude plus a curated set of low-level helpers and common module-owned macros.
+- Policy: Still respects feature gating (does not silently include visuals). Prefer the core prelude in production and import only what you need.
+
+### `rsb::prelude_dev`
+- Purpose: Dev/test-only helper namespace. Aggregates low-level helpers under module paths for convenience:
+  - `rsb::prelude_dev::string` → `string::utils::*`
+  - `rsb::prelude_dev::param` → `param::utils::*`
+- Policy: Unstable surface; may change as modules evolve. Keep narrow and avoid pulling in optional/visual components.
+
 ## Maintenance Guidelines
 
 ### Adding to Prelude
@@ -128,6 +151,8 @@ Before adding any item to the prelude, verify:
 2. **No conflicts**: Doesn't shadow std library items
 3. **No dependencies**: Doesn't require optional features
 4. **Stable API**: Won't change frequently
+
+When in doubt, prefer adding to `prelude_ez` or `prelude_dev` rather than the core prelude.
 
 ### Removing from Prelude
 Breaking changes to prelude require:

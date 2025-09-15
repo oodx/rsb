@@ -121,4 +121,4 @@ Shell helpers
 - `string::utils::shell_single_quote(&str) -> String` — POSIX-safe single-quoting (wraps in single quotes and escapes embedded `'`). Useful for constructing shell commands safely.
 
 Specifications
-- See `docs/development/MODULE_SPECIFICATION.md` for module structure and exposure conventions.
+- See `docs/tech/development/MODULE_SPEC.md` for module structure and exposure conventions.

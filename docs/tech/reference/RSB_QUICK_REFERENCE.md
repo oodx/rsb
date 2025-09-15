@@ -19,6 +19,21 @@ fn build_command(args: Args) -> i32 {
     // Your command logic here
     0  // Return exit code
 }
+
+// Built-ins available via dispatch:
+// - "help"    → usage + registered commands
+// - "inspect" → list registered handlers with descriptions
+// - "stack"   → show call stack (most recent first)
+
+// Visuals (colors/glyphs/prompts) are optional:
+// Enable with: `--features visuals` and env `RSB_COLOR=always RSB_COLORS=simple,status,named`
+// For quick validation: `./bin/test.sh run uat-visual`
+
+// Features at a glance:
+// - visual (base), colors-simple, colors-named, colors-status
+// - glyphs, prompts (opt-in)
+// - visuals (umbrella: visual + colors + glyphs + prompts)
+// - stdopts (short-flag expansion in options!)
 ```
 
 ## Core Patterns
@@ -46,7 +61,7 @@ fn handler(mut args: Args) -> i32 {
     
     // Array values: features=feat1,feat2,feat3
     if let Some(features) = args.get_array("features") {
-        info!("Features: {}", features.join(", "));
+        echo!("Features: {}", features.join(", "));
     }
     
     // Remaining unprocessed args
@@ -64,6 +79,7 @@ let name = get_var("PROJECT_NAME");
 
 // Check if variable exists
 if has_var("DEBUG_MODE") {
+    #[cfg(feature = "visual")]
     debug!("Debug mode enabled");
 }
 
@@ -74,7 +90,7 @@ let config_path = param!("HOME", prefix: ".", suffix: "/.myapp.conf");
 
 // Variable expansion in strings
 echo!("Building $PROJECT_NAME in $BUILD_DIR");
-let path = var!("$HOME/.local/bin/$PROJECT_NAME").expand();
+let path = rsb::global::expand_vars("$HOME/.local/bin/$PROJECT_NAME");
 ```
 
 ### Stream Processing
@@ -118,14 +134,17 @@ require_var!("HOME");
 
 // Custom validation
 validate!(args.len() > 0, "No arguments provided");
-validate!(is_numeric("42"), "Value must be numeric");
+validate!(test!("42", -gt, "0"), "Value must be positive");
 
 // Test conditions (bash-style)
 if test!(-f "Cargo.toml") {
+    #[cfg(feature = "visual")]
     info!("Found Rust project");
 }
 
-if test!($count -gt 10) {
+let count = "12";
+if test!(count, -gt, "10") {
+    #[cfg(feature = "visual")]
     warn!("Count is too high: {}", count);
 }
 
@@ -200,22 +219,28 @@ echo!("Filename: {}", get_var("TOOL_PATH_file_name"));
 
 ### Logging and Output
 ```rust
-// Structured logging (colored output)
-info!("Application starting...");           // ℹ blue
-okay!("Operation completed successfully");  // ✓ green  
-warn!("This might be a problem");          // ⚠ yellow
-error!("Something went wrong");            // ✗ red
-fatal!("Critical failure, exiting");      // 💀 red (exits)
-debug!("Detailed debug information");     // 🔍 grey
-trace!("Very detailed trace info");       // 👁 magenta
+// Structured logging (colors/glyphs with visuals feature)
+#[cfg(feature = "visual")]
+{
+    info!("Application starting...");           // ℹ blue
+    okay!("Operation completed successfully");  // ✓ green  
+    warn!("This might be a problem");          // ⚠ yellow
+    error!("Something went wrong");            // ✗ red
+    debug!("Detailed debug information");      // 🔍 grey
+    trace!("Very detailed trace info");        // 👁 magenta
+    // fatal! exits the process
+}
 
 // Plain output (for piping)
 echo!("Hello, World!");                   // stdout
 printf!("No newline");                    // stdout, no \n
 
-// Colored manual output
-echo!("{green}Success!{reset}");
-echo!("{red}Error: {bold}critical failure{reset}");
+// Colored manual output (visuals)
+#[cfg(feature = "visual")]
+{
+    echo!("{green}Success!{reset}");
+    echo!("{red}Error: {bold}critical failure{reset}");
+}
 ```
 
 ### Math and Random Operations
@@ -261,6 +286,7 @@ echo!("Working directory: {}", current_dir!());
 // Process management
 let pid = pid_of!("nginx");
 if process_exists!("mysql") {
+    #[cfg(feature = "visual")]
     info!("MySQL is running");
 }
 
@@ -274,6 +300,7 @@ let duration = benchmark!({
     // Some operation to measure
     sleep!(ms: 100);
 });
+#[cfg(feature = "visual")]
 info!("Operation took: {:?}", duration);
 ```
 
@@ -281,7 +308,7 @@ info!("Operation took: {:?}", duration);
 ```rust
 // HTTP requests (requires curl)
 let response = get!("https://api.example.com/data");
-let html = get!("https://example.com", headers: "User-Agent: MyApp/1.0");
+let html = get!("https://example.com", options: "-H 'User-Agent: MyApp/1.0'");
 
 // JSON processing (requires jq)  
 let json_data = r#"{"users": [{"name": "Alice"}, {"name": "Bob"}]}"#;
@@ -289,7 +316,8 @@ let first_user = json_get!(&json_data, ".users[0].name");
 echo!("First user: {}", first_user);
 
 // Save JSON field to file
-json_get_file!("response.json", ".data.results", into: "results.txt");
+let results = json_get_file!("response.json", ".data.results");
+write_file("results.txt", &results);
 ```
 
 ### Advanced Text Processing
@@ -297,19 +325,24 @@ json_get_file!("response.json", ".data.results", into: "results.txt");
 // Advanced sed operations
 let result = sed_lines!("long text", 5, 10);          // Extract lines 5-10
 let context = sed_around!("log text", "ERROR", 3);    // 3 lines around "ERROR"
-let replaced = sed_template!("Alice", "{{NAME}}", "Hello {{NAME}}!");
+let templated = sed_template!("Alice", "{{NAME}}", "Hello {{NAME}}!");
 
 // File-based sed operations
-sed_insert_file!("new content", "<!-- INSERT HERE -->", "template.html");
-sed_replace_file!("config.txt", "old_value", "new_value");
+sed_insert_file!("template.html", "new content", "<!-- INSERT HERE -->");
+// Replace occurrences in file via Stream helpers
+let cfg = read_file("config.txt");
+let replaced = rsb::streams::Stream::from_string(&cfg).sed("old_value", "new_value").to_string();
+write_file("config.txt", &replaced);
 ```
 
 ### Utilities and Helpers
 ```rust
-// String utilities
-let length = str_len!("hello");
-let trimmed = str_trim!("  spaced  ");
-let words = str_explode!("comma,separated,values", ",");
+// String utilities (var-based macros)
+set_var("NAME", "  spaced  ");
+let length = str_len!("NAME");
+let trimmed = str_trim!("NAME");
+str_explode!("comma,separated,values", on: ",", into: "WORDS");
+let words = rsb::utils::get_array("WORDS");
 
 // Temporary files
 let temp_file = tmp!();          // Random temp file
@@ -317,13 +350,15 @@ let temp_with_pid = tmp!(pid);   // Include PID in name
 
 // Locking mechanisms
 with_lock!("/tmp/myapp.lock" => {
+    #[cfg(feature = "visual")]
     info!("Critical section - only one instance running");
     // Your critical code here
 });
 
 // Path utilities
-if path_exists!("./config") {
-    info!("Config directory found");
+if test!(-e "./config") {
+    #[cfg(feature = "visual")]
+    info!("Config entity found");
 }
 ```
 
@@ -447,7 +482,7 @@ set_var("PROJECT_NAME", "my-app");
 echo!("Building $PROJECT_NAME..."); // Auto-expands variables
 
 // Context flows through the application
-let expanded_path = var!("$HOME/.local/bin/$PROJECT_NAME").expand();
+let expanded_path = rsb::global::expand_vars("$HOME/.local/bin/$PROJECT_NAME");
 ```
 
 ### Core Architecture Patterns
@@ -493,18 +528,14 @@ cat!("data.csv")
 ```
 
 #### 3. Sentinel-Based Operations  
-**Safe, reversible file modifications:**
+**Safe, reversible file modifications using sentinels:**
 
 ```rust
-// Add line with sentinel marker for easy removal
-link_with_sentinel(
-    "~/.bashrc",
-    "export PATH=$PATH:~/.local/bin", 
-    "RSB_PATH_ADDITION"
-);
+// Insert content at a unique sentinel line in a file
+sed_insert_file!("~/.bashrc", "export PATH=$PATH:~/.local/bin", "# RSB_PATH_ADDITION");
 
-// Later removal by sentinel
-unlink_with_sentinel("~/.bashrc", "RSB_PATH_ADDITION");
+// Replace a sentinel marker with content (template mode)
+sed_template_file("~/.bashrc", "export RUSTUP_HOME=$HOME/.rustup", "# RUSTUP_HOME_SENTINEL");
 ```
 
 #### 4. Event-Driven Error Handling
@@ -670,7 +701,7 @@ When building RSB-compliant applications:
 - **No Result Chains**: Use `validate!()` for immediate assertion-based exits
 - **Clear Messages**: Always include context in error messages
 - **Exit Codes**: Functions return `i32` exit codes, not `Result`
-- **Colored Output**: Automatic color coding for different error levels
+- **Colored Output**: Available when the `visuals` feature is enabled
 
 ### 3. Global State Management
 - **Context-Centric**: Global `CTX` for all application state

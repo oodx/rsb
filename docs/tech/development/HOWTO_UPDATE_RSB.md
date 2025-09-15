@@ -1,8 +1,8 @@
 # HOWTO: Update and Refactor RSB (Read Me First)
 
 **WARNING**: Verify repository folder name before making changes.
-- If you are working in `.../repos/code/rust/oodx/rsb2`, this is a temporary workspace due to issues with the original `rsb` checkout. Proceed, but expect a later consolidation back to `rsb`.
-- If only `rsb/` exists and `rsb2/` does not, the consolidation has happened; use `rsb/` as the canonical path.
+- As of 2025-09, `rsb/` is the canonical path.
+- If you see `.../rsb.old/`, that was a temporary workspace; prefer `rsb/` when present.
 
 **Purpose**: Give a zero-context engineer or agent a fast, opinionated guide to make safe, consistent changes to RSB without rediscovering patterns. Summarize key paradigms (prelude policy, progressive enhancement, macros, tests, features) and where to find deeper docs.
 
@@ -22,18 +22,19 @@
 
 ## 1.2: Essential Documentation
 - `README.md` (top-level orientation + Visuals section)
-- `FEATURES_COLORS.md` (visual colors quick stub)
-- `FEATURES_PARAMS.md` (param progressive enhancement plan)
- - `FEATURES_STRINGS.md` (string helpers, macros, Unicode behavior)
- - `FEATURES_GLOBAL.md` (global store/expansion/config/introspection)
-- `docs/tech/development/MODULE_SPEC.md` (module helper/macro/prelude exposure spec)
-  - `rsb::prelude_ez` (EZ prelude for rapid prototyping; includes curated low-level helpers)
-- `FEATURES_DATE.md` (date macros and helpers)
-- `SESSION.md`, `SESSION_CURRENT.md` (what changed recently)
-- `RSB_QUICK_REFERENCE.md`, `RSB_TACTICAL_GUIDE.md`, `RSB_ARCHITECTURE_PRINCIPLES.md`
-- REBEL references: `../rebel/docs/REBEL.md`, `../rebel/docs/rsb-architecture.md`
+- Feature guides (under `docs/tech/features/`):
+  - `FEATURES_COLORS.md` (visual colors quick stub)
+  - `FEATURES_PARAMS.md` (param progressive enhancement plan)
+  - `FEATURES_STRINGS.md` (string helpers, macros, Unicode behavior)
+  - `FEATURES_GLOBAL.md` (global store/expansion/config/introspection)
+  - `FEATURES_DATE.md` (date macros and helpers)
+- Module spec: `docs/tech/development/MODULE_SPEC.md` (helper/macro/prelude exposure spec)
+- Testing: `docs/tech/development/HOWTO_TEST.md` (runner lanes, features)
+- EZ prelude: `rsb::prelude_ez` (curated helpers for prototyping)
+- Session notes: `docs/tech/development/SESSION.md` and `.session/SESSION_CURRENT.md`
+- References: `docs/tech/reference/RSB_ARCH.md`, `docs/tech/reference/RSB_QUICK_REFERENCE.md`, `docs/tech/reference/REBEL.md`
 
-EVERY NEW MAJOR FEATURE NEEEDS A FEATURE_<NAME>.md FILE BE SURE TO CREATE IT WHEN YOU MAKE ONE
+EVERY NEW MAJOR FEATURE NEEDS a `FEATURES_<NAME>.md` under `docs/tech/features/`. Create it alongside code changes.
 
 # Chapter 2: Core Paradigms and Policies
 
@@ -83,13 +84,14 @@ Use the structure in `tests/README_TEST.md`. High-level:
 - **UAT**: `tests/uat/*.rs` with a wrapper `tests/uat_main.rs`
 - **Shell tests**: `tests/sh/*.sh`
 
-IMPORTANT! all tests must implement a sanity test (check core assumptions), and a visual uat test (show the commands being called and show the outputs) -- read `tests/README_TEST.md`
+IMPORTANT! All modules should include a sanity test (check core assumptions) and, if applicable, a visual UAT (show commands and outputs). See `tests/README_TEST.md`.
 
 ## 3.2: Test Runner
 The test runner: `bin/test.sh`
 - `./bin/test.sh list` shows available tests and auto-discovered wrappers.
 - `./bin/test.sh run <name>` runs a mapped test or any auto-discovered wrapper (e.g., `features_colors`).
 - `./bin/test.sh run smoke` quick lane; `./bin/test.sh run all` full lane.
+- Visual suites and UATs require features; the runner enables them automatically (see HOWTO_TEST.md for cargo equivalents).
 
 ## 3.3: Adding New Test Suites
 Add new test suites by creating a wrapper `tests/<module>_<suite>.rs` and placing files under `tests/<module>/<suite>`. No need to edit `test.sh` thanks to auto-discovery. If you add named entries, follow the existing mapping style.
@@ -126,33 +128,28 @@ Before refactoring:
 - [ ] Update feature guides (`FEATURES_STRINGS.md`, `FEATURES_PARAMS.md`) if behavior changes
 
 # Chapter 6: Common Commands
-- `cargo test` — default tests (no visuals)
-- `cargo test --features visuals` — visual suites
+- `cargo test` — core/default tests (no visuals)
+- `cargo test --features visuals` — enable colors + glyphs + prompts umbrella
 - `./bin/test.sh list` — discover tests
 - `./bin/test.sh run sanity` — sanity package (core + baseline demos)
-- `./bin/test.sh run colors` — color feature suites
-- `./bin/test.sh run param` — param feature suites
-- `./bin/test.sh run uat-colors` — visual UATs (requires visuals)
+- `./bin/test.sh run colors` — color suites (features enabled automatically)
+- `./bin/test.sh run param` — param suites
+- `./bin/test.sh run uat-colors` — visual UATs
 - `./bin/test.sh run smoke` — fast checks
-- `./bin/test.sh run all` — full checks
+- `./bin/test.sh run all` — full checks (includes visuals)
 
-# Chapter 7: Workspace Notes
 
-## 7.1: rsb2 Temporary Workspace
-- If you see `rsb2` in the path, you are in the temporary workspace. Continue refactors here; coordinate a later move to `rsb/`.
-- After consolidation (only `rsb/` exists), remove this warning and update references.
+# Chapter 7: Additional Resources
 
-# Chapter 8: Additional Resources
+## 7.1: Architecture and Context
+- For architectural intent, see `docs/tech/reference/RSB_ARCH.md` and `docs/tech/reference/REBEL.md`.
+- For current session context, read `.session/SESSION_CURRENT.md` (recent) and `docs/tech/development/SESSION.md` (history).
 
-## 8.1: Architecture and Context
-- For architectural intent, consult REBEL docs and `RSB_ARCHITECTURE_PRINCIPLES.md`.
-- For current session context, read `SESSION_CURRENT.md`.
-
-## 8.2: Module-Specific Quick Reference
+## 7.2: Module-Specific Quick Reference
 - `param!` lives at `src/param/macros.rs`; helpers at `src/param/basic.rs`.
 - Strings live at `src/string/` with `helpers.rs` and `macros.rs`. See `FEATURES_STRINGS.md` for Unicode and wildcard semantics.
-- Module exposure pattern and naming conventions are defined in `docs/development/MODULE_SPECIFICATION.md`.
- - For dev/testing convenience, `rsb::dev` aggregates curated low-level helpers:
-   - `rsb::dev::string` → `string::utils` (helpers, case, error, safety registry)
-   - `rsb::dev::param` → `param::utils`
+ - Module exposure pattern and naming conventions are defined in `docs/tech/development/MODULE_SPEC.md`.
+ - For dev/testing convenience, `rsb::prelude_dev` aggregates curated low-level helpers:
+   - `rsb::prelude_dev::string` → `string::utils` (helpers, case, error, safety registry)
+   - `rsb::prelude_dev::param` → `param::utils`
    - Note: stream items are intentionally deferred until the stream module reorg is complete.

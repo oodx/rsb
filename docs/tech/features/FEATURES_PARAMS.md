@@ -106,7 +106,7 @@ println!("{}", p::replace(s, "/", "_", true)); // -> "_home_user_file.txt"
 - **Thread Safety**: Global context is thread-safe via `Arc<Mutex<Context>>` wrapping.
 - **Memory Model**: All variables stored as `String` values, bash-style string-first approach.
  - **Progressive Enhancement**: `param::advanced` will host optional tracing/preview and extended patterns; opt-in via API (no feature gates yet).
- - **Module Spec Alignment**: See `docs/development/MODULE_SPECIFICATION.md` for the helper/macro/prelude exposure pattern. `param!` acts as a DSL and delegates to `rsb::string` (ASCII-SAFE/UNICODE-SAFE helpers noted in FEATURES_STRINGS.md).
+ - **Module Spec Alignment**: See `docs/tech/development/MODULE_SPEC.md` for the helper/macro/prelude exposure pattern. `param!` acts as a DSL and delegates to `rsb::string` (ASCII-SAFE/UNICODE-SAFE helpers noted in FEATURES_STRINGS.md).
 
 ## Policy: expand_vars vs param!
 
