@@ -6,6 +6,9 @@ use crate::os::run_cmd;
 use std::collections::HashSet;
 use std::io::Write;
 
+// Module-owned macros for stream constructors and shell helpers
+pub mod macros;
+
 /// A struct for building and executing bash-like data processing pipelines.
 #[derive(Debug, Clone)]
 pub struct Stream {

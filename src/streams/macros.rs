@@ -1,6 +1,10 @@
-// --- Stream Macros ---
-// Namespaced re-exports for selective imports
+//! Streams Macros (module-owned)
+//!
+//! Bash-like stream constructors and shell helpers for building pipelines.
+
+// Re-export names for selective imports if desired
 pub use crate::{cat, cmd, pipe, stream, run, shell};
+
 #[macro_export]
 macro_rules! cat {
     ($path:expr) => { $crate::streams::Stream::from_file($path) };
@@ -33,7 +37,7 @@ macro_rules! run {
                 Err(res) => {
                     $crate::event!(emit "COMMAND_ERROR", "source" => "run!", "command" => &cmd_str, "status" => &res.status.to_string(), "stderr" => &res.error);
                     $crate::fatal!("Shell command failed: {}", cmd_str);
-                    
+
                     // Detect if running in test environment
                     let is_test = std::env::var("CARGO_TEST").is_ok() || std::thread::current().name().map_or(false, |name| name.contains("test"));
                     if !is_test {
@@ -63,3 +67,4 @@ macro_rules! shell {
         }
     };
 }
+

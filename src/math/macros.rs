@@ -421,7 +421,7 @@ macro_rules! random_list {
         match $crate::math::random_list_string($type, $count, None) {
             Ok(result) => result,
             Err(e) => {
-                $crate::error!("Random list error: {}", e);
+                $crate::utils::stderrx("error", &format!("Random list error: {}", e));
                 String::new()
             }
         }
@@ -430,7 +430,7 @@ macro_rules! random_list {
         match $crate::math::random_list_string($type, $count, Some($range)) {
             Ok(result) => result,
             Err(e) => {
-                $crate::error!("Random list error: {}", e);
+                $crate::utils::stderrx("error", &format!("Random list error: {}", e));
                 String::new()
             }
         }

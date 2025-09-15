@@ -18,6 +18,26 @@ elif [[ -f "../boxy/target/release/boxy" ]]; then
     BOXY="../boxy/target/release/boxy"
 fi
 
+# Optional timeout wrapper for cargo (prevents hangs on TTY‑waiting tests)
+TIMEOUT_BIN=""
+if command -v timeout >/dev/null 2>&1; then
+    TIMEOUT_BIN="timeout"
+elif command -v gtimeout >/dev/null 2>&1; then
+    TIMEOUT_BIN="gtimeout"
+fi
+
+# Helper: run cargo with optional timeout
+# Usage: ctest <args...> → runs `cargo <args...>` with timeout when available
+ctest() {
+    if [[ -n "$TIMEOUT_BIN" ]]; then
+        # Default to 10 minutes if not provided; override via RSB_TEST_TIMEOUT (in seconds)
+        local secs="${RSB_TEST_TIMEOUT:-600}"
+        "$TIMEOUT_BIN" "${secs}s" cargo "$@"
+    else
+        cargo "$@"
+    fi
+}
+
 
 # Parse optional flags (can be anywhere in arguments)
 VERBOSE_MODE="false"
@@ -236,7 +256,7 @@ run_test() {
         # Fallback: run by wrapper filename or shell script name
         if [[ -f "$TEST_DIR/$test_name.rs" ]]; then
             echo "ℹ️  Running auto‑discovered wrapper: $test_name.rs"
-            cargo test --test "$test_name" -- --nocapture
+            ctest test --test "$test_name" -- --nocapture
             exit 0
         elif [[ -f "$TEST_DIR/sh/$test_name.sh" ]]; then
             echo "ℹ️  Running shell test: tests/sh/$test_name.sh"
@@ -260,7 +280,7 @@ run_test() {
         else
             echo "🦀 Running Rust wrapper: $test_file"
         fi
-        cargo test --test "$wrapper_name" -- --nocapture
+        ctest test --test "$wrapper_name" -- --nocapture
         exit 0
     fi
     
@@ -308,29 +328,29 @@ run_test() {
             # Sanity package (core + baseline demos)
             if [[ "$VERBOSE_MODE" == "true" ]]; then
                 echo "🦀 Running sanity package with verbose output..."
-                cargo test --test sanity_main -- --nocapture
+            ctest test --test sanity_main -- --nocapture
             else
                 echo "🦀 Running sanity package..."
-                cargo test --test sanity_main
+                ctest test --test sanity_main
             fi
             ;;
         "param")
             # Comprehensive parameter expansion tests
             if [[ "$VERBOSE_MODE" == "true" ]]; then
                 echo "🦀 Running comprehensive parameter expansion tests with verbose output..."
-                cargo test --test features_param -- --nocapture
+                ctest test --test features_param -- --nocapture
             else
                 echo "🦀 Running comprehensive parameter expansion tests..."
-                cargo test --test features_param
+                ctest test --test features_param
             fi
             ;;
         "param-helpers")
             if [[ "$VERBOSE_MODE" == "true" ]]; then
                 echo "🦀 Running param helper tests with verbose output..."
-                cargo test --test param_helpers -- --nocapture
+                ctest test --test param_helpers -- --nocapture
             else
                 echo "🦀 Running param helper tests..."
-                cargo test --test param_helpers
+                ctest test --test param_helpers
             fi
             ;;
         "param-uat")
@@ -339,17 +359,17 @@ run_test() {
             else
                 echo "🧪 UAT: param! usage demo..."
             fi
-            cargo test --features visuals --test uat_main -- --nocapture
+            ctest test --features visuals --test uat_main -- --nocapture
             ;;
         "colors")
             # Ensure color sets are enabled for the test run
             export RSB_COLORS="simple,status,named"
             if [[ "$VERBOSE_MODE" == "true" ]]; then
                 echo "🦀 Running color sanity tests with verbose output..."
-                cargo test --features visuals --test features_colors -- --nocapture
+                ctest test --features visuals --test features_colors -- --nocapture
             else
                 echo "🦀 Running color sanity tests..."
-                cargo test --features visuals --test features_colors
+                ctest test --features visuals --test features_colors
             fi
             ;;
         "colors-runtime")
@@ -357,19 +377,19 @@ run_test() {
             export RSB_COLOR="always"
             if [[ "$VERBOSE_MODE" == "true" ]]; then
                 echo "🦀 Running color runtime tests with verbose output..."
-                cargo test --features visuals --test features_colors -- --nocapture
+                ctest test --features visuals --test features_colors -- --nocapture
             else
                 echo "🦀 Running color runtime tests..."
-                cargo test --features visuals --test features_colors
+                ctest test --features visuals --test features_colors
             fi
             ;;
         "stdopts")
             if [[ "$VERBOSE_MODE" == "true" ]]; then
                 echo "🦀 Running stdopts tests (feature-gated) with verbose output..."
-                cargo test --features stdopts --test stdopts -- --nocapture
+                ctest test --features stdopts --test stdopts -- --nocapture
             else
                 echo "🦀 Running stdopts tests (feature-gated)..."
-                cargo test --features stdopts --test stdopts
+                ctest test --features stdopts --test stdopts
             fi
             ;;
         "uat-colors")
@@ -381,7 +401,7 @@ run_test() {
             else
                 echo "🧪 UAT: Colors demo (visible)..."
             fi
-            cargo test --features visuals --test uat_main -- --nocapture
+            ctest test --features visuals --test uat_main -- --nocapture
             ;;
         "uat-colors-macros")
             export RSB_COLORS="simple,status,named"
@@ -391,7 +411,7 @@ run_test() {
             else
                 echo "🧪 UAT: Colors macros (colored!) demo..."
             fi
-            cargo test --features visuals --test uat_main -- --nocapture
+            ctest test --features visuals --test uat_main -- --nocapture
             ;;
         "uat-stdopts")
             if [[ "$VERBOSE_MODE" == "true" ]]; then
@@ -399,7 +419,7 @@ run_test() {
             else
                 echo "🧪 UAT: Stdopts demo (visible)..."
             fi
-            cargo test --features stdopts --test uat_stdopts -- --nocapture
+            ctest test --features stdopts --test uat_stdopts -- --nocapture
             ;;
         "uat-glyphs")
             if [[ "$VERBOSE_MODE" == "true" ]]; then
@@ -407,7 +427,7 @@ run_test() {
             else
                 echo "🧪 UAT: Glyphs demo (visible)..."
             fi
-            cargo test --features visuals --test uat_main -- --nocapture
+            ctest test --features visuals --test uat_main -- --nocapture
             ;;
         "uat-visual")
             export RSB_COLORS="simple,status,named,bg"
@@ -417,7 +437,7 @@ run_test() {
             else
                 echo "🧪 UAT: Visual combo (bg + color + glyphs)..."
             fi
-            cargo test --features visuals --test uat_main -- --nocapture
+            ctest test --features visuals --test uat_main -- --nocapture
             ;;
         "uat-prompts")
             export RSB_COLORS="simple"
@@ -440,7 +460,7 @@ run_test() {
                 # If this is a Rust wrapper but we didn't catch it above, run via cargo
                 if [[ "$test_file" == *.rs ]]; then
                     local wrapper_name="${test_file%.rs}"
-                    cargo test --test "$wrapper_name" -- --nocapture
+                    ctest test --test "$wrapper_name" -- --nocapture
                     exit 0
                 fi
                 test_path="$TEST_DIR/$test_file"

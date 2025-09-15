@@ -8,6 +8,9 @@ use crate::global::expand_vars;
 use std::process::Command;
 use std::sync::{Arc, Mutex};
 
+// Module-owned macros for process helpers and locking
+pub mod macros;
+
 /// The result of a command execution, containing status, stdout, and stderr.
 #[derive(Debug, Clone)]
 pub struct CmdResult {

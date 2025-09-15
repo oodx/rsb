@@ -101,6 +101,14 @@ Runner Usage (`bin/test.sh`)
 - Flags:
   - `--verbose` — pass `-- --nocapture` to cargo where applicable
   - `--comprehensive` — hint for broader runs (informational)
+  
+Timeouts and Non‑TTY
+- The runner uses a best‑effort timeout wrapper when `timeout`/`gtimeout` is available.
+  - Set `RSB_TEST_TIMEOUT=<seconds>` to override the default (600 seconds).
+- Interactive prompts are TTY‑aware and tests use non‑TTY fallbacks.
+  - In CI/non‑TTY, prompts return defaults immediately.
+  - You can also force non‑interactive behavior in tests by setting the global
+    context variable `opt_quiet` to `1`.
 
 Cargo Equivalents
 - Default core tests (no visuals):

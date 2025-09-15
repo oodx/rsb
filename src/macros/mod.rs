@@ -1,5 +1,4 @@
 // Grouped macro modules. All macros use `#[macro_export]` and are exported at crate root.
-pub mod streams_exec;
 pub mod stderr;
 #[cfg(feature = "visual")]
 pub mod visual;

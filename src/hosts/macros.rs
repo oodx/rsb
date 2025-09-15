@@ -22,7 +22,7 @@ macro_rules! user { () => { $crate::hosts::get_username() }; }
 
 // Host path wrappers
 #[macro_export]
-macro_rules! home_dir { () => { $crate::hosts::host_path::get_home_dir() }; }
+macro_rules! home_dir { () => { $crate::hosts::get_home_dir() }; }
 
 #[macro_export]
-macro_rules! current_dir { () => { $crate::hosts::host_path::get_current_dir() }; }
+macro_rules! current_dir { () => { $crate::hosts::get_current_dir() }; }
