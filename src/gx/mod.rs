@@ -7,6 +7,7 @@
 pub mod string;
 pub mod id;
 pub mod collection;
+pub mod macros;
 
 mod utils;
 pub use utils::*;

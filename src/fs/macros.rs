@@ -21,6 +21,12 @@ macro_rules! cap_stream { ($stream:expr) => { $crate::fs::capture_stream_to_temp
 #[macro_export]
 macro_rules! subst { ($stream:expr) => { $crate::cap_stream!($stream) }; }
 
+// --- Dictionary Macros ---
+#[macro_export]
+macro_rules! dict {
+    ($path:expr) => { $crate::fs::load_dict_from_file($path) };
+}
+
 // --- Advanced Sed Macros ---
 #[macro_export]
 macro_rules! sed_lines { ($content:expr, $start:expr, $end:expr) => { $crate::streams::Stream::from_string($content).sed_lines($start, $end).to_string() }; }

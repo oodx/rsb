@@ -3,7 +3,10 @@
 //! Process, PID, and simple locking helpers wrapping `os` module functions.
 
 // Re-export names for selective imports if desired
-pub use crate::{pid_of, process_exists, kill_pid, kill_process, with_lock, lock, unlock};
+pub use crate::{
+    pid_of, process_exists, kill_pid, kill_process, with_lock, lock, unlock,
+    json_get, json_get_file,
+};
 
 #[macro_export]
 macro_rules! pid_of { ($process:expr) => { $crate::os::pid_of($process) }; }
@@ -66,3 +69,17 @@ macro_rules! lock {
 #[macro_export]
 macro_rules! unlock { ($lock_path:expr) => { $crate::os::remove_lock($lock_path); $crate::okay!("Lock released: {}", $lock_path); }; }
 
+// --- JSON Macros (jq-backed helpers)
+#[macro_export]
+macro_rules! json_get {
+    ($json:expr, $path:expr) => {
+        $crate::os::json_get($json, $path)
+    };
+}
+
+#[macro_export]
+macro_rules! json_get_file {
+    ($file:expr, $path:expr) => {
+        $crate::os::json_get_file($file, $path)
+    };
+}

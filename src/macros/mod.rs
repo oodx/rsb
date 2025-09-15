@@ -4,6 +4,5 @@ pub mod stderr;
 pub mod visual;
 pub mod math;
 pub mod control_validation;
-pub mod json_dict_random;
 pub mod jobs_events;
 pub mod test_helpers;
