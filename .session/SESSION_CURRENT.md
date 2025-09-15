@@ -42,3 +42,4 @@ Repo: rsb (new canonical), branch `main`
 - Validate lanes on a fresh workspace: `./bin/test.sh run smoke`, key wrappers, and visuals features.
 - Begin incremental migration of legacy macros in `src/macros/` to module-owned `macros.rs` per MODULE_SPEC.
 - Keep prelude policy intact (core-only; visuals/loggers opt-in).
+- Drafted modular feature-gating plan at `docs/tech/development/FEATURES_GATING_PLAN.md` for per-concept basic/advanced enablement.
