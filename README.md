@@ -15,6 +15,7 @@ RSB is designed for the "too big for bash, too small for Rust" sweet spot — to
 | Dev Guide | How to run tests and use the runner | [HOWTO_TEST.md](docs/tech/development/HOWTO_TEST.md) |
 | Reference | Architecture overview and standards | [RSB_ARCH.md](docs/tech/reference/RSB_ARCH.md) |
 | Reference | REBEL philosophy and principles | [REBEL.md](docs/tech/reference/REBEL.md) |
+- Feature | Truth/Booleans (REBEL: 0=true, 1=false) | [FEATURES_TRUTH.md](docs/tech/features/FEATURES_TRUTH.md) |
 - Latest Session Notes (what changed, how to resume):
   - [.session/SESSION_05_progress_integration_and_deps.md](.session/SESSION_05_progress_integration_and_deps.md)
 

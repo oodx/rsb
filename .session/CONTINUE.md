@@ -12,9 +12,14 @@ Quick snapshot
 - Deps: `rsb::deps` supports per‑dependency flags and an umbrella (`deps-all`, alias `deps`).
 
 New since last session
-- FS moduleization (MODULE_SPEC): fs moved to `src/fs/{mod.rs,utils.rs,macros.rs}`; legacy `src/macros/fs_data.rs` removed. Added `docs/tech/features/FEATURES_FS.md`.
-- Dev PTY (feature `dev-pty`): `rsb::dev::pty` for PTY-backed tests; added `tests/dev_pty.rs`. HOWTO_TEST updated. Test runner gains timeout wrapper via `timeout`/`gtimeout` (env `RSB_TEST_TIMEOUT`, default 600s).
-- Macro ownership: host info/path macros under `hosts::macros`; streams under `streams::macros`; OS pid/lock under `os::macros`.
+- Truth model (REBEL booleans): 0=true, 1=false. Centralized in `rsb::com` with macros `is_true!`/`is_false!`.
+  - Docs: `docs/tech/features/FEATURES_TRUTH.md`; regression advisory: `docs/tech/development/LOGIC_REGRESSION.md`.
+  - CLI options: flags set to "0", negations to "1"; detectors return "0"/"1".
+- Generators (GX): adapters + data under `src/gx/data/dict/*`; tests added; docs `FEATURES_GENERATORS.md`.
+- Parse/FS: file sed lives in `parse::sed_file` (composes streams+fs). `wc` counters in FS; streaming variants added.
+- FS moduleization: `src/fs/{mod.rs,utils.rs,macros.rs}` (legacy `fs_data` removed). `FEATURES_FS.md` updated with wc.
+- Dev PTY (feature `dev-pty`): `rsb::dev::pty` sanity; HOWTO updated. Runner supports timeout via `RSB_TEST_TIMEOUT`.
+- Macro ownership: host info/path under `hosts::macros`; streams under `streams::macros`; OS pid/lock under `os::macros`.
 
 Start here (zero‑context)
 - Read:
@@ -109,9 +114,11 @@ Quick validation
 - optional: cargo test --features dev-pty --test dev_pty
 
 Next tasks
-1) Split json_dict_random macros per MODULE_SPEC (gx/json split; re-export macros)
-2) Optional CI lanes for smoke/visuals/progress (document in HOWTO_TEST)
-3) Macro migration audit and prelude policy check
+1) Gate parse-fs adapter with a feature flag; add streaming wc macros.
+2) Showcase/UAT for Generators using `src/gx/data/dict` files.
+3) Optional CI lanes for smoke/visuals/progress (document in HOWTO_TEST).
+4) Math audit: ensure MODERN orchestrator-only `mod.rs`; move any logic into submodules.
+5) Continue macro migration audit and prelude policy checks.
 
 Agents / tooling
 - No special services needed; use Cargo and the provided test runner.
