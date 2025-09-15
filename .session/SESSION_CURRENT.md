@@ -24,6 +24,7 @@ Repo: rsb (new canonical), branch `main`
 - Host concept: env and paths tests passing; plan marked Completed.
 - Threads concept: sanity + UAT passing; plan marked Completed.
 - Bash concept: sanity + UAT passing; plan marked Completed.
+- Params concept: comprehensive features passing; plan marked Completed.
 
 ## Next Actions
 1) Choose next concept (e.g., GLOBAL or DATE) and repeat: analyze, fill gaps, add/adjust tests, update PLAN, commit.
