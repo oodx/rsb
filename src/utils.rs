@@ -29,7 +29,26 @@ pub fn expand_colors_unified(text: &str) -> String {
     }
     #[cfg(not(feature = "visual"))]
     {
-        return text.to_string();
+        // Strip inline color tags like {bold}, {cyan}, {reset}, etc. when visuals are disabled.
+        // This keeps output clean and readable in plain mode.
+        let mut out = String::with_capacity(text.len());
+        let mut chars = text.chars().peekable();
+        while let Some(c) = chars.next() {
+            if c == '{' {
+                // skip until matching '}' if it looks like a tag
+                let mut buf = String::new();
+                while let Some(&nc) = chars.peek() {
+                    chars.next();
+                    if nc == '}' { break; }
+                    buf.push(nc);
+                }
+                // omit the tag (do not push '{buf}')
+                continue;
+            } else {
+                out.push(c);
+            }
+        }
+        return out;
     }
 }
 
