@@ -6,6 +6,9 @@
 
 **Purpose**: Give a zero-context engineer or agent a fast, opinionated guide to make safe, consistent changes to RSB without rediscovering patterns. Summarize key paradigms (prelude policy, progressive enhancement, macros, tests, features) and where to find deeper docs.
 
+
+IMPORTANT! RSB uses UNIX/POSIX convention for return values; 0=true; 1=false; any code that has this backwards is WRONG. We've also added TRUE and FALSE constants, and is_true and is_false helpers to assist in maintaining this standard. 
+
 # Chapter 1: Quick Orientation
 - Code root: `src/`
   - `lib.rs`: module exports; do not casually add to prelude; keep optional packages behind features.

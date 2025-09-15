@@ -46,5 +46,8 @@ pub mod param;
 // Token processing module (ported from XStream)
 pub mod token;
 
+// Common constants and helpers (REBEL booleans, conversions)
+pub mod com;
+
 // Parse (sed-like stream/string transforms)
 pub mod parse;

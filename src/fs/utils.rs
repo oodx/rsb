@@ -271,6 +271,36 @@ pub fn wc_file_string(path: &str) -> String {
     let (l, w, c) = wc_tuple_file(path);
     format!("{} {} {}", l, w, c)
 }
+
+// --- Streaming counters for large files ---
+pub fn count_lines_file_stream(path: &str) -> usize {
+    use std::io::{BufRead, BufReader};
+    let f = std::fs::File::open(expand_vars(path)).unwrap();
+    let reader = BufReader::new(f);
+    reader.lines().count()
+}
+
+pub fn wc_tuple_file_stream(path: &str) -> (usize, usize, usize) {
+    use std::io::{BufRead, BufReader};
+    let f = std::fs::File::open(expand_vars(path)).unwrap();
+    let reader = BufReader::new(f);
+    let mut lines = 0usize;
+    let mut words = 0usize;
+    let mut chars = 0usize;
+    for line in reader.lines() {
+        if let Ok(l) = line {
+            lines += 1;
+            words += l.split_whitespace().count();
+            chars += l.chars().count();
+        }
+    }
+    (lines, words, chars)
+}
+
+pub fn wc_file_string_stream(path: &str) -> String {
+    let (l, w, c) = wc_tuple_file_stream(path);
+    format!("{} {} {}", l, w, c)
+}
 pub fn create_temp_file_path(name_type: &str) -> String {
     let tmp_dir = crate::global::get_var("XDG_TMP");
     let _ = std::fs::create_dir_all(&tmp_dir);
