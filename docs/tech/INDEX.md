@@ -3,28 +3,37 @@
 This index links to feature guides, developer docs, and reference material.
 
 ## Features
-- Strings: docs/tech/features/FEATURES_STRINGS.md
-- Params: docs/tech/features/FEATURES_PARAMS.md
-- Global: docs/tech/features/FEATURES_GLOBAL.md
-- Date: docs/tech/features/FEATURES_DATE.md
-- Tokens: docs/tech/features/FEATURES_TOKENS.md
-- Math: docs/tech/features/FEATURES_MATH.md
-- Host: docs/tech/features/FEATURES_HOST.md
-- CLI: docs/tech/features/FEATURES_CLI.md
-- Options: docs/tech/features/FEATURES_OPTIONS.md
-- Threads: docs/tech/features/FEATURES_THREADS.md
-- Bash: docs/tech/features/FEATURES_BASH.md
-- Colors: docs/tech/features/FEATURES_COLORS.md
-- Prompts: docs/tech/features/FEATURES_PROMPTS.md
-- Progress: docs/tech/features/FEATURES_PROGRESS.md
+
+| Feature | Description | Link |
+|---|---|---|
+| Strings | String helpers, macros, Unicode behavior | [FEATURES_STRINGS.md](features/FEATURES_STRINGS.md) |
+| Params | Parameter expansion and helpers | [FEATURES_PARAMS.md](features/FEATURES_PARAMS.md) |
+| Global | Global store and configuration management | [FEATURES_GLOBAL.md](features/FEATURES_GLOBAL.md) |
+| Date | Date/time operations and formatting | [FEATURES_DATE.md](features/FEATURES_DATE.md) |
+| Tokens | Token parsing/formatting utilities | [FEATURES_TOKENS.md](features/FEATURES_TOKENS.md) |
+| Math | Mathematical operations and macros | [FEATURES_MATH.md](features/FEATURES_MATH.md) |
+| Host | Environment, paths, and script contexts | [FEATURES_HOST.md](features/FEATURES_HOST.md) |
+| CLI | Args, bootstrap, dispatch, introspection | [FEATURES_CLI.md](features/FEATURES_CLI.md) |
+| Options | Configuration options and feature flags | [FEATURES_OPTIONS.md](features/FEATURES_OPTIONS.md) |
+| Threads | Thread utilities and job control | [FEATURES_THREADS.md](features/FEATURES_THREADS.md) |
+| Bash | Shell interaction and job macros | [FEATURES_BASH.md](features/FEATURES_BASH.md) |
+| Colors | Visual color system and runtime registry | [FEATURES_COLORS.md](features/FEATURES_COLORS.md) |
+| Prompts | Interactive prompts with timeouts | [FEATURES_PROMPTS.md](features/FEATURES_PROMPTS.md) |
+| Progress | Modular progress indicators | [FEATURES_PROGRESS.md](features/FEATURES_PROGRESS.md) |
 
 ## Development
-- Update Guide: docs/tech/development/HOWTO_UPDATE_RSB.md
-- Module Spec: docs/tech/development/MODULE_SPEC.md
-- Prelude Policy: docs/tech/development/PRELUDE_POLICY.md
-- How to Test: docs/tech/development/HOWTO_TEST.md
+
+| Topic | Description | Link |
+|---|---|---|
+| Update Guide | How to update/refactor RSB safely | [HOWTO_UPDATE_RSB.md](development/HOWTO_UPDATE_RSB.md) |
+| Module Spec | Spec and alignment requirements | [MODULE_SPEC.md](development/MODULE_SPEC.md) |
+| Prelude Policy | What is/ isn’t in the prelude | [PRELUDE_POLICY.md](development/PRELUDE_POLICY.md) |
+| How to Test | Runner lanes and cargo equivalents | [HOWTO_TEST.md](development/HOWTO_TEST.md) |
 
 ## Reference
-- REBEL: docs/tech/reference/REBEL.md
-- RSB Architecture: docs/tech/reference/RSB_ARCH.md
-- Quick Reference: docs/tech/reference/RSB_QUICK_REFERENCE.md
+
+| Topic | Description | Link |
+|---|---|---|
+| REBEL | Philosophy and principles | [REBEL.md](reference/REBEL.md) |
+| Architecture | RSB architecture overview | [RSB_ARCH.md](reference/RSB_ARCH.md) |
+| Quick Reference | High-level API quick reference | [RSB_QUICK_REFERENCE.md](reference/RSB_QUICK_REFERENCE.md) |
