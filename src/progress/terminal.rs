@@ -615,7 +615,7 @@ impl From<SilentReporter> for TerminalReporter {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::cage::progress::core::ProgressEvent;
+    use super::super::core::ProgressEvent;
 
     #[test]
     fn test_terminal_reporter_creation() {

@@ -105,6 +105,9 @@ RSB math package provides comprehensive mathematical operations organized into s
 
 ## 🎯 Comprehensive Macro Interface
 
+Logging & Errors
+- Math macros report recoverable errors (e.g., divide by zero, parse failures) via the core logger `utils::stderrx("error", msg)` to keep default builds feature‑neutral. Optional visual macros can be used by importing them explicitly when compiling with visuals.
+
 ### Expression Macros
 ```rust
 math!("result = x * 2 + 5");     // Advanced expression evaluation
@@ -238,15 +241,15 @@ println!("Random test scores: {}", test_data);
 
 ### Expression-Based Calculations
 ```rust
-set_var!("radius", "7.5");
-set_var!("pi", "3.14159");
+rsb::global::set_var("radius", "7.5");
+rsb::global::set_var("pi", "3.14159");
 
 math!("area = pi * radius ** 2");          // Calculate area
 math!("circumference = 2 * pi * radius");  // Calculate circumference
 math!("diameter = radius * 2");            // Calculate diameter
 
-println!("Circle area: {}", get_var!("area"));           // "176.714"
-println!("Circumference: {}", get_var!("circumference")); // "47.124"
+println!("Circle area: {}", rsb::global::get_var("area"));           // "176.714"
+println!("Circumference: {}", rsb::global::get_var("circumference")); // "47.124"
 ```
 
 ### Base Conversions for Programming

@@ -17,8 +17,8 @@ fn uat_global_demo() {
     #[cfg(feature = "visual")]
     {
         // Show colored/glyph stderr messages without affecting stdout data
-        info!("Global UAT (info): {}", msg);
-        okay!("Global UAT (okay): {}", msg);
+        rsb::info!("Global UAT (info): {}", msg);
+        rsb::okay!("Global UAT (okay): {}", msg);
     }
 
     // Store basics

@@ -86,7 +86,8 @@ fn build_command(args: Args) -> i32 {
 ```
 
 Vanity Descriptions
-- `dispatch!` supports optional `desc: "..."` after each handler mapping. These are registered via `global::register_function(name, desc)` and shown by the `inspect` built-in.
+- `dispatch!` and `pre_dispatch!` support optional `desc: "..."` after each handler mapping. Descriptions are registered via `global::register_function(name, desc)` and shown by the `inspect` built-in.
+- Both macros also auto‑register the handler names to power built‑ins like `inspect` without requiring separate calls.
 - You may also register functions manually anywhere prior to dispatch:
   ```rust
   rsb::global::register_function("demo", "Runs the uat demo");

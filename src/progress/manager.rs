@@ -371,7 +371,7 @@ impl MultiStepProgress {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::cage::progress::terminal::TerminalReporter;
+    use crate::progress::ProgressState;
 
     #[test]
     fn test_progress_manager_creation() {
@@ -463,7 +463,7 @@ mod tests {
 
         multi.complete("All steps completed");
 
-        assert_eq!(multi.main_task().state(), super::core::ProgressState::Complete);
+        assert_eq!(multi.main_task().state(), ProgressState::Complete);
     }
 
     #[test]

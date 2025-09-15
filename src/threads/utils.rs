@@ -14,7 +14,7 @@ pub fn bench<F: FnOnce()>(label: &str, f: F) -> Duration {
     let start = Instant::now();
     f();
     let dur = start.elapsed();
-    crate::utils::glyph_stderr("info", &format!("[bench] {} took: {:?}", label, dur));
+    crate::utils::stderrx("info", &format!("[bench] {} took: {:?}", label, dur));
     dur
 }
 
@@ -41,7 +41,7 @@ pub fn start_background(command: &str) -> u32 {
         rx,
     };
     crate::os::JOBS.lock().unwrap().insert(job_id, Arc::new(Mutex::new(job_handle)));
-    crate::utils::glyph_stderr("info", &format!("[{}] Started background job", job_id));
+    crate::utils::stderrx("info", &format!("[{}] Started background job", job_id));
     job_id
 }
 

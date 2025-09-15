@@ -22,11 +22,11 @@
 //!
 //! ```rust
 //! // Explicit import - not included in prelude
-//! use rsb::visual::colors::simple::*;
+//! use rsb::visual::colors::colorize;
 //! use rsb::visual::prompts::*;
-//! 
+//!
 //! let colored_text = colorize("Hello", "red");
-//! let response = confirm("Continue?")?;
+//! let response = confirm("Continue?");
 //! ```
 
 #[cfg(feature = "visual")]

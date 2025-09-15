@@ -11,14 +11,30 @@
 //! ```
 
 // Re-export selected external crates used internally by rsb
-pub use base64;
-pub use chrono;
-pub use glob;
-pub use lazy_static;
-pub use libc;
-pub use rand;
-pub use regex;
-pub use serde;
-pub use serde_json;
-pub use urlencoding;
-pub use uuid;
+// Gated by the `deps` feature to keep the default surface lean.
+#[cfg(any(feature = "deps", feature = "deps-all", feature = "deps-base64"))] pub use base64;
+#[cfg(any(feature = "deps", feature = "deps-all", feature = "deps-chrono"))] pub use chrono;
+#[cfg(any(feature = "deps", feature = "deps-all", feature = "deps-glob"))] pub use glob;
+#[cfg(any(feature = "deps", feature = "deps-all", feature = "deps-lazy_static"))] pub use lazy_static;
+#[cfg(any(feature = "deps", feature = "deps-all", feature = "deps-libc"))] pub use libc;
+#[cfg(any(feature = "deps", feature = "deps-all", feature = "deps-rand"))] pub use rand;
+#[cfg(any(feature = "deps", feature = "deps-all", feature = "deps-regex"))] pub use regex;
+#[cfg(any(feature = "deps", feature = "deps-all", feature = "deps-serde"))] pub use serde;
+#[cfg(any(feature = "deps", feature = "deps-all", feature = "deps-serde_json"))] pub use serde_json;
+#[cfg(any(feature = "deps", feature = "deps-all", feature = "deps-urlencoding"))] pub use urlencoding;
+#[cfg(any(feature = "deps", feature = "deps-all", feature = "deps-uuid"))] pub use uuid;
+
+/// Optional convenience prelude: `use rsb::deps::prelude::*;` to bring enabled crates into scope.
+pub mod prelude {
+    #[cfg(any(feature = "deps", feature = "deps-all", feature = "deps-base64"))] pub use super::base64;
+    #[cfg(any(feature = "deps", feature = "deps-all", feature = "deps-chrono"))] pub use super::chrono;
+    #[cfg(any(feature = "deps", feature = "deps-all", feature = "deps-glob"))] pub use super::glob;
+    #[cfg(any(feature = "deps", feature = "deps-all", feature = "deps-lazy_static"))] pub use super::lazy_static;
+    #[cfg(any(feature = "deps", feature = "deps-all", feature = "deps-libc"))] pub use super::libc;
+    #[cfg(any(feature = "deps", feature = "deps-all", feature = "deps-rand"))] pub use super::rand;
+    #[cfg(any(feature = "deps", feature = "deps-all", feature = "deps-regex"))] pub use super::regex;
+    #[cfg(any(feature = "deps", feature = "deps-all", feature = "deps-serde"))] pub use super::serde;
+    #[cfg(any(feature = "deps", feature = "deps-all", feature = "deps-serde_json"))] pub use super::serde_json;
+    #[cfg(any(feature = "deps", feature = "deps-all", feature = "deps-urlencoding"))] pub use super::urlencoding;
+    #[cfg(any(feature = "deps", feature = "deps-all", feature = "deps-uuid"))] pub use super::uuid;
+}

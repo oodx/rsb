@@ -16,6 +16,7 @@ This index links to feature guides, developer docs, and reference material.
 - Bash: docs/tech/features/FEATURES_BASH.md
 - Colors: docs/tech/features/FEATURES_COLORS.md
 - Prompts: docs/tech/features/FEATURES_PROMPTS.md
+- Progress: docs/tech/features/FEATURES_PROGRESS.md
 
 ## Development
 - Update Guide: docs/tech/development/HOWTO_UPDATE_RSB.md

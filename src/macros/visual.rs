@@ -16,19 +16,19 @@ macro_rules! colored {
 }
 
 #[macro_export]
-macro_rules! info { ($($arg:tt)*) => { $crate::utils::glyph_stderr("info", &format!($($arg)*)); }; }
+macro_rules! info { ($($arg:tt)*) => { $crate::utils::stderrx("info", &format!($($arg)*)); }; }
 #[macro_export]
-macro_rules! okay { ($($arg:tt)*) => { $crate::utils::glyph_stderr("okay", &format!($($arg)*)); }; }
+macro_rules! okay { ($($arg:tt)*) => { $crate::utils::stderrx("okay", &format!($($arg)*)); }; }
 #[macro_export]
-macro_rules! warn { ($($arg:tt)*) => { $crate::utils::glyph_stderr("warn", &format!($($arg)*)); }; }
+macro_rules! warn { ($($arg:tt)*) => { $crate::utils::stderrx("warn", &format!($($arg)*)); }; }
 #[macro_export]
-macro_rules! error { ($($arg:tt)*) => { $crate::utils::glyph_stderr("error", &format!($($arg)*)); }; }
+macro_rules! error { ($($arg:tt)*) => { $crate::utils::stderrx("error", &format!($($arg)*)); }; }
 #[macro_export]
-macro_rules! fatal { ($($arg:tt)*) => { $crate::utils::glyph_stderr("fatal", &format!($($arg)*)); }; }
+macro_rules! fatal { ($($arg:tt)*) => { $crate::utils::stderrx("fatal", &format!($($arg)*)); }; }
 #[macro_export]
-macro_rules! debug { ($($arg:tt)*) => { $crate::utils::glyph_stderr("debug", &format!($($arg)*)); }; }
+macro_rules! debug { ($($arg:tt)*) => { $crate::utils::stderrx("debug", &format!($($arg)*)); }; }
 #[macro_export]
-macro_rules! trace { ($($arg:tt)*) => { $crate::utils::glyph_stderr("trace", &format!($($arg)*)); }; }
+macro_rules! trace { ($($arg:tt)*) => { $crate::utils::stderrx("trace", &format!($($arg)*)); }; }
 
 // --- Prompt Macros (feature: prompts) ---
 // Thin macros that delegate to visual::prompts functions

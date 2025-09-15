@@ -47,6 +47,6 @@ impl Display for StringError {
 /// Prints a fatal message and exits the process with status 1.
 pub fn log_string_error(op: &str, err: &StringError) -> ! {
     // Fail-fast without requiring visual feature flags
-    crate::utils::glyph_stderr("fatal", &format!("[string::{}] {}", op, err));
+    crate::utils::stderrx("fatal", &format!("[string::{}] {}", op, err));
     std::process::exit(1);
 }

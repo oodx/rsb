@@ -24,6 +24,7 @@ Macros (module-owned)
 Design
 - Implementation leverages existing `os` job registry structures; migration to `threads` proper is planned.
 - Fail-fast policy remains in higher-level macros that exit on error cases (consistent with RS).
+- Logging: non‑visual paths use `utils::stderrx(level, msg)` so core builds do not depend on optional visual macros. Visual macros can be imported explicitly when the `visuals` feature is enabled.
 
 Examples
 ```rust
@@ -35,4 +36,3 @@ let status = job!(wait: id);
 Testing
 - Sanity: `tests/threads_sanity.rs` → `tests/threads/sanity.rs`
 - UAT: `tests/uat_threads.rs` → `tests/uat/threads.rs` (visible demo of sleep/bench/jobs)
-

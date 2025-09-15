@@ -31,9 +31,15 @@ macro_rules! options {
 // --- Dispatch ---
 #[macro_export]
 macro_rules! dispatch {
-    ($args:expr, { $($cmd:literal => $handler:ident),* }) => {{
-        // Register handlers for introspection
+    // Enhanced form: optional descriptions per command via `desc: "..."`
+    ($args:expr, { $( $cmd:literal => $handler:ident $(, desc: $desc:expr )? ),* $(,)? }) => {{
+        // Register handlers for introspection (ensures built-ins like inspect work)
         $crate::cli::register_handlers(&[$(($cmd, $handler)),*]);
+
+        // If vanity descriptions are provided, store them (overrides empty entries)
+        $(
+            let _ = dispatch!(@maybe_register_desc $cmd $(, $desc)?);
+        )*
 
         // Delegate to helper function with lookup closure
         $crate::cli::execute_dispatch($args, |command| {
@@ -43,11 +49,23 @@ macro_rules! dispatch {
             }
         });
     }};
+
+    (@maybe_register_desc $name:expr) => { () };
+    (@maybe_register_desc $name:expr, $d:expr) => {{ $crate::global::register_function($name, $d); }};
 }
 
 #[macro_export]
 macro_rules! pre_dispatch {
-    ($args:expr, { $($cmd:literal => $handler:ident),* }) => {{
+    // Enhanced form with optional descriptions, mirrors dispatch! behavior
+    ($args:expr, { $( $cmd:literal => $handler:ident $(, desc: $desc:expr )? ),* $(,)? }) => {{
+        // Register handlers for introspection
+        $crate::cli::register_handlers(&[$(($cmd, $handler)),*]);
+
+        // If descriptions provided, record them
+        $(
+            let _ = pre_dispatch!(@maybe_register_desc $cmd $(, $desc)?);
+        )*
+
         // Delegate to helper function with lookup closure
         $crate::cli::execute_pre_dispatch($args, |command| {
             match command {
@@ -56,4 +74,18 @@ macro_rules! pre_dispatch {
             }
         })
     }};
+
+    // Back-compat: simple form without descriptions
+    ($args:expr, { $($cmd:literal => $handler:ident),* }) => {{
+        $crate::cli::register_handlers(&[$(($cmd, $handler)),*]);
+        $crate::cli::execute_pre_dispatch($args, |command| {
+            match command {
+                $($cmd => Some($handler),)*
+                _ => None,
+            }
+        })
+    }};
+
+    (@maybe_register_desc $name:expr) => { () };
+    (@maybe_register_desc $name:expr, $d:expr) => {{ $crate::global::register_function($name, $d); }};
 }

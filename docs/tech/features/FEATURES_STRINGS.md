@@ -114,7 +114,7 @@ Try variants
   - `try_to_snake_case`, `try_to_kebab_case`, `try_to_dot_case`, `try_to_space_case`, `try_to_camel_case`
 
 Logging policy
-- Fail-fast path uses `glyph_stderr("fatal", ...)` then exits(1).
+- Fail-fast path uses `stderrx("fatal", ...)` then exits(1).
 - Example: `[string::prefix] Regex compilation failed for pattern: '['` then exit.
 
 Shell helpers

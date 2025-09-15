@@ -8,18 +8,18 @@ macro_rules! job {
     (wait: $job_id:expr) => {{
         match $crate::threads::wait($job_id, None) {
             Ok(status) => status,
-            Err(e) => { $crate::error!("Failed to wait for job {}: {}", $job_id, e); -1 }
+            Err(e) => { $crate::utils::stderrx("error", &format!("Failed to wait for job {}: {}", $job_id, e)); -1 }
         }
     }};
     (timeout: $timeout:expr, wait: $job_id:expr) => {{
         match $crate::threads::wait($job_id, Some($timeout)) {
             Ok(status) => status,
-            Err(e) => { $crate::error!("Failed to wait for job {}: {}", $job_id, e); -1 }
+            Err(e) => { $crate::utils::stderrx("error", &format!("Failed to wait for job {}: {}", $job_id, e)); -1 }
         }
     }};
     (list) => {{
         let jobs = $crate::threads::list_jobs();
-        if jobs.is_empty() { $crate::info!("No running jobs."); }
+        if jobs.is_empty() { $crate::utils::stderrx("info", "No running jobs."); }
         for (id, cmd) in jobs { $crate::echo!("[{}] {}", id, cmd); }
     }};
 }
@@ -81,4 +81,3 @@ macro_rules! sleep {
         std::thread::sleep(std::time::Duration::from_millis($millis as u64));
     }};
 }
-

@@ -24,18 +24,6 @@ RSB's focus on enabling productivity means developers can build meaningful tools
 
 RSB is for builders, for automators, for practitioners who need to "get stuff done."
 
-## Start Here
-
-- Development Guide: `docs/tech/development/HOWTO_UPDATE_RSB.md`
-- Module Spec (helpers, macros, prelude policy): `docs/tech/development/MODULE_SPEC.md`
-- Test Structure and Runner: `docs/tech/development/HOWTO_TEST.md` and `tests/README_TEST.md`
-- Architecture and Philosophy: `docs/tech/reference/RSB_ARCH.md` and `docs/tech/reference/REBEL.md`
-
-Quick flows:
-- List tests: `./bin/test.sh list`
-- Run smoke/all: `./bin/test.sh run smoke` | `./bin/test.sh run all`
-- Visual tests: `cargo test --features visuals`
-
 ## How RSB Differs from Standard Rust
 
 | Standard Rust | RSB Approach |

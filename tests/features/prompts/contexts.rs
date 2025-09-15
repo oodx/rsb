@@ -1,6 +1,12 @@
 #![cfg(feature = "prompts")]
 use rsb::prelude::*;
 use rsb::visual::prompts::{confirm, ask, select};
+use lazy_static::lazy_static;
+use std::sync::Mutex;
+
+lazy_static! {
+    static ref TEST_LOCK: Mutex<()> = Mutex::new(());
+}
 
 fn setup_clean_context() {
     unset_var("opt_yes");
@@ -9,6 +15,7 @@ fn setup_clean_context() {
 
 #[test]
 fn test_prompts_respect_global_context() {
+    let _lock = TEST_LOCK.lock().unwrap();
     setup_clean_context();
 
     // Test global context integration through opt flags
@@ -26,6 +33,7 @@ fn test_prompts_respect_global_context() {
 
 #[test]
 fn test_context_isolation() {
+    let _lock = TEST_LOCK.lock().unwrap();
     setup_clean_context();
 
     // Each prompt should read context fresh, not cache
@@ -45,6 +53,7 @@ fn test_context_isolation() {
 
 #[test]
 fn test_non_tty_fallback_behavior() {
+    let _lock = TEST_LOCK.lock().unwrap();
     setup_clean_context();
 
     // In non-TTY (like CI), prompts should use defaults without blocking
@@ -67,6 +76,7 @@ fn test_non_tty_fallback_behavior() {
 
 #[test]
 fn test_color_integration() {
+    let _lock = TEST_LOCK.lock().unwrap();
     setup_clean_context();
     set_var("opt_quiet", "1"); // Avoid actual TTY interaction
 

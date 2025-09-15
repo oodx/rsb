@@ -32,6 +32,41 @@ visuals = [
 glyphs = ["visual"]
 prompts = ["visual", "colors-simple"]
 
+# Progress indicators (modular, zero-dep core)
+progress = []
+
+# Dependency re-exports (rsb::deps) surface
+# Per-dependency opt-ins with an umbrella alias. Consumers can enable
+# individual deps (e.g., `deps-chrono`) or the whole set via `deps`.
+deps-base64 = []
+deps-chrono = []
+deps-glob = []
+deps-lazy_static = []
+deps-libc = []
+deps-rand = []
+deps-regex = []
+deps-serde = []
+deps-serde_json = []
+deps-urlencoding = []
+deps-uuid = []
+
+deps-all = [
+    "deps-base64",
+    "deps-chrono",
+    "deps-glob",
+    "deps-lazy_static",
+    "deps-libc",
+    "deps-rand",
+    "deps-regex",
+    "deps-serde",
+    "deps-serde_json",
+    "deps-urlencoding",
+    "deps-uuid",
+]
+
+# Convenience alias for the full set
+deps = ["deps-all"]
+
 # Standard options auto expansion
 stdopts = []
 
@@ -64,4 +99,3 @@ path = "src/dummy_cli.rs"
 [[example]]
 name = "showcase"
 path = "examples/showcase.rs"
-required-features = ["visuals"]

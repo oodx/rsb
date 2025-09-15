@@ -11,15 +11,15 @@ pub mod utils;
 pub mod string;
 pub mod random;
 pub mod math;
-pub mod gx;
 pub mod threads;
 pub mod bash;
 pub mod deps;
 pub mod xcls;
 pub mod global;
 
+pub mod gx;
 // Dev/testing namespace (aggregated low-level helpers)
-pub mod dev;
+pub mod prelude_dev;
 
 // Host discovery namespace (env/paths/script awareness)
 pub mod hosts;
@@ -31,6 +31,10 @@ pub mod prelude_ez;
 // Optional visual package - behind feature flags
 #[cfg(feature = "visual")]
 pub mod visual;
+
+// Optional progress package - behind feature flags
+#[cfg(feature = "progress")]
+pub mod progress;
 
 // Param helpers namespace (non-macro implementation details)
 pub mod param;

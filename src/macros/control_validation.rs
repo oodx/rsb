@@ -163,18 +163,6 @@ macro_rules! require_var {
     ($var:expr) => { $crate::validate!($crate::global::has_var($var), "Required variable not set: {}", $var); };
 }
 
-// --- Variable Management Macros ---
-
-#[macro_export]
-macro_rules! set_var {
-    ($name:expr, $value:expr) => {
-        $crate::global::set_var($name, $value);
-    };
-}
-
-#[macro_export]
-macro_rules! get_var {
-    ($name:expr) => {
-        $crate::global::get_var($name)
-    };
-}
+// --- Variable Management ---
+// Intentionally no set_var!/get_var! macros.
+// Policy: prefer function calls `rsb::global::{set_var, get_var}` to avoid macro leakage.

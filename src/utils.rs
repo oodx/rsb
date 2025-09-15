@@ -52,7 +52,7 @@ pub fn expand_colors_unified(text: &str) -> String {
     }
 }
 
-pub fn glyph_stderr(level: &str, message: &str) {
+pub fn stderrx(level: &str, message: &str) {
     if !should_print_level(level) { return; }
     let glyph = {
         #[cfg(feature = "glyphs")]
@@ -106,6 +106,11 @@ pub fn glyph_stderr(level: &str, message: &str) {
     // Expand variables and then colors (mutexes are now released)
     let expanded_vars = expand_vars(&format_string);
     eprintln!("{}", expand_colors_unified(&expanded_vars));
+}
+
+#[deprecated(since = "0.2.19", note = "use utils::stderrx instead")]
+pub fn glyph_stderr(level: &str, message: &str) {
+    stderrx(level, message)
 }
 
 

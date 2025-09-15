@@ -24,8 +24,8 @@ Gaps / Findings
 
 Plan to Compliance
 1) Decouple macros from visual logging
-   - Change `$crate::error!(...)` to `$crate::utils::glyph_stderr("error", &format!(...))` in `src/math/macros.rs`.
-   - Rationale: glyph_stderr is core, feature-neutral, respects quiet/debug modes.
+   - Change `$crate::error!(...)` to `$crate::utils::stderrx("error", &format!(...))` in `src/math/macros.rs`.
+   - Rationale: stderrx is core, feature-neutral, respects quiet/debug modes.
 2) Ensure MODULE_SPEC shape
    - Verify orchestrator, helpers, utils split; macros thin and delegating to helpers.
    - Confirm curated exports in prelude remain core-only; no macro leakage.
@@ -45,4 +45,3 @@ Acceptance Criteria
 
 Notes
 - This plan has step 1+3 implemented in this session; proceeding to run validations and then commit.
-

@@ -2,8 +2,11 @@
 
 // Using the prelude brings all the essential RSB tools into scope.
 use rsb::prelude::*;
-// Visual/log macros are opt-in; import explicitly by name
+// Visual/log macros: import explicitly; gate colored under feature
+#[cfg(feature = "visual")]
 use rsb::{info, okay, warn, error, fatal, debug, trace, colored};
+#[cfg(not(feature = "visual"))]
+use rsb::{info, okay, warn, error, fatal, debug, trace};
 
 fn main() {
     // The bootstrap! macro handles collecting args, loading the environment,

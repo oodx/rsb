@@ -64,6 +64,18 @@ EVERY NEW MAJOR FEATURE NEEDS a `FEATURES_<NAME>.md` under `docs/tech/features/`
   - `visuals` umbrella aggregates color sets + glyphs + prompts.
 - Ensure callers opt in explicitly; do not make visuals a transitive surprise.
 
+## 2.6: Dependency Re-exports (`rsb::deps`)
+- RSB re-exports selected third‑party crates under `rsb::deps` for convenience.
+- Use per‑dependency feature flags to keep builds lean:
+  - `deps-chrono`, `deps-rand`, `deps-regex`, `deps-serde`, etc.
+  - Umbrella alias `deps` (and `deps-all`) enables the full set.
+- Example usage patterns:
+  - Minimal: `cargo test --features deps-chrono` → `use rsb::deps::chrono;`
+  - All: `cargo test --features deps` → `use rsb::deps::*;`
+- Implementation pattern:
+  - Cargo.toml: define `deps-<name>` features and a `deps-all` group; alias `deps = ["deps-all"]`.
+  - src/deps.rs: gate each `pub use <crate>;` behind `#[cfg(any(feature = "deps", feature = "deps-all", feature = "deps-<name>"))]`.
+
 ## 2.6: Legacy Macro Organization
 - All legacy macros live under `src/macros/` and export at crate root via `#[macro_export]`.
 - Group macros logically (core, control_validation, text, time_math, fs_data, streams_exec, visual, etc.).

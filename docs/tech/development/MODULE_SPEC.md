@@ -82,7 +82,7 @@ pub use self::math_string_adapter::parse_num_list;
 
 Error and Logging Conventions
 - Core modules must not depend on optional visual macros (`info!`, `warn!`, `error!`, etc.).
-- Use `utils::glyph_stderr(level, msg)` for best-effort, non-visual logging.
+- Use `utils::stderrx(level, msg)` for best-effort, non-visual logging.
 - Wrap examples/tests that use visual macros with `#[cfg(feature = "visual")]`.
 
 Macro Surface Guidelines
@@ -128,4 +128,3 @@ Testing
 - Include a baseline sanity test for each module without optional features.
 - Gate adapter/integration tests with the required features; ensure runner lanes cover both default and feature-enabled profiles.
 - Use `bin/test.sh` lanes (`smoke`, `all`) and cargo feature combos as documented in HOWTO_TEST.md.
-
