@@ -36,6 +36,10 @@ pub mod visual;
 #[cfg(feature = "progress")]
 pub mod progress;
 
+// Optional dev utilities (e.g., PTY wrapper for tests)
+#[cfg(feature = "dev-pty")]
+pub mod dev;
+
 // Param helpers namespace (non-macro implementation details)
 pub mod param;
 

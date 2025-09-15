@@ -20,6 +20,7 @@ This index links to feature guides, developer docs, and reference material.
 | Colors | Visual color system and runtime registry | [FEATURES_COLORS.md](features/FEATURES_COLORS.md) |
 | Prompts | Interactive prompts with timeouts | [FEATURES_PROMPTS.md](features/FEATURES_PROMPTS.md) |
 | Progress | Modular progress indicators | [FEATURES_PROGRESS.md](features/FEATURES_PROGRESS.md) |
+| Dev Utils | Development/test utilities (PTY wrapper) | [FEATURES_DEV.md](features/FEATURES_DEV.md) |
 
 ## Development
 

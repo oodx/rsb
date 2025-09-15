@@ -129,6 +129,9 @@ visuals = [
 # Progress indicators (zero‑dep core)
 progress = []
 
+# Development/testing utilities (opt‑in)
+dev-pty = [ ]  # PTY wrapper for interactive tests (rsb::dev::pty)
+
 # Dependency re‑exports via rsb::deps (per‑dep opt‑ins + umbrella)
 deps-base64 = []
 deps-chrono = []
@@ -151,6 +154,7 @@ deps = ["deps-all"]      # convenience umbrella
 Examples
 - Visual demos: `cargo test --features visuals`
 - Progress: `cargo test --features progress`
+- PTY-backed tests: `cargo test --features dev-pty`
 - Use a specific dep through RSB: `cargo test --features deps-chrono` then `use rsb::deps::chrono;`
 - Enable all deps: `cargo test --features deps` then `use rsb::deps::*;`
 
