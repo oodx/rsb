@@ -11,6 +11,7 @@ pub mod utils;
 pub mod string;
 pub mod random;
 pub mod math;
+pub mod gx;
 pub mod threads;
 pub mod bash;
 pub mod deps;

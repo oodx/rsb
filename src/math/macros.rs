@@ -9,7 +9,7 @@ macro_rules! math {
         match $crate::math::evaluate_expression($expr) {
             Ok(result) => result,
             Err(e) => {
-                $crate::error!("Math expression failed: {}", e);
+                $crate::utils::glyph_stderr("error", &format!("Math expression failed: {}", e));
                 0.0
             }
         }
@@ -92,7 +92,7 @@ macro_rules! divide {
         match $crate::math::divide($a, $b) {
             Ok(result) => result,
             Err(e) => {
-                $crate::error!("Division error: {}", e);
+                $crate::utils::glyph_stderr("error", &format!("Division error: {}", e));
                 0.0
             }
         }
@@ -112,7 +112,7 @@ macro_rules! sqrt {
         match $crate::math::sqrt($n) {
             Ok(result) => result,
             Err(e) => {
-                $crate::error!("Square root error: {}", e);
+                $crate::utils::glyph_stderr("error", &format!("Square root error: {}", e));
                 0.0
             }
         }
@@ -211,7 +211,7 @@ macro_rules! from_hex {
         match $crate::math::from_hex($hex_str) {
             Ok(result) => result,
             Err(e) => {
-                $crate::error!("Hex parsing error: {}", e);
+                $crate::utils::glyph_stderr("error", &format!("Hex parsing error: {}", e));
                 0
             }
         }
@@ -224,7 +224,7 @@ macro_rules! from_binary {
         match $crate::math::from_binary($bin_str) {
             Ok(result) => result,
             Err(e) => {
-                $crate::error!("Binary parsing error: {}", e);
+                $crate::utils::glyph_stderr("error", &format!("Binary parsing error: {}", e));
                 0
             }
         }
@@ -237,7 +237,7 @@ macro_rules! from_octal {
         match $crate::math::from_octal($oct_str) {
             Ok(result) => result,
             Err(e) => {
-                $crate::error!("Octal parsing error: {}", e);
+                $crate::utils::glyph_stderr("error", &format!("Octal parsing error: {}", e));
                 0
             }
         }
@@ -250,7 +250,7 @@ macro_rules! to_base {
         match $crate::math::to_base($n, $base) {
             Ok(result) => result,
             Err(e) => {
-                $crate::error!("Base conversion error: {}", e);
+                $crate::utils::glyph_stderr("error", &format!("Base conversion error: {}", e));
                 String::new()
             }
         }
@@ -263,7 +263,7 @@ macro_rules! from_base {
         match $crate::math::from_base($num_str, $base) {
             Ok(result) => result,
             Err(e) => {
-                $crate::error!("Base parsing error: {}", e);
+                $crate::utils::glyph_stderr("error", &format!("Base parsing error: {}", e));
                 0
             }
         }
@@ -276,7 +276,7 @@ macro_rules! base_convert {
         match $crate::math::base_convert($num_str, $from_base, $to_base) {
             Ok(result) => result,
             Err(e) => {
-                $crate::error!("Base conversion error: {}", e);
+                $crate::utils::glyph_stderr("error", &format!("Base conversion error: {}", e));
                 String::new()
             }
         }
@@ -305,7 +305,7 @@ macro_rules! ratio {
         match $crate::math::ratio($numerator, $denominator) {
             Ok(result) => result,
             Err(e) => {
-                $crate::error!("Ratio error: {}", e);
+                $crate::utils::glyph_stderr("error", &format!("Ratio error: {}", e));
                 0.0
             }
         }
@@ -334,7 +334,7 @@ macro_rules! modulo {
         match $crate::math::modulo($a, $b) {
             Ok(result) => result,
             Err(e) => {
-                $crate::error!("Modulo error: {}", e);
+                $crate::utils::glyph_stderr("error", &format!("Modulo error: {}", e));
                 0
             }
         }

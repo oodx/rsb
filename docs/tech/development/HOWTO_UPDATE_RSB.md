@@ -26,7 +26,7 @@
 - `FEATURES_PARAMS.md` (param progressive enhancement plan)
  - `FEATURES_STRINGS.md` (string helpers, macros, Unicode behavior)
  - `FEATURES_GLOBAL.md` (global store/expansion/config/introspection)
- - `docs/development/MODULE_SPECIFICATION.md` (module helper/macro/prelude exposure spec)
+- `docs/tech/development/MODULE_SPEC.md` (module helper/macro/prelude exposure spec)
   - `rsb::prelude_ez` (EZ prelude for rapid prototyping; includes curated low-level helpers)
 - `FEATURES_DATE.md` (date macros and helpers)
 - `SESSION.md`, `SESSION_CURRENT.md` (what changed recently)

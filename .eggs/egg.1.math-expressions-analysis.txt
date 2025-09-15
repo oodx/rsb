@@ -1,0 +1,140 @@
+================================================================================
+ 🐔 CHINA'S MATH EXPRESSIONS ANALYSIS EGG #1 🥚
+================================================================================
+
+📋 EGG METADATA:
+   Subject: RSB Math Expressions Module Design & Failing Tests Analysis
+   Requested by: User analyzing evaluate_expression functionality
+   Date/Time: 2025-09-14
+   Target: /src/math/expressions/mod.rs & /tests/math/sanity/expressions.rs
+
++----------------------------------------------+
+ 🔬 EXECUTIVE SUMMARY: DESIGN INTENT REVEALED
++----------------------------------------------+
+
+The evaluate_expression function is designed as a variable assignment engine that:
+1. ONLY handles assignment expressions (VAR = EXPR or VAR += EXPR)
+2. Does NOT support standalone mathematical evaluations
+3. Parses, evaluates, and stores results in global variable store
+4. Uses Shunting Yard algorithm for proper operator precedence
+
+🧪 VERIFICATION TESTS PERFORMED:
+================================
+✅ 9 tests PASSING (basic functionality works)
+❌ 3 tests FAILING (critical design flaws detected)
+
++----------------------------------------------+
+ 🚨 CRITICAL DISCOVERY: NEGATIVE NUMBER PARSING
++----------------------------------------------+
+
+The parser DOES NOT handle negative numbers correctly!
+
+Current tokenizer logic (lines 17-27):
+- Only recognizes digits 0-9 and decimal points as number starts
+- Minus sign (-) always treated as operator token
+- Expression "-5 + 3" becomes: [Operator(-), Number(5), Operator(+), Number(3)]
+- RPN evaluation fails: tries to subtract with only one operand
+
+Expected behavior for "neg = -5 + 3":
+- Should parse -5 as a negative number literal
+- Should result in -2.0, not crash
+
+🔧 ASSIGNMENT VS NON-ASSIGNMENT HANDLING:
+=========================================
+
+The function is HARDCODED to only accept assignment expressions:
+
+Line 162-168: Splits on '=' and requires exactly 2 parts
+- If no '=' found → Returns error "Invalid assignment expression"
+- This explains why "5 + 3" fails (test_error_cases line 126)
+
+SHORTHAND ASSIGNMENT LOGIC:
+- VAR += EXPR → VAR = current_VAR_value + EXPR_result
+- VAR -= EXPR → VAR = current_VAR_value - EXPR_result
+- VAR *= EXPR → VAR = current_VAR_value * EXPR_result
+- VAR /= EXPR → VAR = current_VAR_value / EXPR_result
+
+❌ FAILING TEST ANALYSIS:
+========================
+
+🐛 TEST: test_edge_cases (line 174)
+   Expression: "neg = -5 + 3"
+   Expected: -2.0
+   Actual: PANIC "Invalid expression: missing operand"
+
+   Problem: Tokenizer sees [-,5,+,3] instead of [(-5),+,3]
+   Root Cause: No negative number literal support
+
+🐛 TEST: test_complex_expressions (line 157)
+   Expression: "complex = x ** 2 + y * z - 5"
+   Expected: 11.0 (2^2 + 3*4 - 5 = 4 + 12 - 5 = 11)
+   Actual: 131.0
+
+   Problem: Likely operator precedence issue with power (**) operation
+   Root Cause: ** → ^ conversion or precedence ordering
+
+🐛 TEST: test_error_cases (line 127)
+   Expression: "x + y = 5"
+   Expected: Should fail (invalid left side)
+   Actual: PASSES (but shouldn't)
+
+   Problem: Parser accepts complex left-hand expressions
+   Root Cause: No validation that left side is simple variable name
+
+✅ WHAT WORKS CORRECTLY:
+========================
+
+🎯 Basic arithmetic with proper precedence:
+   - "result = 2 + 3 * 4" → 14.0 (not 20.0)
+   - Parentheses override: "(2 + 3) * 4" → 20.0
+
+🎯 Variable resolution:
+   - Uses get_var()/set_var() from global store
+   - Variables properly substituted in expressions
+
+🎯 Shorthand operators:
+   - counter += 5, counter -= 3, etc. all work correctly
+
+🎯 Power operations:
+   - "2 ** 3" → 8.0 (** converted to ^ internally)
+
+🎯 Complex parenthetical expressions:
+   - "((2 + 3) * (4 - 1))" → 15.0
+
+📝 DESIGN INTENT CONCLUSIONS:
+=============================
+
+The evaluate_expression function is intended as a CALCULATOR WITH MEMORY:
+1. Every operation must assign to a variable
+2. Supports complex mathematical expressions with variables
+3. Maintains state through global variable store
+4. Designed for scripting/automation contexts
+
+🔧 REQUIRED FIXES FOR FAILING TESTS:
+====================================
+
+1. NEGATIVE NUMBER PARSING:
+   - Modify tokenizer to recognize negative literals
+   - Add context-aware minus handling (unary vs binary)
+
+2. OPERATOR PRECEDENCE:
+   - Verify ** (power) precedence is higher than +/-
+   - Check precedence values in get_precedence()
+
+3. ASSIGNMENT VALIDATION:
+   - Add validation that left side is simple variable name
+   - Reject expressions like "x + y = 5"
+
+⚠️  DISCLAIMERS:
+================
+This analysis reflects the current state of source files examined on 2025-09-14.
+Actual runtime behavior may differ based on:
+- Global variable store state
+- Compilation flags or runtime configuration
+- Dependencies not analyzed in this summary
+
+Additional verification with live debugging recommended for complete accuracy.
+
+================================================================================
+ 🐔 CHINA'S SIGN-OFF: "Some bugs are just unhatched features!" 🥚
+================================================================================

@@ -1,0 +1,20 @@
+RSB Tasks Tracker
+Date: $(date -u +%Y-%m-%dT%H:%M:%SZ)
+
+Completed
+- [x] Add README “Start Here” section with key dev/reference links
+- [x] Fix HOWTO_UPDATE_RSB link to MODULE_SPEC and add redirect stub
+- [x] Confirm feature docs exist under docs/tech/features
+
+Planned / Next
+- [ ] Prelude audit: ensure optional visuals/log macros are not exported via prelude
+- [ ] Cross-link docs: add README pointers to docs/tech/development and docs/tech/reference where helpful
+- [ ] Test runs: `./bin/test.sh list`, `run smoke`, `run all`; `cargo test` and `cargo test --features visuals`
+- [ ] Module-owned macro migration: move legacy macros in src/macros/ into module-owned macros.rs where applicable; update prelude::macros
+- [ ] Verify doc references (HOWTO_UPDATE_RSB, others) point to existing paths; fix any stale links
+- [ ] Consider adding a docs/index.md that links HOWTO_UPDATE_RSB, MODULE_SPEC, HOWTO_TEST, REBEL, RSB_ARCH
+- [ ] Optional: add CI to run smoke suite and visuals (feature-gated) on demand
+
+Notes
+- Feature docs present: FEATURES_BASH, CLI, COLORS, DATE, GLOBAL, HOST, MATH, OPTIONS, PARAMS, PROMPTS, STRINGS, THREADS, TOKENS
+- HOWTO_TEST documents wrapper pattern and runner; verify wrappers reflect current layout

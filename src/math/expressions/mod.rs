@@ -1,5 +1,19 @@
 use crate::global::{get_var, set_var};
 
+fn is_valid_variable_name(name: &str) -> bool {
+    if name.is_empty() {
+        return false;
+    }
+    // Must start with letter or underscore
+    let mut chars = name.chars();
+    let first_char = chars.next().unwrap();
+    if !first_char.is_alphabetic() && first_char != '_' {
+        return false;
+    }
+    // Rest can be alphanumeric or underscore
+    chars.all(|c| c.is_alphanumeric() || c == '_')
+}
+
 #[derive(Debug, Clone, PartialEq)]
 enum MathToken {
     Number(f64),
@@ -38,9 +52,33 @@ fn parse_math_tokens(expr: &str) -> Result<Vec<MathToken>, String> {
                 }
                 tokens.push(MathToken::Variable(var_str));
             }
-            '+' | '-' | '/' | '%' => {
+            '+' | '/' | '%' => {
                 tokens.push(MathToken::Operator(c));
                 chars.next();
+            }
+            '-' => {
+                chars.next();
+                // Check if this is a negative number (unary minus)
+                // It's unary if: at start, after operator, or after opening paren
+                let is_unary = tokens.is_empty() ||
+                    matches!(tokens.last(), Some(MathToken::Operator(_)) | Some(MathToken::LeftParen));
+
+                if is_unary && chars.peek().map_or(false, |c| c.is_digit(10) || *c == '.') {
+                    // Parse negative number
+                    let mut num_str = String::from("-");
+                    while let Some(&c) = chars.peek() {
+                        if c.is_digit(10) || c == '.' {
+                            num_str.push(c);
+                            chars.next();
+                        } else {
+                            break;
+                        }
+                    }
+                    tokens.push(MathToken::Number(num_str.parse::<f64>().map_err(|_| format!("Invalid negative number: {}", num_str))?));
+                } else {
+                    // It's a binary minus operator
+                    tokens.push(MathToken::Operator('-'));
+                }
             }
             '*' => {
                 chars.next();
@@ -178,6 +216,11 @@ pub fn evaluate_expression(full_expr: &str) -> Result<f64, String> {
     } else {
         ('=', target_var)
     };
+
+    // Validate that var_name is a simple variable identifier
+    if !is_valid_variable_name(var_name) {
+        return Err(format!("Invalid variable name: '{}'. Must be a simple identifier.", var_name));
+    }
 
     let tokens = parse_math_tokens(expr_str)?;
     let rpn = shunting_yard(tokens)?;

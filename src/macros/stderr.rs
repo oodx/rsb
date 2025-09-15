@@ -41,3 +41,6 @@ macro_rules! stderr {
 macro_rules! echo { ($($arg:tt)*) => { println!("{}", $crate::global::expand_vars(&format!($($arg)*))); }; }
 #[macro_export]
 macro_rules! printf { ($($arg:tt)*) => { print!("{}", $crate::global::expand_vars(&format!($($arg)*))); }; }
+
+#[macro_export]
+macro_rules! error { ($($arg:tt)*) => { eprintln!("ERROR: {}", format!($($arg)*)); }; }

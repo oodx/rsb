@@ -162,3 +162,19 @@ macro_rules! require_command {
 macro_rules! require_var {
     ($var:expr) => { $crate::validate!($crate::global::has_var($var), "Required variable not set: {}", $var); };
 }
+
+// --- Variable Management Macros ---
+
+#[macro_export]
+macro_rules! set_var {
+    ($name:expr, $value:expr) => {
+        $crate::global::set_var($name, $value);
+    };
+}
+
+#[macro_export]
+macro_rules! get_var {
+    ($name:expr) => {
+        $crate::global::get_var($name)
+    };
+}
