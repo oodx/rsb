@@ -42,7 +42,8 @@ pub fn options(args: &Args) {
             // Handle negation: --not-verbose
             if arg_key.starts_with("not-") {
                 let base = arg_key.trim_start_matches("not-").replace("-", "_");
-                global::set_var(&format!("opt_{}", base), "0");
+                // REBEL boolean: 1 = false
+                global::set_var(&format!("opt_{}", base), "1");
                 continue;
             }
 
@@ -85,23 +86,25 @@ pub fn options(args: &Args) {
 
                 global::set_var(&format!("opt_{}", opt_name.replace("-", "_")), opt_value);
             } else {
-                // Flag option (no value)
-                global::set_var(&format!("opt_{}", arg_clean.replace("-", "_")), "1");
+                // Flag option (no value) — REBEL boolean: 0 = true
+                global::set_var(&format!("opt_{}", arg_clean.replace("-", "_")), "0");
             }
         } else if arg.starts_with("-") && arg.len() == 2 {
             // Short option
             let opt_char = &arg[1..2];
-            global::set_var(&format!("opt_{}", opt_char), "1");
+            // REBEL boolean: 0 = true
+            global::set_var(&format!("opt_{}", opt_char), "0");
 
             // Standard options mapping (when stdopts feature is enabled)
             #[cfg(feature = "stdopts")]
             match opt_char {
-                "d" => global::set_var("opt_debug", "1"),
-                "q" => global::set_var("opt_quiet", "1"),
-                "t" => global::set_var("opt_trace", "1"),
-                "D" => global::set_var("opt_dev_mode", "1"),
-                "y" => global::set_var("opt_yes", "1"),
-                "s" => global::set_var("opt_safe", "1"),
+                // REBEL boolean: 0 = true
+                "d" => global::set_var("opt_debug", "0"),
+                "q" => global::set_var("opt_quiet", "0"),
+                "t" => global::set_var("opt_trace", "0"),
+                "D" => global::set_var("opt_dev_mode", "0"),
+                "y" => global::set_var("opt_yes", "0"),
+                "s" => global::set_var("opt_safe", "0"),
                 _ => {}
             }
         }
@@ -120,7 +123,7 @@ pub fn options(args: &Args) {
 /// assert!(!has_option("quiet"));
 /// ```
 pub fn has_option(name: &str) -> bool {
-    global::get_var(&format!("opt_{}", name)) == "1"
+    crate::global::is_true_val(global::get_var(&format!("opt_{}", name)))
 }
 
 /// Get option value if it was provided.

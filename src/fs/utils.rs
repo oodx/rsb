@@ -277,7 +277,7 @@ pub fn create_temp_file_path(name_type: &str) -> String {
     let filename = match name_type {
         "pid" => format!("{}.tmp", std::process::id()),
         "timestamp" => format!("{}.tmp", chrono::Utc::now().timestamp_millis()),
-        "random" | _ => format!("{}.tmp", crate::random::get_rand_alnum(8)),
+        "random" | _ => format!("{}.tmp", crate::gx::string::get_rand_alnum(8)),
     };
     let mut path = std::path::PathBuf::from(tmp_dir);
     path.push(filename);

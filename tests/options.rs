@@ -7,7 +7,7 @@ fn long_boolean_flag_sets_true() {
     let args = vec!["rsb-test".to_string(), "--quiet".to_string()];
     let args = rsb::cli::Args::new(&args);
     options!(&args);
-    assert_eq!(get_var("opt_quiet"), "1");
+    assert_eq!(get_var("opt_quiet"), "0");
 }
 
 #[test]
@@ -38,7 +38,7 @@ fn long_space_value_is_not_consumed_boolean_only() {
     ];
     let args = rsb::cli::Args::new(&args);
     options!(&args);
-    assert_eq!(get_var("opt_config"), "1");
+    assert_eq!(get_var("opt_config"), "0");
 }
 
 #[test]
@@ -89,8 +89,8 @@ fn multi_generic_sets_letters_and_supports_inline_and_commas() {
     ];
     let args = rsb::cli::Args::new(&args);
     options!(&args);
-    assert_eq!(get_var("opt_d"), "1");
-    assert_eq!(get_var("opt_q"), "1");
+    assert_eq!(get_var("opt_d"), "0");
+    assert_eq!(get_var("opt_q"), "0");
 
     // Inline with negation toggle
     let args2 = vec![
@@ -99,8 +99,8 @@ fn multi_generic_sets_letters_and_supports_inline_and_commas() {
     ];
     let args2 = rsb::cli::Args::new(&args2);
     options!(&args2);
-    assert_eq!(get_var("opt_d"), "1");
-    assert_eq!(get_var("opt_q"), "1");
-    assert_eq!(get_var("opt_t"), "0");
-    assert_eq!(get_var("opt_s"), "0");
+    assert_eq!(get_var("opt_d"), "0");
+    assert_eq!(get_var("opt_q"), "0");
+    assert_eq!(get_var("opt_t"), "1");
+    assert_eq!(get_var("opt_s"), "1");
 }
