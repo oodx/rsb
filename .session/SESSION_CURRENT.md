@@ -27,8 +27,8 @@ Repo: rsb (new canonical), branch `main`
 - Params concept: comprehensive features passing; plan marked Completed.
 
 ## Next Actions
-1) Choose next concept (e.g., GLOBAL or DATE) and repeat: analyze, fill gaps, add/adjust tests, update PLAN, commit.
-2) Continue using smoke lane for quick validation, and targeted cargo test for new/changed tests.
+1) Legacy macro migration: identify remaining items in `src/macros/` suitable for MODULE_SPEC migration and schedule moves into module-owned `macros.rs` with curated exports; update `prelude::macros` accordingly (deferred for a focused pass).
+2) Verify any remaining doc cross-links opportunistically during future changes.
 
 ## Notes
 - If full `cargo test` fails due to linker disk space, prioritize targeted lanes (`smoke`, feature subsets) and visuals lane.
