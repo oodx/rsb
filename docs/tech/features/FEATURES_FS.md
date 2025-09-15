@@ -21,6 +21,9 @@ Public API (curated)
 - Dictionaries: `load_dict_from_file`
 - Temp files: `create_temp_file_path`, `capture_stream_to_temp_file`, `cleanup_temp_files`
 - File-based sed: `sed_lines_file`, `sed_around_file`, `sed_insert_file`, `sed_template_file`
+- Counters (wc-like):
+  - strings: `wc!(content) -> "lines words chars"`, `wc_lines!`, `wc_words!`, `wc_chars!`
+  - files: `wc_file!(path)`, `wc_lines_file!`, `wc_words_file!`, `wc_chars_file!`
 
 Macros (curated)
 - Files/temp: `chmod!`, `backup!`, `tmp!`, `cap_stream!`, `subst!`
@@ -67,4 +70,3 @@ Testing (HOWTO_TEST)
 Status
 - MODERN: Yes — utils in one place, macros are thin, curated surface.
 - SPEC_ALIGNED: Yes — orchestrator-only `mod.rs`, module-owned `macros.rs`, documented and tested.
-

@@ -27,49 +27,32 @@ macro_rules! dict {
     ($path:expr) => { $crate::fs::load_dict_from_file($path) };
 }
 
-// --- Advanced Sed Macros ---
+// --- WC-like counters (string and file) ---
 #[macro_export]
-macro_rules! sed_lines { ($content:expr, $start:expr, $end:expr) => { $crate::streams::Stream::from_string($content).sed_lines($start, $end).to_string() }; }
-#[macro_export]
-macro_rules! sed_around { ($content:expr, $pattern:expr, $context:expr) => { $crate::streams::Stream::from_string($content).sed_around($pattern, $context).to_string() }; }
+macro_rules! wc { ($content:expr) => { $crate::fs::wc_string($content) }; }
 
 #[macro_export]
-macro_rules! sed_insert {
-    ($content:expr, $sentinel:expr, $source:expr) => {{
-        match $crate::streams::Stream::from_string($source).sed_insert($content, $sentinel) {
-            Ok(stream) => stream.to_string(),
-            Err(e) => { $crate::error!("sed_insert failed: {}", e); std::process::exit(1); }
-        }
-    }};
-}
+macro_rules! wc_lines { ($content:expr) => { $crate::fs::count_lines_str($content) }; }
 
 #[macro_export]
-macro_rules! sed_template { ($content:expr, $sentinel:expr, $source:expr) => { $crate::streams::Stream::from_string($source).sed_template($content, $sentinel).to_string() }; }
+macro_rules! wc_words { ($content:expr) => { $crate::fs::count_words_str($content) }; }
 
 #[macro_export]
-macro_rules! sed_replace {
-    ($source:expr, $from:expr, $to:expr) => { $source.replace($from, $to) };
-    ($source:expr, $from:expr, $to:expr, all) => { $source.replace($from, $to) };
-}
-
-// --- File-based Sed Macros ---
-#[macro_export]
-macro_rules! sed_lines_file { ($path:expr, $start:expr, $end:expr) => { $crate::fs::sed_lines_file($path, $start, $end) }; }
-#[macro_export]
-macro_rules! sed_around_file { ($path:expr, $pattern:expr, $context:expr) => { $crate::fs::sed_around_file($path, $pattern, $context) }; }
+macro_rules! wc_chars { ($content:expr) => { $crate::fs::count_chars_str($content) }; }
 
 #[macro_export]
-macro_rules! sed_insert_file {
-    ($path:expr, $content:expr, $sentinel:expr) => {{
-        match $crate::fs::sed_insert_file($path, $content, $sentinel) {
-            Ok(_) => {},
-            Err(e) => { $crate::error!("sed_insert_file failed: {}", e); std::process::exit(1); }
-        }
-    }};
-}
+macro_rules! wc_file { ($path:expr) => { $crate::fs::wc_file_string($path) }; }
 
 #[macro_export]
-macro_rules! sed_template_file { ($path:expr, $content:expr, $sentinel:expr) => { $crate::fs::sed_template_file($path, $content, $sentinel) }; }
+macro_rules! wc_lines_file { ($path:expr) => { $crate::fs::count_lines_file($path) }; }
+
+#[macro_export]
+macro_rules! wc_words_file { ($path:expr) => { $crate::fs::count_words_file($path) }; }
+
+#[macro_export]
+macro_rules! wc_chars_file { ($path:expr) => { $crate::fs::count_chars_file($path) }; }
+
+// File-based sed macros moved to parse::macros as an adapter over fs
 
 // --- Archive Macros ---
 #[macro_export]

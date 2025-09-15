@@ -225,6 +225,52 @@ pub fn load_dict_from_file(path: &str) -> Vec<String> {
     content.split_whitespace().map(|s| s.to_string()).collect()
 }
 
+// --- Counters (wc-like) ---
+/// Count lines in a string (splits on '\n').
+pub fn count_lines_str(s: &str) -> usize { s.lines().count() }
+
+/// Count words in a string (whitespace-delimited).
+pub fn count_words_str(s: &str) -> usize { s.split_whitespace().count() }
+
+/// Count Unicode scalar characters in a string.
+pub fn count_chars_str(s: &str) -> usize { s.chars().count() }
+
+/// Return wc-like triple for a string: (lines, words, chars).
+pub fn wc_tuple_str(s: &str) -> (usize, usize, usize) {
+    (count_lines_str(s), count_words_str(s), count_chars_str(s))
+}
+
+/// wc as a single space-delimited string: "lines words chars".
+pub fn wc_string(s: &str) -> String {
+    let (l, w, c) = wc_tuple_str(s);
+    format!("{} {} {}", l, w, c)
+}
+
+/// File-backed counters
+pub fn count_lines_file(path: &str) -> usize {
+    let content = read_file(path);
+    count_lines_str(&content)
+}
+
+pub fn count_words_file(path: &str) -> usize {
+    let content = read_file(path);
+    count_words_str(&content)
+}
+
+pub fn count_chars_file(path: &str) -> usize {
+    let content = read_file(path);
+    count_chars_str(&content)
+}
+
+pub fn wc_tuple_file(path: &str) -> (usize, usize, usize) {
+    let content = read_file(path);
+    wc_tuple_str(&content)
+}
+
+pub fn wc_file_string(path: &str) -> String {
+    let (l, w, c) = wc_tuple_file(path);
+    format!("{} {} {}", l, w, c)
+}
 pub fn create_temp_file_path(name_type: &str) -> String {
     let tmp_dir = crate::global::get_var("XDG_TMP");
     let _ = std::fs::create_dir_all(&tmp_dir);
@@ -251,30 +297,4 @@ pub fn cleanup_temp_files() {
     }
 }
 
-pub fn sed_lines_file(path: &str, start_line: usize, end_line: usize) -> String {
-    use crate::streams::Stream;
-    let content = read_file(path);
-    Stream::from_string(&content).sed_lines(start_line, end_line).to_string()
-}
-
-pub fn sed_around_file(path: &str, pattern: &str, context_lines: usize) -> String {
-    use crate::streams::Stream;
-    let content = read_file(path);
-    Stream::from_string(&content).sed_around(pattern, context_lines).to_string()
-}
-
-pub fn sed_insert_file(path: &str, content: &str, sentinel: &str) -> Result<(), String> {
-    use crate::streams::Stream;
-    let file_content = read_file(path);
-    let result_stream = Stream::from_string(&file_content).sed_insert(content, sentinel)?;
-    write_file(path, &result_stream.to_string());
-    Ok(())
-}
-
-pub fn sed_template_file(path: &str, content: &str, sentinel: &str) {
-    use crate::streams::Stream;
-    let file_content = read_file(path);
-    let result = Stream::from_string(&file_content).sed_template(content, sentinel).to_string();
-    write_file(path, &result);
-}
-
+// File-based sed helpers now live under parse::sed_file

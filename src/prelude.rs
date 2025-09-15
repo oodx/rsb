@@ -55,7 +55,9 @@ pub use crate::{
     rand_alnum, rand_alpha, rand_dict, rand_hex, rand_string, rand_uuid,
     rand_range,
     readline, require_command, require_dir, require_file, require_var, sed_around, sed_around_file,
-    sed_insert, sed_insert_file, sed_lines, sed_lines_file, sed_replace, sed_template,
+    sed_insert, sed_insert_file, sed_lines, sed_lines_file, sed_replace, sed_template, sed_read,
+    // fs counters
+    wc, wc_file, wc_lines, wc_words, wc_chars, wc_lines_file, wc_words_file, wc_chars_file,
     sed_template_file, run, shell, src, stderr, stream, str_explode, str_in, str_len,
     str_trim, str_line, subst, tar, tar_gz, test, tmp, to_number, trap, unpack, unlock, user, validate,
     with_lock, zip, sleep, path_canon, path_split, meta_keys,

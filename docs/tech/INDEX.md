@@ -18,6 +18,7 @@ This index links to feature guides, developer docs, and reference material.
 | Threads | Thread utilities and job control | [FEATURES_THREADS.md](features/FEATURES_THREADS.md) |
 | Bash | Shell interaction and job macros | [FEATURES_BASH.md](features/FEATURES_BASH.md) |
 | FS | File system operations and helpers | [FEATURES_FS.md](features/FEATURES_FS.md) |
+| Parse | String/stream sed-like transforms + file adapter | [FEATURES_PARSE.md](features/FEATURES_PARSE.md) |
 | Colors | Visual color system and runtime registry | [FEATURES_COLORS.md](features/FEATURES_COLORS.md) |
 | Prompts | Interactive prompts with timeouts | [FEATURES_PROMPTS.md](features/FEATURES_PROMPTS.md) |
 | Progress | Modular progress indicators | [FEATURES_PROGRESS.md](features/FEATURES_PROGRESS.md) |
