@@ -156,6 +156,8 @@ Examples
 
 ## Contributing
 
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide.
+
 - Follow the prelude policy: optional subsystems (visuals, logging, progress, etc.) must not be exported via the prelude.
 - For new or changed behavior in a module, update or add a feature guide under `docs/tech/features/FEATURES_<NAME>.md`.
 - Keep the index up to date: add your feature doc to `docs/tech/INDEX.md` (use relative links, table format).

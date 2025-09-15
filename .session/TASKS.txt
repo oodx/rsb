@@ -1,20 +1,24 @@
 RSB Tasks Tracker
-Date: $(date -u +%Y-%m-%dT%H:%M:%SZ)
+Date: 2025-09-15T00:00:00Z
 
 Completed
-- [x] Add README “Start Here” section with key dev/reference links
-- [x] Fix HOWTO_UPDATE_RSB link to MODULE_SPEC and add redirect stub
-- [x] Confirm feature docs exist under docs/tech/features
+- [x] Rename internal logger to `stderrx` (shim for `glyph_stderr`) and update call sites
+- [x] Enhance `pre_dispatch!` to auto-register handlers and accept `desc:` (mirror `dispatch!`)
+- [x] Integrate progress module behind `progress` feature; add `FEATURES_PROGRESS.md`; restore two-mode rate formatting
+- [x] Rewrite `FEATURES_COLORS.md` for MODERN + SPEC_ALIGNED
+- [x] Refresh README: Start Here table, Feature docs with Progress, Cargo features section
+- [x] Refresh docs index: tables and relative links
+- [x] Remove stashed `set_var!`/`get_var!` macros; use function API in tests/docs
+- [x] Implement grouped + per-dependency `rsb::deps` surface; add `deps::prelude` (optional)
+- [x] Validate tests: core, visuals, and progress builds
 
 Planned / Next
-- [ ] Prelude audit: ensure optional visuals/log macros are not exported via prelude
-- [ ] Cross-link docs: add README pointers to docs/tech/development and docs/tech/reference where helpful
-- [ ] Test runs: `./bin/test.sh list`, `run smoke`, `run all`; `cargo test` and `cargo test --features visuals`
-- [ ] Module-owned macro migration: move legacy macros in src/macros/ into module-owned macros.rs where applicable; update prelude::macros
-- [ ] Verify doc references (HOWTO_UPDATE_RSB, others) point to existing paths; fix any stale links
-- [ ] Consider adding a docs/index.md that links HOWTO_UPDATE_RSB, MODULE_SPEC, HOWTO_TEST, REBEL, RSB_ARCH
-- [ ] Optional: add CI to run smoke suite and visuals (feature-gated) on demand
+- [ ] Legacy macro migration: move remaining legacy macros in `src/macros/` into module-owned `macros.rs`; update `prelude::macros`
+- [ ] Optional: convert math `random_list!` error logging to `stderrx` for uniformity
+- [ ] Optional CI: add lanes for smoke, visuals, progress
+- [ ] Keep README and docs index in sync when adding new features/modules
+- [ ] RFC guideline: require brief discussion before changing user-visible output defaults (e.g., progress formatting)
 
 Notes
-- Feature docs present: FEATURES_BASH, CLI, COLORS, DATE, GLOBAL, HOST, MATH, OPTIONS, PARAMS, PROMPTS, STRINGS, THREADS, TOKENS
-- HOWTO_TEST documents wrapper pattern and runner; verify wrappers reflect current layout
+- Visuals are opt-in; default builds print plain text with color tags stripped.
+- Deps surface: enable individual crates with `deps-<name>` or the full set via `deps`/`deps-all`.

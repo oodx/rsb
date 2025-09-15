@@ -1,46 +1,40 @@
-# Session: Per-Concept Plans, Math Decoupling, Next Steps
+# Session: Progress Integration, CLI Dispatch, Colors/Docs, Deps Surface
 
 Date: 2025-09-15
-Repo: rsb (new canonical), branch `main`
+Repo: rsb (canonical), branch `main`
 
 ## Summary
-- Added plan files for each feature concept in `.session/PLAN_*.md`.
-- Began implementation with Math: decoupled math macros from visual logging and updated math UAT global usage to function-based API.
-- Prelude audit confirms optional visuals/log macros are not exported via prelude.
+- Logger rename: internal `glyph_stderr` → `stderrx`; all call sites updated; shim retained for compatibility.
+- CLI macros: `pre_dispatch!` enhanced to auto‑register handlers and accept `desc:"..."` (mirrors `dispatch!`).
+- Progress module integrated behind `progress` feature; added `FEATURES_PROGRESS.md`; fixed tests and preserved rate formatting behavior.
+- Colors docs aligned (MODERN + SPEC_ALIGNED) and help/inspect use unified color expansion.
+- Deps surface: added per‑dependency and umbrella features with gated re‑exports in `rsb::deps` plus optional `deps::prelude`.
+- README and docs index refreshed: tables, relative links, Cargo feature map, feature index includes Progress.
+- Removed stashed `set_var!` / `get_var!` macros to prevent defects; use function API.
 
-## Plans Added
-- PLAN_STRINGS.md, PLAN_PARAMS.md, PLAN_GLOBAL.md, PLAN_COLORS.md, PLAN_DATE.md, PLAN_TOKENS.md,
-  PLAN_PROMPTS.md, PLAN_OPTIONS.md, PLAN_HOST.md, PLAN_THREADS.md, PLAN_CLI.md, PLAN_BASH.md, PLAN_OPTIONS_STDOPTS.md
+## Status
+- Tests
+  - `cargo test`: PASS
+  - `cargo test --features visuals`: PASS
+  - `cargo test --features progress`: PASS
+- Policy checks
+  - Prelude policy: compliant (no optional visual/log exports via prelude).
+  - Progress rate formatting: two‑mode behavior (>=1.0 → 1 decimal, <1.0 → 2 decimals) preserved.
 
-- Math concept: macros decoupled from visual logging; math UAT adjusted; smoke lane green.
-- Strings concept: UAT added (`tests/uat/string.rs` + wrapper) and verified via targeted test run. Plan marked Completed.
-- Tokens concept: existing sanity, feature, and UAT tests all passing; plan marked Completed.
-- Global concept: feature, core, and adapter tests passing; plan marked Completed.
-- Date concept: feature + UAT tests passing; plan marked Completed.
-- Options concept: default and stdopts feature tests passing; plans marked Completed.
-- CLI concept: E2E shell test passed; plan marked Completed.
-- CLI concept: E2E shell test passed; plan marked Completed.
-- Colors/Visuals: visuals tests passing after macro fix; plan marked Completed.
-- Host concept: env and paths tests passing; plan marked Completed.
-- Threads concept: sanity + UAT passing; plan marked Completed.
-- Bash concept: sanity + UAT passing; plan marked Completed.
-- Params concept: comprehensive features passing; plan marked Completed.
+## What Changed (Key Paths)
+- Logger: `src/utils.rs` (`stderrx`, shim), macros under `src/macros/{stderr.rs,visual.rs}`.
+- CLI: `src/cli/{macros.rs,dispatch.rs}`; registry printing in `src/global/registry.rs`.
+- Progress: `src/progress/{mod.rs,core.rs,manager.rs,terminal.rs,styles.rs}`; docs `docs/tech/features/FEATURES_PROGRESS.md`.
+- Colors: `docs/tech/features/FEATURES_COLORS.md` rewritten.
+- Deps: features in `Cargo.toml`; code in `src/deps.rs`.
+- Docs landing: `README.md` and `docs/tech/INDEX.md` use table layout and relative links.
 
 ## Next Actions
-1) Legacy macro migration: identify remaining items in `src/macros/` suitable for MODULE_SPEC migration and schedule moves into module-owned `macros.rs` with curated exports; update `prelude::macros` accordingly (deferred for a focused pass).
-2) Verify any remaining doc cross-links opportunistically during future changes.
+1) Optional: convert remaining math `random_list!` error paths to `stderrx` for uniform logging.
+2) Legacy macro migration pass: move remaining legacy items in `src/macros/` into module‑owned `macros.rs` per MODULE_SPEC; update `prelude::macros`.
+3) Optional CI: add smoke + visuals + progress lanes.
+4) Keep README/INDEX in sync when adding modules or features; add RFC notes for any behavior changes.
 
 ## Notes
-- If full `cargo test` fails due to linker disk space, prioritize targeted lanes (`smoke`, feature subsets) and visuals lane.
-
-## Wrap-up (This Pass)
-- All major concept suites validated green (sanity, features, UAT; visuals included).
-- Docs index added and README cross-linked.
-- Plans for each concept saved in `.session/PLAN_*.md` and marked Completed.
-- CLI built-ins polished: inspect/help/stack now expand color templates correctly; handler registry stores clean names (no pointer strings).
-
-## Continuation Checklist
-- Validate lanes on a fresh workspace: `./bin/test.sh run smoke`, key wrappers, and visuals features.
-- Begin incremental migration of legacy macros in `src/macros/` to module-owned `macros.rs` per MODULE_SPEC.
-- Keep prelude policy intact (core-only; visuals/loggers opt-in).
-- Drafted modular feature-gating plan at `docs/tech/development/FEATURES_GATING_PLAN.md` for per-concept basic/advanced enablement.
+- The deps surface now supports both per‑dependency opt‑in (e.g., `deps-chrono`) and a full umbrella (`deps`/`deps-all`).
+- For visuals, default builds print plain text (tags stripped); visuals render when the `visuals` feature is enabled.
