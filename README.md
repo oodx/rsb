@@ -90,6 +90,62 @@ Index of Feature Modules
 | **Threads** | Threading utilities and background tasks | [`FEATURES_THREADS.md`](docs/tech/features/FEATURES_THREADS.md) |
 | **Tokens** | Token generation and parsing utilities | [`FEATURES_TOKENS.md`](docs/tech/features/FEATURES_TOKENS.md) |
 | **Options** | Configuration options and feature flags | [`FEATURES_OPTIONS.md`](docs/tech/features/FEATURES_OPTIONS.md) |
+| **Progress** | Modular progress indicators (spinner/bar/bytes) | [`FEATURES_PROGRESS.md`](docs/tech/features/FEATURES_PROGRESS.md) |
+
+## Cargo Features
+
+Feature flags are explicit and modular. Enable only what you need:
+
+```
+[features]
+default = []
+
+# Visual base + packages
+visual = []
+colors-simple = ["visual"]
+colors-status = ["visual"]
+colors-named  = ["visual", "colors-simple"]
+colors-all    = ["visual", "colors-simple", "colors-named", "colors-status"]
+colors        = ["visual", "colors-simple"]        # convenience baseline
+
+# Other visual components
+glyphs  = ["visual"]
+prompts = ["visual", "colors-simple"]
+
+# Umbrella for everything visual (colors + glyphs + prompts)
+visuals = [
+  "visual",
+  "colors-simple", "colors-named", "colors-status",
+  "glyphs", "prompts",
+]
+
+# Progress indicators (zero‑dep core)
+progress = []
+
+# Dependency re‑exports via rsb::deps (per‑dep opt‑ins + umbrella)
+deps-base64 = []
+deps-chrono = []
+deps-glob = []
+deps-lazy_static = []
+deps-libc = []
+deps-rand = []
+deps-regex = []
+deps-serde = []
+deps-serde_json = []
+deps-urlencoding = []
+deps-uuid = []
+deps-all = [
+  "deps-base64","deps-chrono","deps-glob","deps-lazy_static","deps-libc",
+  "deps-rand","deps-regex","deps-serde","deps-serde_json","deps-urlencoding","deps-uuid",
+]
+deps = ["deps-all"]      # convenience umbrella
+```
+
+Examples
+- Visual demos: `cargo test --features visuals`
+- Progress: `cargo test --features progress`
+- Use a specific dep through RSB: `cargo test --features deps-chrono` then `use rsb::deps::chrono;`
+- Enable all deps: `cargo test --features deps` then `use rsb::deps::*;`
 
 ## Getting Started
 

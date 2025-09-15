@@ -108,9 +108,16 @@ impl ProgressManager {
         self.active_tasks.lock().unwrap().get(&task_id).cloned()
     }
 
-    /// Get all active tasks
+    /// Get all active (non-finished) tasks
     pub fn active_tasks(&self) -> Vec<Arc<ProgressTask>> {
-        self.active_tasks.lock().unwrap().values().cloned().collect()
+        self
+            .active_tasks
+            .lock()
+            .unwrap()
+            .values()
+            .filter(|t| !t.is_finished())
+            .cloned()
+            .collect()
     }
 
     /// Remove a completed task

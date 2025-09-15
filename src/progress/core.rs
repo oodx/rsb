@@ -442,7 +442,7 @@ mod tests {
 
         // Test rate formatting
         assert_eq!(format_rate(100, Duration::from_secs(10)), "10.0 items/s");
-        assert_eq!(format_rate(5, Duration::from_secs(10)), "0.5 items/s");
+        assert_eq!(format_rate(5, Duration::from_secs(10)), "0.50 items/s");
     }
 
     #[test]
