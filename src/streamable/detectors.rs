@@ -9,11 +9,7 @@ impl Streamable for DetectEmpty {
     type Args = ();
     
     fn stream_apply(stdin: &str, _args: Self::Args) -> String {
-        if stdin.trim().is_empty() {
-            "true".to_string()
-        } else {
-            "false".to_string()
-        }
+        if stdin.trim().is_empty() { "0".to_string() } else { "1".to_string() }
     }
 }
 
@@ -23,11 +19,7 @@ impl Streamable for DetectPattern {
     type Args = String;
     
     fn stream_apply(stdin: &str, pattern: Self::Args) -> String {
-        if stdin.contains(&pattern) {
-            "true".to_string()
-        } else {
-            "false".to_string()
-        }
+        if stdin.contains(&pattern) { "0".to_string() } else { "1".to_string() }
     }
 }
 
@@ -39,11 +31,7 @@ impl Streamable for DetectBinary {
     fn stream_apply(stdin: &str, _args: Self::Args) -> String {
         // Check for non-text bytes (excluding tab, newline, carriage return)
         let has_binary = stdin.bytes().any(|b| b < 0x20 && b != 0x09 && b != 0x0A && b != 0x0D);
-        if has_binary {
-            "true".to_string()
-        } else {
-            "false".to_string()
-        }
+        if has_binary { "0".to_string() } else { "1".to_string() }
     }
 }
 
@@ -56,11 +44,7 @@ impl Streamable for DetectRegex {
         use regex::Regex;
         match Regex::new(&pattern) {
             Ok(re) => {
-                if re.is_match(stdin) {
-                    "true".to_string()
-                } else {
-                    "false".to_string()
-                }
+                if re.is_match(stdin) { "0".to_string() } else { "1".to_string() }
             }
             Err(_) => "error: invalid regex".to_string()
         }
@@ -76,11 +60,9 @@ impl Streamable for DetectDuplicates {
         use std::collections::HashSet;
         let mut seen = HashSet::new();
         for line in stdin.lines() {
-            if !seen.insert(line) {
-                return "true".to_string();
-            }
+            if !seen.insert(line) { return "0".to_string(); }
         }
-        "false".to_string()
+        "1".to_string()
     }
 }
 
@@ -142,11 +124,7 @@ impl Streamable for DetectAllMatch {
     
     fn stream_apply(stdin: &str, pattern: Self::Args) -> String {
         let all_match = stdin.lines().all(|line| line.contains(&pattern));
-        if all_match {
-            "true".to_string()
-        } else {
-            "false".to_string()
-        }
+        if all_match { "0".to_string() } else { "1".to_string() }
     }
 }
 
@@ -157,11 +135,7 @@ impl Streamable for DetectAnyMatch {
     
     fn stream_apply(stdin: &str, pattern: Self::Args) -> String {
         let any_match = stdin.lines().any(|line| line.contains(&pattern));
-        if any_match {
-            "true".to_string()
-        } else {
-            "false".to_string()
-        }
+        if any_match { "0".to_string() } else { "1".to_string() }
     }
 }
 
@@ -172,16 +146,16 @@ mod tests {
 
     #[test]
     fn test_detect_empty() {
-        assert_eq!("".stream_apply(DetectEmpty, ()), "true");
-        assert_eq!("  \n  ".stream_apply(DetectEmpty, ()), "true");
-        assert_eq!("content".stream_apply(DetectEmpty, ()), "false");
+        assert_eq!("".stream_apply(DetectEmpty, ()), "0");
+        assert_eq!("  \n  ".stream_apply(DetectEmpty, ()), "0");
+        assert_eq!("content".stream_apply(DetectEmpty, ()), "1");
     }
 
     #[test]
     fn test_detect_pattern() {
         let input = "hello world";
-        assert_eq!(input.stream_apply(DetectPattern, "world".to_string()), "true");
-        assert_eq!(input.stream_apply(DetectPattern, "rust".to_string()), "false");
+        assert_eq!(input.stream_apply(DetectPattern, "world".to_string()), "0");
+        assert_eq!(input.stream_apply(DetectPattern, "rust".to_string()), "1");
     }
 
     #[test]
@@ -194,7 +168,7 @@ mod tests {
     fn test_detect_duplicates() {
         let input_with_dup = "line1\nline2\nline1";
         let input_no_dup = "line1\nline2\nline3";
-        assert_eq!(input_with_dup.stream_apply(DetectDuplicates, ()), "true");
-        assert_eq!(input_no_dup.stream_apply(DetectDuplicates, ()), "false");
+        assert_eq!(input_with_dup.stream_apply(DetectDuplicates, ()), "0");
+        assert_eq!(input_no_dup.stream_apply(DetectDuplicates, ()), "1");
     }
 }

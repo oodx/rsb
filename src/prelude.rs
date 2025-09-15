@@ -54,6 +54,8 @@ pub use crate::{
     pid_of, pipe, pre_dispatch, printf, process_exists,
     rand_alnum, rand_alpha, rand_dict, rand_hex, rand_string, rand_uuid,
     rand_range,
+    // boolean helpers
+    is_true, is_false,
     readline, require_command, require_dir, require_file, require_var, sed_around, sed_around_file,
     sed_insert, sed_insert_file, sed_lines, sed_lines_file, sed_replace, sed_template, sed_read,
     // fs counters

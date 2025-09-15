@@ -165,7 +165,7 @@ fn test_options_macro_integration() {
     // Verify options were parsed and stored
     assert_eq!(get_var("opt_verbose"), "0");
     assert_eq!(get_var("opt_config"), "test.conf");
-    assert_eq!(get_var("opt_d"), "1");
+    assert_eq!(get_var("opt_d"), "0");
     assert_eq!(get_var("opt_layout"), "k1=v1,k2=v2");
     
     // Verify token stream recognition

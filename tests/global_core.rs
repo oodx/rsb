@@ -21,8 +21,8 @@ fn expansion_basic_substitution() {
 
 #[test]
 fn integer_boolean_helpers() {
-    rsb::global::set_var("opt_quiet", "1");
-    rsb::global::set_var("opt_trace", "0");
+    rsb::global::set_var("opt_quiet", "0");
+    rsb::global::set_var("opt_trace", "1");
     assert!(rsb::global::is_true("opt_quiet"));
     assert!(rsb::global::is_false("opt_trace"));
 }
@@ -34,4 +34,3 @@ fn token_stream_validation() {
     assert!(rsb::global::is_token_stream("a=1"));
     assert!(!rsb::global::is_token_stream("=bad"));
 }
-

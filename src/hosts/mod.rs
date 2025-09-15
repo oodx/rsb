@@ -1,3 +1,4 @@
+#![allow(unused_imports)]
 //! Host Environment Discovery Module
 //!
 //! Clean orchestrator pattern — host discovers environment, global stores it,

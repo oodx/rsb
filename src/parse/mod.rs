@@ -1,3 +1,4 @@
+#![allow(unused_imports)]
 // src/parse/mod.rs — Orchestrator (MODULE_SPEC)
 // Curated parse transforms (string/stream), sed-like helpers.
 

@@ -65,8 +65,8 @@ fn not_prefix_unsets_positive_and_sets_negative_marker() {
     ];
     let args = rsb::cli::Args::new(&args);
     options!(&args);
-    // Value is explicitly false on the same key
-    assert_eq!(get_var("opt_quiet"), "0");
+    // Value is explicitly false on the same key (REBEL: 1 = false)
+    assert_eq!(get_var("opt_quiet"), "1");
 }
 
 #[test]
@@ -77,7 +77,7 @@ fn not_prefix_alone_sets_negative_marker_only() {
     ];
     let args = rsb::cli::Args::new(&args);
     options!(&args);
-    assert_eq!(get_var("opt_trace"), "0");
+    assert_eq!(get_var("opt_trace"), "1");
 }
 
 #[test]

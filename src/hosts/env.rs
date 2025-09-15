@@ -20,10 +20,10 @@ pub fn import_environment() {
 /// Apply standard mode flags from environment into global (REBEL booleans).
 /// Sets: DEBUG_MODE, DEV_MODE, QUIET_MODE, TRACE_MODE to "0" (true) when present.
 pub fn setup_standard_modes() {
-    if std::env::var("DEBUG").is_ok() { crate::global::set_var("DEBUG_MODE", crate::global::TRUE); }
-    if std::env::var("DEV").is_ok() { crate::global::set_var("DEV_MODE", crate::global::TRUE); }
-    if std::env::var("QUIET").is_ok() { crate::global::set_var("QUIET_MODE", crate::global::TRUE); }
-    if std::env::var("TRACE").is_ok() { crate::global::set_var("TRACE_MODE", crate::global::TRUE); }
+    if std::env::var("DEBUG").is_ok() { crate::global::set_var("DEBUG_MODE", crate::com::TRUE_STR); }
+    if std::env::var("DEV").is_ok() { crate::global::set_var("DEV_MODE", crate::com::TRUE_STR); }
+    if std::env::var("QUIET").is_ok() { crate::global::set_var("QUIET_MODE", crate::com::TRUE_STR); }
+    if std::env::var("TRACE").is_ok() { crate::global::set_var("TRACE_MODE", crate::com::TRUE_STR); }
 }
 
 /// Get an environment variable directly (bypasses global).

@@ -13,7 +13,7 @@ use std::path::Path;
 /// for each option found. It handles:
 /// - Long options: `--verbose`, `--config=value`
 /// - Short options: `-v`, `-d`
-/// - Negation: `--not-verbose` sets `opt_verbose=0`
+/// - Negation: `--not-verbose` sets `opt_verbose=1` (REBEL false)
 /// - Multi-options: `--multi=a,b,!c` sets multiple flags
 /// - Path validation: automatically validates path/file options
 /// - Standard options: when `stdopts` feature is enabled
@@ -26,7 +26,7 @@ use std::path::Path;
 /// options(&args);
 ///
 /// // Now opt_verbose and opt_config are set in global context
-/// assert_eq!(rsb::param!("opt_verbose"), "1");
+/// assert_eq!(rsb::param!("opt_verbose"), "0");
 /// assert_eq!(rsb::param!("opt_config"), "app.conf");
 /// ```
 pub fn options(args: &Args) {
@@ -65,10 +65,11 @@ pub fn options(args: &Args) {
                         }
                         if ch.is_ascii_alphabetic() {
                             let base_key = format!("opt_{}", ch);
+                            // REBEL boolean: 0 = true, 1 = false
                             if neg {
-                                global::set_var(&base_key, "0");
-                            } else {
                                 global::set_var(&base_key, "1");
+                            } else {
+                                global::set_var(&base_key, "0");
                             }
                         }
                     }
