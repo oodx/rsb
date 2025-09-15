@@ -1,6 +1,6 @@
 # PLAN_HOST
 
-Status: Draft
+Status: Completed
 Date: 2025-09-15
 
 Docs: docs/tech/features/FEATURES_HOST.md
@@ -11,8 +11,10 @@ Gaps/Findings
 - Ensure XDG path derivations and fallbacks documented; environment hydration order clarified.
 
 Plan
-- Verify MODULE_SPEC split; confirm helpers are crate-internal or curated.
+- Verify MODULE_SPEC split; confirm helpers are crate-internal or curated. (OK)
 
 Acceptance
 - Sanity + UAT green; docs match behavior.
 
+Result
+- Ran `host_env` and `host_paths` — both passed.

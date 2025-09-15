@@ -1,6 +1,6 @@
 # PLAN_BASH
 
-Status: Draft
+Status: Completed
 Date: 2025-09-15
 
 Docs: docs/tech/features/FEATURES_BASH.md
@@ -11,8 +11,10 @@ Gaps/Findings
 - Network access in CI may be limited; tests should be resilient (use HEAD/timeout or stub).
 
 Plan
-- Confirm error mapping and outputs; document options.
+- Confirm error mapping and outputs; document options. (OK)
 
 Acceptance
 - Sanity + UAT green locally; CI strategy documented.
 
+Result
+- Ran `bash_sanity` and `uat_bash` — both passed.
