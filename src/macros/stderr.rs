@@ -42,5 +42,28 @@ macro_rules! echo { ($($arg:tt)*) => { println!("{}", $crate::global::expand_var
 #[macro_export]
 macro_rules! printf { ($($arg:tt)*) => { print!("{}", $crate::global::expand_vars(&format!($($arg)*))); }; }
 
+// --- Core logging fallbacks (only when visuals are disabled) ---
+// Provide standard log macros that write to stderr using core utils.
+// These are intentionally not compiled when the `visual` feature is enabled,
+// to avoid macro name conflicts with the visual variants.
+#[cfg(not(feature = "visual"))]
 #[macro_export]
-macro_rules! error { ($($arg:tt)*) => { eprintln!("ERROR: {}", format!($($arg)*)); }; }
+macro_rules! info { ($($arg:tt)*) => { $crate::utils::glyph_stderr("info", &format!($($arg)*)); }; }
+#[cfg(not(feature = "visual"))]
+#[macro_export]
+macro_rules! okay { ($($arg:tt)*) => { $crate::utils::glyph_stderr("okay", &format!($($arg)*)); }; }
+#[cfg(not(feature = "visual"))]
+#[macro_export]
+macro_rules! warn { ($($arg:tt)*) => { $crate::utils::glyph_stderr("warn", &format!($($arg)*)); }; }
+#[cfg(not(feature = "visual"))]
+#[macro_export]
+macro_rules! error { ($($arg:tt)*) => { $crate::utils::glyph_stderr("error", &format!($($arg)*)); }; }
+#[cfg(not(feature = "visual"))]
+#[macro_export]
+macro_rules! fatal { ($($arg:tt)*) => { $crate::utils::glyph_stderr("fatal", &format!($($arg)*)); }; }
+#[cfg(not(feature = "visual"))]
+#[macro_export]
+macro_rules! debug { ($($arg:tt)*) => { $crate::utils::glyph_stderr("debug", &format!($($arg)*)); }; }
+#[cfg(not(feature = "visual"))]
+#[macro_export]
+macro_rules! trace { ($($arg:tt)*) => { $crate::utils::glyph_stderr("trace", &format!($($arg)*)); }; }

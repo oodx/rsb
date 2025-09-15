@@ -1,6 +1,6 @@
 # PLAN_COLORS
 
-Status: In Progress
+Status: Completed
 Date: 2025-09-15
 
 Docs: docs/tech/features/FEATURES_COLORS.md
@@ -24,4 +24,5 @@ Acceptance
 - cargo test --features visuals passes; default cargo test unaffected.
 
 Result
-- Attempted `cargo test --features visuals --test features_colors` → failed with `E0428 macro 'error' defined multiple times`. Tracked for fix.
+- Resolved macro duplication by gating core log macros under `#[cfg(not(feature="visual"))]` and removing an unconditional legacy `error!` macro.
+- Ran `cargo test --features visuals --test features_colors` and prompts UAT — passed.

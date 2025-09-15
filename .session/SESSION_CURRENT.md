@@ -20,7 +20,7 @@ Repo: rsb (new canonical), branch `main`
 - Options concept: default and stdopts feature tests passing; plans marked Completed.
 - CLI concept: E2E shell test passed; plan marked Completed.
 - CLI concept: E2E shell test passed; plan marked Completed.
-- Colors/Visuals: Plan marked In Progress; `--features visuals` reveals a macro name conflict (`error!`) to resolve next.
+- Colors/Visuals: visuals tests passing after macro fix; plan marked Completed.
 - Host concept: env and paths tests passing; plan marked Completed.
 - Threads concept: sanity + UAT passing; plan marked Completed.
 - Bash concept: sanity + UAT passing; plan marked Completed.
