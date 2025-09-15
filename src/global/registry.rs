@@ -87,27 +87,38 @@ pub fn get_call_stack() -> Vec<CallFrame> {
 }
 
 pub fn show_help() {
-    println!(
-        "{}",
-        crate::global::expand_vars(&format!(
-            "{{bold}}{{blue}}{}{{reset}}\n\n{{bold}}USAGE:{{reset}}\n  {} <command> [options]\n\n{{bold}}COMMANDS:{{reset}}",
-            crate::global::get_var("SCRIPT_NAME"),
-            crate::global::get_var("SCRIPT_NAME")
-        ))
-    );
+    // Header + usage
+    let header = crate::global::expand_vars(&format!(
+        "{{bold}}{{blue}}{}{{reset}}\n\n{{bold}}USAGE:{{reset}}\n  {} <command> [options]\n\n{{bold}}COMMANDS:{{reset}}",
+        crate::global::get_var("SCRIPT_NAME"),
+        crate::global::get_var("SCRIPT_NAME")
+    ));
+    println!("{}", crate::utils::expand_colors_unified(&header));
+
+    // Registered functions
     for (name, desc) in list_functions() {
-        println!("  {{cyan}}{:<15}{{reset}} {}", name, desc);
+        let line = format!("  {{cyan}}{:<15}{{reset}} {}", name, desc);
+        println!("{}", crate::utils::expand_colors_unified(&line));
     }
-    println!("\n{{bold}}BUILT-IN COMMANDS:{{reset}}");
-    println!("  {{green}}{:<15}{{reset}} Show this help message", "help");
-    println!("  {{green}}{:<15}{{reset}} List all available functions", "inspect");
-    println!("  {{green}}{:<15}{{reset}} Show the current call stack", "stack");
+
+    // Built-in commands
+    println!("{}", crate::utils::expand_colors_unified("\n{bold}BUILT-IN COMMANDS:{reset}"));
+    println!("{}", crate::utils::expand_colors_unified(&format!(
+        "  {{green}}{:<15}{{reset}} Show this help message", "help"
+    )));
+    println!("{}", crate::utils::expand_colors_unified(&format!(
+        "  {{green}}{:<15}{{reset}} List all available functions", "inspect"
+    )));
+    println!("{}", crate::utils::expand_colors_unified(&format!(
+        "  {{green}}{:<15}{{reset}} Show the current call stack", "stack"
+    )));
 }
 
 pub fn show_functions() {
-    println!("{{bold}}Available functions:{{reset}}");
+    println!("{}", crate::utils::expand_colors_unified("{bold}Available functions:{reset}"));
     for (name, desc) in list_functions() {
-        println!("  {{cyan}}{:<20}{{reset}} {}", name, desc);
+        let line = format!("  {{cyan}}{:<20}{{reset}} {}", name, desc);
+        println!("{}", crate::utils::expand_colors_unified(&line));
     }
 }
 
@@ -117,19 +128,23 @@ pub fn show_call_stack() {
         println!("Call stack is empty");
         return;
     }
-    println!("{{bold}}Call stack (most recent first):{{reset}}");
+    println!(
+        "{}",
+        crate::utils::expand_colors_unified("{bold}Call stack (most recent first):{reset}")
+    );
     for (i, frame) in stack.iter().rev().enumerate() {
         let elapsed = frame
             .timestamp
             .elapsed()
             .map(|d| format!("{}ms", d.as_millis()))
             .unwrap_or_else(|_| "?".to_string());
-        println!(
+        let line = format!(
             "  {}: {{yellow}}{}{{reset}} {} ({{grey}}{} ago{{reset}})",
             i,
             frame.function,
             frame.args.join(" "),
             elapsed
         );
+        println!("{}", crate::utils::expand_colors_unified(&line));
     }
 }

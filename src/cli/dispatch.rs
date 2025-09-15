@@ -87,8 +87,10 @@ where
 /// This is called by the dispatch macros to register all available commands
 /// for the built-in "inspect" command functionality.
 pub fn register_handlers(handlers: &[(&str, CommandHandler)]) {
-    for (cmd, handler) in handlers {
-        global::register_function(cmd, &format!("{:?}", handler as *const _));
+    for (cmd, _handler) in handlers {
+        // Store a clean, human-readable entry without leaking pointer debug strings.
+        // Description can be enriched by higher-level helpers later.
+        global::register_function(cmd, "");
     }
 }
 
