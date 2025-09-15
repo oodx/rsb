@@ -42,8 +42,8 @@ pub fn options(args: &Args) {
             // Handle negation: --not-verbose
             if arg_key.starts_with("not-") {
                 let base = arg_key.trim_start_matches("not-").replace("-", "_");
-                // REBEL boolean: 1 = false
-                global::set_var(&format!("opt_{}", base), "1");
+                // Rust-native textual booleans
+                global::set_var(&format!("opt_{}", base), "false");
                 continue;
             }
 
@@ -65,12 +65,9 @@ pub fn options(args: &Args) {
                         }
                         if ch.is_ascii_alphabetic() {
                             let base_key = format!("opt_{}", ch);
-                            // REBEL boolean: 0 = true, 1 = false
-                            if neg {
-                                global::set_var(&base_key, "1");
-                            } else {
-                                global::set_var(&base_key, "0");
-                            }
+                            // Rust-native textual booleans
+                            let val = if neg { "false" } else { "true" };
+                            global::set_var(&base_key, val);
                         }
                     }
                     continue;
@@ -87,25 +84,25 @@ pub fn options(args: &Args) {
 
                 global::set_var(&format!("opt_{}", opt_name.replace("-", "_")), opt_value);
             } else {
-                // Flag option (no value) — REBEL boolean: 0 = true
-                global::set_var(&format!("opt_{}", arg_clean.replace("-", "_")), "0");
+                // Flag option (no value) — Rust-native textual boolean
+                global::set_var(&format!("opt_{}", arg_clean.replace("-", "_")), "true");
             }
         } else if arg.starts_with("-") && arg.len() == 2 {
             // Short option
             let opt_char = &arg[1..2];
-            // REBEL boolean: 0 = true
-            global::set_var(&format!("opt_{}", opt_char), "0");
+            // Rust-native textual boolean
+            global::set_var(&format!("opt_{}", opt_char), "true");
 
             // Standard options mapping (when stdopts feature is enabled)
             #[cfg(feature = "stdopts")]
             match opt_char {
-                // REBEL boolean: 0 = true
-                "d" => global::set_var("opt_debug", "0"),
-                "q" => global::set_var("opt_quiet", "0"),
-                "t" => global::set_var("opt_trace", "0"),
-                "D" => global::set_var("opt_dev_mode", "0"),
-                "y" => global::set_var("opt_yes", "0"),
-                "s" => global::set_var("opt_safe", "0"),
+                // Rust-native textual booleans
+                "d" => global::set_var("opt_debug", "true"),
+                "q" => global::set_var("opt_quiet", "true"),
+                "t" => global::set_var("opt_trace", "true"),
+                "D" => global::set_var("opt_dev_mode", "true"),
+                "y" => global::set_var("opt_yes", "true"),
+                "s" => global::set_var("opt_safe", "true"),
                 _ => {}
             }
         }
@@ -140,9 +137,7 @@ pub fn has_option(name: &str) -> bool {
 /// ```
 pub fn get_option_value(name: &str) -> Option<String> {
     let value = global::get_var(&format!("opt_{}", name));
-    if value.is_empty() || value == "0" {
-        None
-    } else {
-        Some(value)
-    }
+    if value.is_empty() { return None; }
+    let v_lower = value.to_ascii_lowercase();
+    if v_lower == "true" || v_lower == "false" { None } else { Some(value) }
 }
