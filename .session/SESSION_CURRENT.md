@@ -13,10 +13,12 @@ Repo: rsb (new canonical), branch `main`
   PLAN_PROMPTS.md, PLAN_OPTIONS.md, PLAN_HOST.md, PLAN_THREADS.md, PLAN_CLI.md, PLAN_BASH.md, PLAN_OPTIONS_STDOPTS.md
 
 ## Progress Update
+- Math concept: macros decoupled from visual logging; math UAT adjusted; smoke lane green.
 - Strings concept: UAT added (`tests/uat/string.rs` + wrapper) and verified via targeted test run. Plan marked Completed.
+- Tokens concept: existing sanity, feature, and UAT tests all passing; plan marked Completed.
 
 ## Next Actions
-1) Choose next concept (e.g., TOKENS or GLOBAL) and repeat: analyze, fill gaps, add/adjust tests, update PLAN, commit.
+1) Choose next concept (e.g., GLOBAL or DATE) and repeat: analyze, fill gaps, add/adjust tests, update PLAN, commit.
 2) Continue using smoke lane for quick validation, and targeted cargo test for new/changed tests.
 
 ## Notes
