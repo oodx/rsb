@@ -12,12 +12,12 @@ Repo: rsb (new canonical), branch `main`
 - PLAN_STRINGS.md, PLAN_PARAMS.md, PLAN_GLOBAL.md, PLAN_COLORS.md, PLAN_DATE.md, PLAN_TOKENS.md,
   PLAN_PROMPTS.md, PLAN_OPTIONS.md, PLAN_HOST.md, PLAN_THREADS.md, PLAN_CLI.md, PLAN_BASH.md, PLAN_OPTIONS_STDOPTS.md
 
-## Progress Update
 - Math concept: macros decoupled from visual logging; math UAT adjusted; smoke lane green.
 - Strings concept: UAT added (`tests/uat/string.rs` + wrapper) and verified via targeted test run. Plan marked Completed.
 - Tokens concept: existing sanity, feature, and UAT tests all passing; plan marked Completed.
 - Global concept: feature, core, and adapter tests passing; plan marked Completed.
 - Date concept: feature + UAT tests passing; plan marked Completed.
+- Options concept: default and stdopts feature tests passing; plans marked Completed.
 - Colors/Visuals: Plan marked In Progress; `--features visuals` reveals a macro name conflict (`error!`) to resolve next.
 
 ## Next Actions
