@@ -115,6 +115,8 @@ Cargo Equivalents
   - `cargo test`
 - With visuals umbrella (colors + glyphs + prompts):
   - `cargo test --features visuals`
+- With PTY-backed dev tests (optional):
+  - `cargo test --features dev-pty`
 - Individual wrappers:
   - `cargo test --test sanity_main`
   - `cargo test --features visuals --test features_colors`
@@ -126,6 +128,14 @@ Visual Tests and Env
   - `RSB_COLOR=always|auto|never` — color policy
   - `RSB_COLORS=simple,status,named[,bg]` — enable color sets and optional backgrounds
 - Glyphs and prompts are part of `visuals`. Use the umbrella unless optimizing footprint.
+
+PTY-backed Tests (dev-only)
+- Enable the optional feature: `--features dev-pty`.
+- The PTY wrapper lives under `rsb::dev::pty` and is intended for testing real TTY behavior.
+- Example: run the included PTY sanity test
+  - `./bin/test.sh run dev_pty` (auto-discovers `tests/dev_pty.rs`)
+  - or `cargo test --test dev_pty --features dev-pty`
+  
 
 Adding New Suites
 - Create a wrapper: `tests/<module>_<suite>.rs` (e.g., `tests/features_string.rs`).

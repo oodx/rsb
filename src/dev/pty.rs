@@ -105,7 +105,7 @@ pub fn spawn_pty(command: &str, opts: &PtyOptions) -> std::io::Result<PtySession
         .map_err(to_io_err)?;
 
     let mut cmd = CommandBuilder::new("sh");
-    cmd.arg("-lc");
+    cmd.arg("-c");
     cmd.arg(command);
     if let Some(cwd) = &opts.cwd {
         cmd.cwd(cwd);
