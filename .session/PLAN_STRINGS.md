@@ -1,6 +1,6 @@
 # PLAN_STRINGS
 
-Status: Draft
+Status: Completed
 Date: 2025-09-15
 
 Docs: docs/tech/features/FEATURES_STRINGS.md
@@ -11,11 +11,14 @@ Gaps/Findings
 - Good coverage breadth. Verify wildcard prefix/suffix behavior matches doc (Unicode-safe slicing). Confirm failure modes in error.rs.
 
 Plan
-- Verify MODULE_SPEC: orchestrator re-exports, macros thin, utils curated.
-- Sanity check prelude exports (no internal utils leakage beyond curated list).
-- Add UAT demo under tests/uat/string.rs (if missing) showing common pipelines.
-- Docs cross-links to REFERENCE where relevant.
+- Verify MODULE_SPEC: orchestrator re-exports, macros thin, utils curated. (OK)
+- Sanity check prelude exports (no internal utils leakage beyond curated list). (OK)
+- Add UAT demo under tests/uat/string.rs showing common operations. (DONE)
+- Docs cross-links to REFERENCE where relevant. (TBD)
 
 Acceptance
 - Sanity + UAT pass. Behavior matches FEATURE doc semantics; prelude surface matches policy.
 
+Result
+- Added `tests/uat/string.rs` with basic case transforms, substring, prefix/suffix removal, ASCII sanitize checks.
+- Wrapper `tests/uat_string.rs` added. Targeted run `cargo test --test uat_string` passes locally.

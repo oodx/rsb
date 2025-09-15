@@ -12,12 +12,12 @@ Repo: rsb (new canonical), branch `main`
 - PLAN_STRINGS.md, PLAN_PARAMS.md, PLAN_GLOBAL.md, PLAN_COLORS.md, PLAN_DATE.md, PLAN_TOKENS.md,
   PLAN_PROMPTS.md, PLAN_OPTIONS.md, PLAN_HOST.md, PLAN_THREADS.md, PLAN_CLI.md, PLAN_BASH.md, PLAN_OPTIONS_STDOPTS.md
 
+## Progress Update
+- Strings concept: UAT added (`tests/uat/string.rs` + wrapper) and verified via targeted test run. Plan marked Completed.
+
 ## Next Actions
-1) Run default tests: `cargo test` (note: ensure enough disk space).
-2) Run visuals: `cargo test --features visuals`.
-3) Quick lane: `./bin/test.sh run smoke`.
-4) Commit Math + plans changes.
+1) Choose next concept (e.g., TOKENS or GLOBAL) and repeat: analyze, fill gaps, add/adjust tests, update PLAN, commit.
+2) Continue using smoke lane for quick validation, and targeted cargo test for new/changed tests.
 
 ## Notes
 - If full `cargo test` fails due to linker disk space, prioritize targeted lanes (`smoke`, feature subsets) and visuals lane.
-
