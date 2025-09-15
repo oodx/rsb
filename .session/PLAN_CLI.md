@@ -1,6 +1,6 @@
 # PLAN_CLI
 
-Status: Draft
+Status: Completed
 Date: 2025-09-15
 
 Docs: docs/tech/features/FEATURES_CLI.md
@@ -11,8 +11,10 @@ Gaps/Findings
 - Ensure bootstrap + dispatch flows are covered; script-style examples validated via shell script.
 
 Plan
-- Review error handling and message clarity; align docs and examples.
+- Review error handling and message clarity; align docs and examples. (OK)
 
 Acceptance
 - Sanity + E2E green; docs examples work.
 
+Result
+- Ran `./bin/test.sh run cli` — E2E shell test passed.

@@ -18,6 +18,7 @@ Repo: rsb (new canonical), branch `main`
 - Global concept: feature, core, and adapter tests passing; plan marked Completed.
 - Date concept: feature + UAT tests passing; plan marked Completed.
 - Options concept: default and stdopts feature tests passing; plans marked Completed.
+- CLI concept: E2E shell test passed; plan marked Completed.
 - Colors/Visuals: Plan marked In Progress; `--features visuals` reveals a macro name conflict (`error!`) to resolve next.
 
 ## Next Actions
