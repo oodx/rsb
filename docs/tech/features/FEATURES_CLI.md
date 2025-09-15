@@ -55,16 +55,17 @@ fn main() {
     let args = bootstrap!();
 
     // Dispatch with automatic error handling
+    // You can attach vanity descriptions for `inspect` via `desc:`
     dispatch!(&args, {
-        "build" => build_command,
-        "test" => test_command,
-        "help" => help_command
+        "build" => build_command, desc: "Build a target (default: debug)",
+        "test"  => test_command,  desc: "Run the test suite",
+        "help"  => help_command
     });
 }
 
 // Built-in commands available:
 // - "help": Shows help information
-// - "inspect": Lists registered command handlers
+// - "inspect": Lists registered command handlers (shows descriptions when provided)
 // - "stack": Shows call stack for debugging
 
 // Unknown command example:
@@ -83,6 +84,16 @@ fn build_command(args: Args) -> i32 {
     0  // Success exit code
 }
 ```
+
+Vanity Descriptions
+- `dispatch!` supports optional `desc: "..."` after each handler mapping. These are registered via `global::register_function(name, desc)` and shown by the `inspect` built-in.
+- You may also register functions manually anywhere prior to dispatch:
+  ```rust
+  rsb::global::register_function("demo", "Runs the uat demo");
+  ```
+
+Help/Inspect Output
+- Built-in `help`, `inspect`, and `stack` employ inline color tags for readability. When compiled with `--features visuals`, colors and styles render. Without visuals, tags are stripped so output remains clean in plain mode.
 
 Testing & UAT
 - Args behavior is exercised broadly via sanity and options tests (`tests/sanity.rs`, `tests/options.rs`, stdopts feature tests).
