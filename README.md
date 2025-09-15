@@ -7,14 +7,14 @@ RSB is designed for the "too big for bash, too small for Rust" sweet spot — to
 
 ## Start Here
 
-- Docs Index: [docs/tech/INDEX.md](docs/tech/INDEX.md)
-- Developer Guides:
-  - [HOWTO_UPDATE_RSB.md](docs/tech/development/HOWTO_UPDATE_RSB.md)
-  - [MODULE_SPEC.md](docs/tech/development/MODULE_SPEC.md)
-  - [HOWTO_TEST.md](docs/tech/development/HOWTO_TEST.md)
-- Reference:
-  - [RSB_ARCH.md](docs/tech/reference/RSB_ARCH.md)
-  - [REBEL.md](docs/tech/reference/REBEL.md)
+| Category | Description | Link |
+|---|---|---|
+| Docs Index | Entry point to all feature and reference docs | [docs/tech/INDEX.md](docs/tech/INDEX.md) |
+| Dev Guide | How to update/refactor RSB safely | [HOWTO_UPDATE_RSB.md](docs/tech/development/HOWTO_UPDATE_RSB.md) |
+| Dev Guide | Module specification and alignment requirements | [MODULE_SPEC.md](docs/tech/development/MODULE_SPEC.md) |
+| Dev Guide | How to run tests and use the runner | [HOWTO_TEST.md](docs/tech/development/HOWTO_TEST.md) |
+| Reference | Architecture overview and standards | [RSB_ARCH.md](docs/tech/reference/RSB_ARCH.md) |
+| Reference | REBEL philosophy and principles | [REBEL.md](docs/tech/reference/REBEL.md) |
 - Latest Session Notes (what changed, how to resume):
   - [.session/SESSION_05_progress_integration_and_deps.md](.session/SESSION_05_progress_integration_and_deps.md)
 
@@ -153,6 +153,14 @@ Examples
 - Progress: `cargo test --features progress`
 - Use a specific dep through RSB: `cargo test --features deps-chrono` then `use rsb::deps::chrono;`
 - Enable all deps: `cargo test --features deps` then `use rsb::deps::*;`
+
+## Contributing
+
+- Follow the prelude policy: optional subsystems (visuals, logging, progress, etc.) must not be exported via the prelude.
+- For new or changed behavior in a module, update or add a feature guide under `docs/tech/features/FEATURES_<NAME>.md`.
+- Keep the index up to date: add your feature doc to `docs/tech/INDEX.md` (use relative links, table format).
+- Align Cargo features in both `Cargo.toml` and the README “Cargo Features” table when adding/removing flags.
+- For potentially user-visible behavior changes (e.g., formatting in progress output), open a brief RFC/discussion before changing defaults.
 
 ## Getting Started
 
