@@ -8,6 +8,11 @@ pub mod string;
 pub mod id;
 pub mod collection;
 pub mod macros;
+// Cross-module adapters owned by gx (consumer):
+pub mod gx_math_adapter;
+pub use gx_math_adapter::rand_usize_inclusive;
+pub mod gx_fs_adapter;
+pub use gx_fs_adapter::{load_dict as load_dict_file, rand_from_dict_file};
 
 mod utils;
 pub use utils::*;

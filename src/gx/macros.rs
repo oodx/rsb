@@ -25,7 +25,7 @@ macro_rules! rand_uuid { () => { $crate::gx::id::get_rand_uuid() }; }
 
 // --- Simple random range macro (inclusive) ---
 #[macro_export]
-macro_rules! rand_range { ($min:expr, $max:expr) => {{ $crate::random::rand_range_usize($min as usize, $max as usize) }}; }
+macro_rules! rand_range { ($min:expr, $max:expr) => {{ $crate::gx::rand_usize_inclusive($min as usize, $max as usize) }}; }
 
 // --- Dictionary Macros (array-backed and generators) ---
 #[macro_export]
@@ -67,4 +67,3 @@ macro_rules! gen_dict {
         $crate::utils::set_array($arr_name, &word_strs);
     }};
 }
-

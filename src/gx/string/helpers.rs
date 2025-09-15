@@ -2,7 +2,7 @@
 //!
 //! Core string generation functions migrated from src/random.rs
 
-use rand::{prelude::IndexedRandom, Rng, distr::Alphanumeric};
+use rand::{Rng, distr::Alphanumeric};
 use super::constants::*;
 
 /// Generates a random alphanumeric string of a given length.
