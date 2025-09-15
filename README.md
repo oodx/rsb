@@ -5,6 +5,12 @@
 RSB is designed for the "too big for bash, too small for Rust" sweet spot — tools and scripts that need more structure and power than shell scripting can offer, but without the ceremonial complexity of mathmetically correct Rust applications. 
 
 
+## Start Here
+
+- Docs Index: docs/tech/INDEX.md
+- Developer Guides: docs/tech/development/HOWTO_UPDATE_RSB.md, docs/tech/development/MODULE_SPEC.md, docs/tech/development/HOWTO_TEST.md
+- Reference: docs/tech/reference/RSB_ARCH.md, docs/tech/reference/REBEL.md
+
 ## The REBEL Philosophy
 
 RSB is the official implementation of the **REBEL (Rust Equalized Beyond Esoteric Lingo)** philosophy, which prioritizes practitioner productivity over academic purity, through an ergonomic batteries-included BASH-like macro DSL and conventions. 
