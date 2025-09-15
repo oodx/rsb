@@ -37,6 +37,7 @@ Repo: rsb (new canonical), branch `main`
 - All major concept suites validated green (sanity, features, UAT; visuals included).
 - Docs index added and README cross-linked.
 - Plans for each concept saved in `.session/PLAN_*.md` and marked Completed.
+- CLI built-ins polished: inspect/help/stack now expand color templates correctly; handler registry stores clean names (no pointer strings).
 
 ## Continuation Checklist
 - Validate lanes on a fresh workspace: `./bin/test.sh run smoke`, key wrappers, and visuals features.
