@@ -4,8 +4,9 @@
 //! projects can depend on `rsb` alone and import these dependencies
 //! from a single place without repeating them in their own `Cargo.toml`.
 //!
-//! Example:
-//! ```rust
+//! Example (enable features first):
+//! ```rust,ignore
+//! // Cargo.toml features: deps-rand, deps-lazy_static (or `deps` umbrella)
 //! use rsb::deps::rand::{Rng, distr::Alphanumeric};
 //! use rsb::deps::lazy_static::lazy_static;
 //! ```
