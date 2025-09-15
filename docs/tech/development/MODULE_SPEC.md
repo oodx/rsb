@@ -2,18 +2,19 @@
 
 Updated: 2025-09-12
 
-Purpose
+##  Purpose
 - Define a consistent pattern for how modules expose low-level helpers, macros, errors, and guards.
 - Keep the user-facing surface ergonomic and predictable while allowing advanced/low-level usage.
 
-Principles
+## Principles
 - Single source of truth per module; avoid duplicate helpers scattered across the codebase.
 - Keep macros thin; push logic into helper functions.
 - Curate the prelude; re-export only what typical apps need.
 - Prefer ASCII-first naming/case transforms; document Unicode semantics for other helpers.
+- use concise UNIX-style names for files, variables and modules, only use longer names when absolutely necessary or when additional clarity or distinction is required! e.g. `my_long_name` => `long` or `calculate_first_derivative` => `calc_deriv`; shorter names indicate a level of generality `calc` vs `calc_deriv` <== additional specificity.
 
-Structure (per module)
-- `<module>/mod.rs`: orchestrator and re-exports. Owns the curated public surface.
+## Structure (per module)
+- `<module>/mod.rs`: orchestrator and re-exports. Owns the curated public surface, no other functions or implementations are allowed. All implementations need their own file adjacent to mod.rs.
 - `<module>/utils.rs`: curated low-level helpers users may explicitly opt into ("utils" namespace).
 - `<module>/helpers.rs` (optional): internal helper implementation files consumed by utils and the orchestrator.
 - `<module>/macros.rs`: module-owned macros. Prefer two forms when applicable:
@@ -28,7 +29,7 @@ Prelude Policy (Amendment A alignment)
 - Avoid re-exporting "utils" or internal submodules unless they are intentionally part of the public surface.
 - Tests may import modules/macros directly as needed.
 
-Param Macros
+## Param Macros
 - `param!` stays crate-level; it delegates to module helpers (e.g., `string::utils` / `string::case`).
 - Avoid business logic inside `param!`—keep it as a DSL router to helpers.
 
