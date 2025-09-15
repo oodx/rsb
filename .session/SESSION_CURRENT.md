@@ -32,3 +32,13 @@ Repo: rsb (new canonical), branch `main`
 
 ## Notes
 - If full `cargo test` fails due to linker disk space, prioritize targeted lanes (`smoke`, feature subsets) and visuals lane.
+
+## Wrap-up (This Pass)
+- All major concept suites validated green (sanity, features, UAT; visuals included).
+- Docs index added and README cross-linked.
+- Plans for each concept saved in `.session/PLAN_*.md` and marked Completed.
+
+## Continuation Checklist
+- Validate lanes on a fresh workspace: `./bin/test.sh run smoke`, key wrappers, and visuals features.
+- Begin incremental migration of legacy macros in `src/macros/` to module-owned `macros.rs` per MODULE_SPEC.
+- Keep prelude policy intact (core-only; visuals/loggers opt-in).

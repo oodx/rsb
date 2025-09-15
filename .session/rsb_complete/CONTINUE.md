@@ -72,6 +72,11 @@ Suggested Next Steps (hands‑on)
 4) Doc pass
    - Add a docs index if helpful; ensure README “Start Here” stays current.
 
+Current Status Snapshot (2025-09-15)
+- All major concept tests are green (sanity, features, UAT; visuals included).
+- Visuals macro duplication resolved; core log macros gated under non-visual.
+- Docs index (`docs/tech/INDEX.md`) added; README cross-links in place.
+
 Quick Pointers
 - Patterns: docs/tech/reference/RSB_ARCH.md
 - Philosophy: docs/tech/reference/REBEL.md
@@ -82,4 +87,3 @@ Quick Pointers
 Contact/Notes
 - Keep changes small and focused; follow patterns in MODULE_SPEC and HOWTO_UPDATE_RSB.
 - Prefer PRs that include test updates and doc tweaks where behavior changes.
-
