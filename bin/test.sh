@@ -614,10 +614,13 @@ EOF
         echo "Documentation Targets:"
         echo "  docs org                          Test organization requirements"
         echo "  docs howto                        Testing HOWTO guide"
-        echo "  docs modules                      Module specification and organization patterns"
+        echo "  docs modules, spec                Module specification and organization patterns"
         echo "  docs rsb                          RSB architecture documentation"
         echo "  docs features                     List all feature documentation"
+        echo "  docs all, list                    List ALL available documentation files"
         echo "  docs <feature>                    Show specific feature (e.g., docs options)"
+        echo "  docs <plan>                       Show specific feature plan (e.g., docs plan_colors)"
+        echo "  docs <document>                   Show any documentation file"
         echo
         echo "Options:"
         echo "  --comprehensive        Run full validation test suite"
@@ -1119,6 +1122,8 @@ case "${1:-status}" in
                         echo "  • howto       - Testing HOWTO guide with examples and patterns"
                         echo "  • rsb         - RSB architecture documentation (REBEL + RSB_ARCH)"
                         echo "  • modules     - Module specification and organization patterns"
+                        echo "  • spec        - Module specification (alias for modules)"
+                        echo "  • all         - List ALL available documentation files"
                         echo
                         echo "Feature Documentation:"
                         echo
@@ -1151,6 +1156,8 @@ case "${1:-status}" in
                     echo "  • howto       - Testing HOWTO guide with examples and patterns"
                     echo "  • rsb         - RSB architecture documentation (REBEL + RSB_ARCH)"
                     echo "  • modules     - Module specification and organization patterns"
+                    echo "  • spec        - Module specification (alias for modules)"
+                    echo "  • all         - List ALL available documentation files"
                     echo
                     echo "Feature Documentation:"
                     echo "  • features    - List all available feature documentation"
@@ -1190,9 +1197,42 @@ case "${1:-status}" in
                 DOC_PATH="$DOCS_DEV_DIR/HOWTO_TEST.md"
                 DOC_TITLE="🧪 RSB Testing HOWTO Guide"
                 ;;
-            "modules"|"module"|"mod")
+            "modules"|"module"|"mod"|"spec")
                 DOC_PATH="$DOCS_DEV_DIR/MODULE_SPEC.md"
                 DOC_TITLE="📦 RSB Module Specification"
+                ;;
+            "all"|"list")
+                # List all available documentation files
+                echo "📚 ALL RSB DOCUMENTATION"
+                echo "======================="
+                echo
+                echo "📋 Development Documentation:"
+                find "$DOCS_DEV_DIR" -name "*.md" 2>/dev/null | sort | while read -r file; do
+                    basename_file=$(basename "$file" .md)
+                    echo "  • $basename_file"
+                done
+                echo
+                echo "🎯 Feature Documentation:"
+                find "$DOCS_FEATURES_DIR" -name "*.md" -not -path "*/plans/*" 2>/dev/null | sort | while read -r file; do
+                    basename_file=$(basename "$file" .md)
+                    echo "  • $basename_file"
+                done
+                echo
+                echo "📋 Feature Plans:"
+                find "$DOCS_FEATURES_DIR/plans" -name "*.md" 2>/dev/null | sort | while read -r file; do
+                    basename_file=$(basename "$file" .md)
+                    echo "  • $basename_file"
+                done
+                echo
+                echo "📚 Reference Documentation:"
+                find "$DOCS_REFERENCE_DIR" -name "*.md" 2>/dev/null | sort | while read -r file; do
+                    basename_file=$(basename "$file" .md)
+                    echo "  • $basename_file"
+                done
+                echo
+                echo "Access any document with: test.sh docs <document-name>"
+                echo "Quick access: org, howto, modules, rsb, features"
+                exit 0
                 ;;
             "rsb"|"arch"|"architecture")
                 # Show both REBEL and RSB_ARCH docs
@@ -1267,29 +1307,59 @@ case "${1:-status}" in
                 exit 0
                 ;;
             *)
-                # Try to find a specific feature document
+                # Try to find document in different locations
+                DOC_PATH=""
+                DOC_TITLE=""
+
+                # Try feature documents first (with FEATURES_ prefix)
                 FEATURE_PATH="$DOCS_FEATURES_DIR/FEATURES_${DOC_TARGET^^}.md"
                 if [[ -f "$FEATURE_PATH" ]]; then
                     DOC_PATH="$FEATURE_PATH"
                     DOC_TITLE="🎯 RSB Feature: ${DOC_TARGET^^}"
-                else
+                # Try feature plans
+                elif [[ -f "$DOCS_FEATURES_DIR/plans/PLAN_${DOC_TARGET^^}.md" ]]; then
+                    DOC_PATH="$DOCS_FEATURES_DIR/plans/PLAN_${DOC_TARGET^^}.md"
+                    DOC_TITLE="📋 RSB Feature Plan: ${DOC_TARGET^^}"
+                # Try development docs
+                elif [[ -f "$DOCS_DEV_DIR/${DOC_TARGET^^}.md" ]]; then
+                    DOC_PATH="$DOCS_DEV_DIR/${DOC_TARGET^^}.md"
+                    DOC_TITLE="📋 RSB Development: ${DOC_TARGET^^}"
+                # Try reference docs
+                elif [[ -f "$DOCS_REFERENCE_DIR/${DOC_TARGET^^}.md" ]]; then
+                    DOC_PATH="$DOCS_REFERENCE_DIR/${DOC_TARGET^^}.md"
+                    DOC_TITLE="📚 RSB Reference: ${DOC_TARGET^^}"
+                # Try exact filename matches (case-insensitive)
+                elif DOC_FOUND=$(find "$DOCS_BASE_DIR" -iname "${DOC_TARGET}.md" -type f 2>/dev/null | head -1); then
+                    if [[ -n "$DOC_FOUND" ]]; then
+                        DOC_PATH="$DOC_FOUND"
+                        DOC_TITLE="📄 RSB Documentation: ${DOC_TARGET^^}"
+                    fi
+                fi
+
+                if [[ -z "$DOC_PATH" ]]; then
                     echo "❌ Error: Unknown documentation target: $DOC_TARGET"
                     echo
                     echo "Available options:"
-                    echo "  org, organization    - Test organization requirements"
-                    echo "  howto, test         - Testing HOWTO guide"
-                    echo "  modules, module, mod - Module specification and organization patterns"
-                    echo "  rsb, arch           - RSB architecture documentation"
-                    echo "  features            - List all feature documentation"
-                    echo "  <feature-name>      - Show specific feature documentation"
+                    echo "  org, organization        - Test organization requirements"
+                    echo "  howto, test             - Testing HOWTO guide"
+                    echo "  modules, module, spec   - Module specification and organization patterns"
+                    echo "  rsb, arch               - RSB architecture documentation"
+                    echo "  features                - List all feature documentation"
+                    echo "  all, list               - List ALL available documentation"
+                    echo "  <feature-name>          - Show specific feature documentation"
+                    echo "  <plan-name>             - Show specific feature plan"
+                    echo "  <document-name>         - Show any documentation file"
                     echo
                     echo "Examples:"
                     echo "  test.sh docs org"
                     echo "  test.sh docs howto"
                     echo "  test.sh docs modules"
-                    echo "  test.sh docs rsb"
-                    echo "  test.sh docs features"
+                    echo "  test.sh docs all"
                     echo "  test.sh docs options"
+                    echo "  test.sh docs rebel"
+                    echo "  test.sh docs bashfx-v3"
+                    echo
+                    echo "For complete list: test.sh docs all"
                     exit 1
                 fi
                 ;;
