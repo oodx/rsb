@@ -154,6 +154,21 @@ mod tests {
     }
 
     #[test]
+    fn test_exit_kind_to_string() {
+        // Test ExitKind ToString implementation
+        assert_eq!(ExitKind::Success.to_string(), "success");
+        assert_eq!(ExitKind::Failure.to_string(), "error");
+        assert_eq!(ExitKind::SystemFailure.to_string(), "error");
+        assert_eq!(ExitKind::LogicFailure.to_string(), "error");
+        assert_eq!(ExitKind::UserFailure.to_string(), "error");
+
+        // Test that the string values work with is_true_val (updated semantics)
+        assert!(is_true_val(&ExitKind::Success.to_string())); // "success" -> true
+        assert!(!is_true_val(&ExitKind::Failure.to_string())); // "error" -> false
+        assert!(!is_true_val(&ExitKind::SystemFailure.to_string())); // "error" -> false
+    }
+
+    #[test]
     fn test_exit_code_classification() {
         // Test exit code helper functions
         assert!(is_success(0));
