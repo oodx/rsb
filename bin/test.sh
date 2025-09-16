@@ -38,11 +38,394 @@ ctest() {
     fi
 }
 
+# Boxy Orchestrator - Centralized boxy call handler
+# Usage: boxy_display <content> <theme> <title> [width]
+boxy_display() {
+    local content="$1"
+    local theme="$2"
+    local title="$3"
+    local width="${4:-max}"
+
+    if command -v boxy &> /dev/null; then
+        if [[ -n "$title" ]]; then
+            echo "$content" | boxy --theme "$theme" --title "$title" --width "$width"
+        else
+            echo "$content" | boxy --theme "$theme" --width "$width"
+        fi
+    else
+        # Fallback ASCII presentation
+        local border_symbol
+        case "$theme" in
+            error) border_symbol="❌" ;;
+            warning) border_symbol="⚠️" ;;
+            success) border_symbol="✅" ;;
+            info) border_symbol="ℹ️" ;;
+            *) border_symbol="•" ;;
+        esac
+
+        echo "$border_symbol ═══════════════════════════════════════════════════════════════════════════════"
+        [[ -n "$title" ]] && echo "   $title"
+        echo "$content" | sed 's/^/   /'
+        echo "   ═══════════════════════════════════════════════════════════════════════════════"
+    fi
+    echo
+}
+
+# Show override warning with boxy
+show_override_warning() {
+    local warning_text="⚠️  OVERRIDE MODE ACTIVE ⚠️
+
+Tests are being run despite organization violations.
+This should only be used for emergency situations.
+
+Recommended actions:
+• Fix test naming patterns: <category>_<module>.rs
+• Create missing sanity tests
+• Move tests to proper directories
+• Run './bin/test.sh lint' to see violations
+
+Use './bin/test.sh run <test>' for standard enforcement."
+
+    boxy_display "$warning_text" "warning" "⚠️  Test Organization Override"
+}
+
+# Generate organized violation report
+generate_violation_report() {
+    local naming_violations=("$@")
+    local missing_sanity_violations=()
+    local directory_violations=()
+
+    # Parse the three arrays passed as arguments
+    local parsing_mode="naming"
+    for arg in "$@"; do
+        case "$arg" in
+            "--missing-sanity-start")
+                parsing_mode="missing_sanity"
+                continue
+                ;;
+            "--directory-start")
+                parsing_mode="directory"
+                continue
+                ;;
+        esac
+
+        case "$parsing_mode" in
+            "naming")
+                [[ "$arg" != "--missing-sanity-start" && "$arg" != "--directory-start" ]] && naming_violations+=("$arg")
+                ;;
+            "missing_sanity")
+                missing_sanity_violations+=("$arg")
+                ;;
+            "directory")
+                directory_violations+=("$arg")
+                ;;
+        esac
+    done
+
+    local total_violations=$((${#naming_violations[@]} + ${#missing_sanity_violations[@]} + ${#directory_violations[@]}))
+    local report_text=""
+
+    echo "📋 Test Organization Violations Report ($total_violations total)"
+    echo "================================================================"
+    echo
+
+    # Naming violations section
+    if [[ ${#naming_violations[@]} -gt 0 ]]; then
+        echo "🏷️  NAMING VIOLATIONS (${#naming_violations[@]} files)"
+        echo "────────────────────────────────────────────────────────"
+        echo "Issue: Test wrapper files don't follow naming pattern"
+        echo "Required: <category>_<module>.rs (e.g., sanity_com.rs, uat_math.rs)"
+        echo "Valid categories: unit, sanity, smoke, integration, e2e, uat, chaos, bench"
+        echo
+        for i in "${!naming_violations[@]}"; do
+            printf "%3d. %s\n" $((i + 1)) "${naming_violations[i]}"
+        done
+        echo
+        echo "Fix: Rename files to match pattern (e.g., com_sanity.rs → sanity_com.rs)"
+        echo
+    fi
+
+    # Missing sanity tests section
+    if [[ ${#missing_sanity_violations[@]} -gt 0 ]]; then
+        echo "🚨 MISSING SANITY TESTS (${#missing_sanity_violations[@]} modules)"
+        echo "────────────────────────────────────────────────────────"
+        echo "Issue: Modules without required sanity tests"
+        echo "Required: Every module must have sanity tests for core functionality"
+        echo
+        for i in "${!missing_sanity_violations[@]}"; do
+            printf "%3d. Module '%s' (create: tests/sanity_%s.rs)\n" $((i + 1)) "${missing_sanity_violations[i]}" "${missing_sanity_violations[i]}"
+        done
+        echo
+        echo "Fix: Create sanity test files for each module"
+        echo
+    fi
+
+    # Directory violations section
+    if [[ ${#directory_violations[@]} -gt 0 ]]; then
+        echo "📁 INVALID DIRECTORIES (${#directory_violations[@]} directories)"
+        echo "────────────────────────────────────────────────────────"
+        echo "Issue: Test directories don't match approved organization"
+        echo "Valid: unit/, sanity/, smoke/, integration/, e2e/, uat/, chaos/, bench/, sh/, old/, _archive/"
+        echo
+        for i in "${!directory_violations[@]}"; do
+            printf "%3d. %s\n" $((i + 1)) "${directory_violations[i]}"
+        done
+        echo
+        echo "Fix: Move tests to approved category directories or rename to _archive/"
+        echo
+    fi
+
+    # Summary box
+    local fix_summary="VIOLATION SUMMARY & FIXES
+
+Total Violations: $total_violations
+• Naming issues: ${#naming_violations[@]}
+• Missing sanity tests: ${#missing_sanity_violations[@]}
+• Invalid directories: ${#directory_violations[@]}
+
+QUICK FIXES:
+• Run './bin/test.sh lint' for detailed analysis
+• Use './bin/test.sh --override' for emergency bypass
+• Follow naming pattern: <category>_<module>.rs
+• Create missing sanity tests for all modules"
+
+    boxy_display "$fix_summary" "warning" "📊 Test Organization Fix Guide"
+}
+
+# Test Organization Enforcement (BASHFX Aligned)
+validate_test_structure() {
+    # Categorized violation arrays
+    local naming_violations=()
+    local missing_sanity_violations=()
+    local directory_violations=()
+
+    # Valid categories for test organization
+    local valid_categories="unit|sanity|smoke|integration|e2e|uat|chaos|bench"
+
+    if [[ "$SKIP_ENFORCEMENT" == "true" ]]; then
+        return 0
+    fi
+
+    # Show override warning if using --override mode
+    if [[ "$OVERRIDE_MODE" == "true" ]]; then
+        show_override_warning
+    fi
+
+    echo "🔍 Validating test structure..."
+
+    # Check wrapper naming patterns
+    for file in tests/*.rs; do
+        [[ ! -f "$file" ]] && continue
+
+        basename="${file##*/}"
+        basename="${basename%.rs}"
+
+        # Skip archive files
+        [[ "$basename" =~ ^_ ]] && continue
+
+        # Check naming pattern
+        if [[ ! "$basename" =~ ^($valid_categories)(_[a-z_]+)?$ ]]; then
+            naming_violations+=("$file")
+        fi
+    done
+
+    # Check for required sanity tests
+    for module_path in src/*.rs src/*/mod.rs; do
+        [[ ! -f "$module_path" ]] && continue
+
+        module_name=""
+        if [[ "$module_path" == src/*.rs ]]; then
+            module_name=$(basename "$module_path" .rs)
+        else
+            module_name=$(basename "$(dirname "$module_path")")
+        fi
+
+        # Skip lib.rs and main.rs
+        [[ "$module_name" == "lib" || "$module_name" == "main" ]] && continue
+
+        # Check for sanity test existence
+        if [[ ! -f "tests/sanity_${module_name}.rs" && ! -f "tests/sanity/${module_name}.rs" ]]; then
+            missing_sanity_violations+=("$module_name")
+        fi
+    done
+
+    # Check for orphaned test directories
+    for test_dir in tests/*/; do
+        [[ ! -d "$test_dir" ]] && continue
+
+        dir_name=$(basename "$test_dir")
+
+        # Skip valid directories and archive
+        if [[ ! "$dir_name" =~ ^($valid_categories|sh|old|_archive)$ ]]; then
+            directory_violations+=("$test_dir")
+        fi
+    done
+
+    # Calculate total violations
+    local total_violations=$((${#naming_violations[@]} + ${#missing_sanity_violations[@]} + ${#directory_violations[@]}))
+
+    # Report violations
+    if [[ $total_violations -gt 0 ]]; then
+        local violation_text=""
+        for violation in "${violations[@]}"; do
+            violation_text+="• $violation\n"
+        done
+
+        # If --violations flag is used, show organized report and exit
+        if [[ "$VIOLATIONS_MODE" == "true" ]]; then
+            echo "📋 Test Organization Violations Report ($total_violations total)"
+            echo "================================================================"
+            echo
+
+            # Naming violations section
+            if [[ ${#naming_violations[@]} -gt 0 ]]; then
+                echo "🏷️  NAMING VIOLATIONS (${#naming_violations[@]} files)"
+                echo "────────────────────────────────────────────────────────"
+                echo "Issue: Test wrapper files don't follow naming pattern"
+                echo "Required: <category>_<module>.rs (e.g., sanity_com.rs, uat_math.rs)"
+                echo "Valid categories: unit, sanity, smoke, integration, e2e, uat, chaos, bench"
+                echo
+                for i in "${!naming_violations[@]}"; do
+                    printf "%3d. %s\n" $((i + 1)) "${naming_violations[i]}"
+                done
+                echo
+                echo "Fix: Rename files to match pattern (e.g., com_sanity.rs → sanity_com.rs)"
+                echo
+            fi
+
+            # Missing sanity tests section
+            if [[ ${#missing_sanity_violations[@]} -gt 0 ]]; then
+                echo "🚨 MISSING SANITY TESTS (${#missing_sanity_violations[@]} modules)"
+                echo "────────────────────────────────────────────────────────"
+                echo "Issue: Modules without required sanity tests"
+                echo "Required: Every module must have sanity tests for core functionality"
+                echo
+                for i in "${!missing_sanity_violations[@]}"; do
+                    printf "%3d. Module '%s' (create: tests/sanity_%s.rs)\n" $((i + 1)) "${missing_sanity_violations[i]}" "${missing_sanity_violations[i]}"
+                done
+                echo
+                echo "Fix: Create sanity test files for each module"
+                echo
+            fi
+
+            # Directory violations section
+            if [[ ${#directory_violations[@]} -gt 0 ]]; then
+                echo "📁 INVALID DIRECTORIES (${#directory_violations[@]} directories)"
+                echo "────────────────────────────────────────────────────────"
+                echo "Issue: Test directories don't match approved organization"
+                echo "Valid: unit/, sanity/, smoke/, integration/, e2e/, uat/, chaos/, bench/, sh/, old/, _archive/"
+                echo
+                for i in "${!directory_violations[@]}"; do
+                    printf "%3d. %s\n" $((i + 1)) "${directory_violations[i]}"
+                done
+                echo
+                echo "Fix: Move tests to approved category directories or rename to _archive/"
+                echo
+            fi
+
+            # Summary box
+            local fix_summary="VIOLATION SUMMARY & FIXES
+
+Total Violations: $total_violations
+• Naming issues: ${#naming_violations[@]}
+• Missing sanity tests: ${#missing_sanity_violations[@]}
+• Invalid directories: ${#directory_violations[@]}
+
+QUICK FIXES:
+• Run './bin/test.sh lint' for detailed analysis
+• Use './bin/test.sh --override' for emergency bypass
+• Follow naming pattern: <category>_<module>.rs
+• Create missing sanity tests for all modules"
+
+            boxy_display "$fix_summary" "warning" "📊 Test Organization Fix Guide"
+            exit 1
+        fi
+
+        if [[ "$STRICT_MODE" == "true" && "$OVERRIDE_MODE" != "true" ]]; then
+            # HARD FAIL: Tests cannot run with violations in strict mode
+            local error_text="🚫 TEST EXECUTION BLOCKED 🚫
+
+Test organization violations detected (${#violations[@]} total):
+
+${violation_text}
+SOLUTION OPTIONS:
+• Fix violations and re-run tests
+• Use --violations flag to see complete violation list
+• Use --override flag for emergency bypass with warnings
+• Use --skip-enforcement to disable validation entirely
+
+Tests cannot proceed until organization is compliant."
+
+            boxy_display "$error_text" "error" "❌ Test Organization Violations"
+            exit 1
+        elif [[ "$OVERRIDE_MODE" == "true" ]]; then
+            # OVERRIDE MODE: Show violations but continue with warning
+            local override_text="Proceeding with violations in override mode (${#violations[@]} total):
+
+${violation_text}Fix these violations when possible.
+Use --violations flag to see complete list."
+
+            boxy_display "$override_text" "warning" "⚠️  Organization Violations (Override Active)"
+        else
+            # PERMISSIVE MODE: Just warn
+            echo "⚠️  Test structure warnings (${#violations[@]} total):"
+            printf "   • %s\n" "${violations[@]}"
+            echo
+        fi
+    else
+        echo "✅ Test structure is compliant"
+    fi
+
+    return 0
+}
+
+# Lint mode: check compliance only
+lint_tests() {
+    echo "🧹 Linting test organization..."
+    echo
+
+    STRICT_MODE="true"  # Always strict in lint mode
+    validate_test_structure
+
+    echo "✅ Test organization lint completed"
+}
+
+# Generate test report
+report_tests() {
+    echo "📊 Test Organization Report"
+    echo "=========================="
+    echo
+
+    # Count tests by category
+    local categories=(unit sanity smoke integration e2e uat chaos bench)
+
+    for category in "${categories[@]}"; do
+        local count=$(find tests -name "${category}_*.rs" -o -name "${category}.rs" 2>/dev/null | wc -l)
+        echo "$category: $count test files"
+    done
+
+    echo
+    echo "Test directories:"
+    for dir in tests/*/; do
+        [[ ! -d "$dir" ]] && continue
+        local dir_name=$(basename "$dir")
+        local file_count=$(find "$dir" -name "*.rs" 2>/dev/null | wc -l)
+        echo "  $dir_name/: $file_count files"
+    done
+
+    echo
+    validate_test_structure
+}
+
 
 # Parse optional flags (can be anywhere in arguments)
 VERBOSE_MODE="false"
 QUICK_MODE="true"  # Default to quick mode
 COMPREHENSIVE_MODE="false"
+STRICT_MODE="true"  # Default to strict - tests fail if disorganized
+SKIP_ENFORCEMENT="false"
+OVERRIDE_MODE="false"
+VIOLATIONS_MODE="false"
 ARGS=()
 
 while [[ $# -gt 0 ]]; do
@@ -59,6 +442,24 @@ while [[ $# -gt 0 ]]; do
         --comprehensive|--full)
             QUICK_MODE="false"
             COMPREHENSIVE_MODE="true"
+            shift 1
+            ;;
+        --strict)
+            STRICT_MODE="true"
+            shift 1
+            ;;
+        --skip-enforcement)
+            SKIP_ENFORCEMENT="true"
+            STRICT_MODE="false"
+            shift 1
+            ;;
+        --override)
+            OVERRIDE_MODE="true"
+            STRICT_MODE="false"
+            shift 1
+            ;;
+        --violations)
+            VIOLATIONS_MODE="true"
             shift 1
             ;;
         *)
@@ -121,58 +522,84 @@ declare -A TESTS=(
 
 show_help() {
     if [[ -n "$BOXY" ]]; then
-        cat <<-EOF | $BOXY --theme info --title "🧪 RSB Test Runner" --width max
+        cat <<-EOF | $BOXY --theme info --title "🧪 RSB Test Runner (BASHFX Aligned)" --width max
 Available Commands:
-  test.sh [--comprehensive|--verbose] run <test>    Run specific test
-  test.sh list                                      List available tests
-  test.sh help                                      Show this help
+  test.sh [options] run <test>      Run specific test
+  test.sh list                      List available tests
+  test.sh lint                      Check test organization compliance
+  test.sh report                    Generate test organization report
+  test.sh help                      Show this help
 
 Options:
   --comprehensive        Run full validation test suite
   --quick                Force quick mode (default)
   --verbose              Show detailed test output
+  --strict               Fail on test organization violations (DEFAULT)
+  --override             Run tests despite violations (shows warnings)
+  --violations           Show complete violation list and exit
+  --skip-enforcement     Skip test organization validation entirely
 
-Available Tests:
-  sanity                 Core functionality unit tests (Rust)
+Test Categories (BASHFX Organization):
+  sanity                 Core functionality validation (REQUIRED for all modules)
+  smoke                  Minimal CI tests (<10s total)
+  unit                   Fast, isolated module tests
+  integration            Cross-module interaction tests
+  e2e                    End-to-end user workflow tests
+  uat                    User Acceptance Tests (with visual ceremony)
+  chaos                  Edge cases, stress tests, property tests
+  bench                  Performance benchmarks
+
+Legacy Tests (Transitioning):
   param                  Parameter expansion comprehensive tests
   macros                 Basic macro functionality tests
   context                Global context operations tests
   args                   Command line argument processing tests
   bootstrap              Full bootstrap → options → dispatch flow
-  integration            End-to-end RSB workflow tests
   regression             Tests for previously broken functionality
-  defects                Verification of fixed defects (param! fixes)
+  defects                Verification of fixed defects
   all                    Run all test categories
-  smoke                  Quick smoke test suite
   full                   Full validation test suite
   old                    Legacy tests (moved to old/ directory)
 EOF
     else
-        echo "🧪 RSB TEST RUNNER"
-        echo "=================="
+        echo "🧪 RSB TEST RUNNER (BASHFX Aligned)"
+        echo "===================================="
         echo
         echo "Available Commands:"
-        echo "  test.sh [--comprehensive|--verbose] run <test>    Run specific test"
-        echo "  test.sh list                                      List available tests" 
-        echo "  test.sh help                                      Show this help"
+        echo "  test.sh [options] run <test>      Run specific test"
+        echo "  test.sh list                      List available tests"
+        echo "  test.sh lint                      Check test organization compliance"
+        echo "  test.sh report                    Generate test organization report"
+        echo "  test.sh help                      Show this help"
         echo
         echo "Options:"
         echo "  --comprehensive        Run full validation test suite"
         echo "  --quick                Force quick mode (default)"
         echo "  --verbose              Show detailed test output"
+        echo "  --strict               Fail on test organization violations (DEFAULT)"
+        echo "  --override             Run tests despite violations (shows warnings)"
+        echo "  --violations           Show complete violation list and exit"
+        echo "  --skip-enforcement     Skip test organization validation entirely"
         echo
-        echo "Available Tests:"
-        echo "  sanity                 Core functionality unit tests (Rust)"
+        echo "Test Categories (BASHFX Organization):"
+        echo "  sanity                 Core functionality validation (REQUIRED for all modules)"
+        echo "  smoke                  Minimal CI tests (<10s total)"
+        echo "  unit                   Fast, isolated module tests"
+        echo "  integration            Cross-module interaction tests"
+        echo "  e2e                    End-to-end user workflow tests"
+        echo "  uat                    User Acceptance Tests (with visual ceremony)"
+        echo "  chaos                  Edge cases, stress tests, property tests"
+        echo "  bench                  Performance benchmarks"
+        echo
+        echo "Legacy Tests (Transitioning):"
         echo "  param                  Parameter expansion comprehensive tests"
         echo "  macros                 Basic macro functionality tests"
         echo "  context                Global context operations tests"
         echo "  args                   Command line argument processing tests"
         echo "  bootstrap              Full bootstrap → options → dispatch flow"
-        echo "  integration            End-to-end RSB workflow tests"
         echo "  regression             Tests for previously broken functionality"
-        echo "  defects                Verification of fixed defects (param! fixes)"
+        echo "  defects                Verification of fixed defects"
         echo "  all                    Run all test categories"
-        echo "  smoke                  Quick smoke test suite"
         echo "  full                   Full validation test suite"
         echo "  old                    Legacy tests (moved to old/ directory)"
     fi
@@ -483,10 +910,20 @@ run_test() {
 # Main command dispatch
 case "${1:-help}" in
     "run")
+        # Validate structure before running tests (unless skipped)
+        if [[ "$SKIP_ENFORCEMENT" != "true" ]]; then
+            validate_test_structure
+        fi
         run_test "$2"
         ;;
     "list")
         list_tests
+        ;;
+    "lint")
+        lint_tests
+        ;;
+    "report")
+        report_tests
         ;;
     "help"|"--help"|"-h")
         show_help
