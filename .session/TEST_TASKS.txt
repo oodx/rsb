@@ -2,7 +2,7 @@
 RSB TEST ORGANIZATION MIGRATION - UPDATED TASK BACKLOG
 ================================================================================
 Updated: 2025-09-16 (Session 10 Continuation - EPIC 4 COMPLETION!)
-Previous Status: 135 violations → Current Status: 37 violations (73% reduction!)
+Previous Status: 135 violations → Current Status: 36 violations (73% reduction!)
 Source: Comprehensive analysis by China + Tina validation + TICKET-011 & TICKET-012 execution
 
 ================================================================================
@@ -29,11 +29,11 @@ Source: Comprehensive analysis by China + Tina validation + TICKET-011 & TICKET-
 ✅ **EPIC 4: OLD TESTS MIGRATION - 100% COMPLETE! (EPIC ACHIEVEMENT!)**
 - TICKET-011: Migrate Refactor-Ready Old Tests ✅ (HIGH VALUE DELIVERY!)
   * Created 3 new test categories: macros, streams, xcls
-  * Moved 6 old test files to proper locations
+  * Moved 6 old test files to proper locations under tests/unit/
   * Results: macros (7 tests pass), streams (1 test), xcls (2 tests pass)
 - TICKET-012: Validate and Update API-Dependent Tests ✅ (SPECTACULAR SUCCESS!)
   * ALL 5 APIs validated as 100% compatible - ZERO modifications needed!
-  * Migrated 5 additional test files to tests/macros/
+  * Migrated 5 additional test files to tests/unit/macros/
   * DOUBLED macro test coverage: 7 → 14 tests (100% increase!)
   * Comprehensive macro coverage across ALL RSB categories achieved!
 - TICKET-013: Extract CLI Test Cases and Rewrite ✅ (COMPLETE!)
@@ -41,24 +41,32 @@ Source: Comprehensive analysis by China + Tina validation + TICKET-011 & TICKET-
   * 11 CLI integration tests covering help, config, meta, array operations
   * Direct API testing approach validated (no external CLI dependencies)
   * All CLI tests pass successfully with zero API modifications needed
+- TICKET-017: Clean Remaining Invalid Directory ✅ (COMPLETE!)
+  * Fixed _adhoc directory validation in test.sh
+  * Removed invalid directory flagging for valid test directories
+  * All test directory violations resolved
 
 ================================================================================
-🎯 CURRENT STATUS: 37 VIOLATIONS REMAINING
+🎯 CURRENT STATUS: 36 VIOLATIONS REMAINING
 ================================================================================
 
 **Breakdown:**
 • Missing sanity tests: 22 modules
 • Missing UAT tests: 14 modules
-• Invalid directories: 1 remaining
+• Invalid directories: 0 remaining (ALL FIXED!)
 
-**Test Structure Now Working:**
+**Test Structure Now Working (REORGANIZED!):**
 - `cargo test --test sanity` → 39 tests pass ✅
-- `cargo test --test unit` → comprehensive coverage ✅
-- `cargo test --test macros` → 14 tests pass ✅ (DOUBLED!)
-- `cargo test --test streams` → 1 test ✅ (NEW!)
-- `cargo test --test xcls` → 2 tests pass ✅ (NEW!)
-- `cargo test --test integration` → 11 CLI tests pass ✅ (NEW!)
+- `cargo test --test unit` → comprehensive coverage (includes domain modules) ✅
+  * includes tests/unit/macros/ → 14 tests pass ✅ (DOUBLED!)
+  * includes tests/unit/streams/ → 1 test ✅ (NEW!)
+  * includes tests/unit/xcls/ → 2 tests pass ✅ (NEW!)
+- `cargo test --test integration` → 21 integration tests pass ✅ (includes CLI!)
 - All category orchestrators functional ✅
+
+**IMPORTANT: Domain modules moved to unit/ structure!**
+- OLD: `cargo test --test macros` (NO LONGER WORKS)
+- NEW: Domain tests included in `cargo test --test unit`
 
 **SPECTACULAR ACHIEVEMENT: Comprehensive Macro Coverage ACHIEVED!**
 - File system & data parsing: sed_*, path_*, meta_keys! ✅
@@ -139,6 +147,46 @@ Update 5 old test files that need API validation and modernization
 - ✅ **Violations:** Still 37 (no increase from migration)
 
 **ACHIEVED IMPACT:** Complete macro test coverage across ALL RSB categories + validation of API stability
+
+================================================================================
+
+🔄 **POST-EPIC 4: TEST REORGANIZATION COMPLETED**
+--------------------------------------------------
+**Type:** Organization | **Priority:** P0 | **Story Points:** 2
+**Status:** ✅ COMPLETED | **Date:** Session 10 Continuation
+
+**Description:**
+Major test structure reorganization to follow proper testing conventions
+
+**Reorganization Changes:**
+- [x] Moved tests/macros/ → tests/unit/macros/ ✅
+- [x] Moved tests/streams/ → tests/unit/streams/ ✅
+- [x] Moved tests/xcls/ → tests/unit/xcls/ ✅
+- [x] Updated tests/unit.rs orchestrator to include new modules ✅
+- [x] Removed old standalone orchestrator files (macros.rs, streams.rs, xcls.rs) ✅
+- [x] Updated test.sh validation logic ✅
+- [x] Cleaned up tests/old/ directory completely ✅
+
+**CRITICAL IMPACT:**
+- ✅ **Test Execution:** Domain modules now properly integrated into unit test structure
+- ✅ **Command Changes:** `cargo test --test macros` NO LONGER WORKS (moved to unit)
+- ✅ **New Structure:** All domain tests accessible via `cargo test --test unit`
+- ✅ **Integration Tests:** Expanded to 21 tests (includes CLI integration)
+- ✅ **Directory Violations:** Fixed during reorganization (TICKET-017 completed)
+
+**Current Test Structure:**
+```
+tests/
+├── unit/               # All unit tests including domain modules
+│   ├── macros/        # 14 macro test files (from Epic 4 migration)
+│   ├── streams/       # 1 stream test file
+│   ├── xcls/          # 2 xcls test files
+│   └── ...            # Other unit tests
+├── integration/       # 21 integration tests (including CLI)
+├── sanity/           # 39 sanity tests (need 22 more)
+├── uat/              # UAT tests (need 14 more)
+└── _adhoc/           # Valid adhoc test directory
+```
 
 ================================================================================
 
@@ -246,15 +294,26 @@ with tests/sh/ceremony.sh system
 EPIC 6: FINAL CLEANUP (Priority: P3 - Polish)
 ================================================================================
 
-TICKET-017: Clean Remaining Invalid Directory
----------------------------------------------
+TICKET-017: Clean Remaining Invalid Directory ✅ COMPLETE
+----------------------------------------------------------
 **Type:** Cleanup | **Priority:** P3 | **Story Points:** 1
-**Status:** Ready | **Assignee:** Unassigned
+**Status:** ✅ COMPLETED | **Assignee:** Completed
 
 **Description:**
 Resolve the 1 remaining invalid directory violation
 
-**Estimated Impact:** Zero invalid directory violations
+**Acceptance Criteria:**
+- [x] Fixed test.sh validation logic for _adhoc directory ✅
+- [x] Removed macros|streams|xcls from top-level valid categories ✅
+- [x] Updated validation to follow proper test categorization ✅
+- [x] Verified all directory violations resolved ✅
+
+**DELIVERY RESULTS:**
+- ✅ _adhoc directory properly recognized as valid
+- ✅ Invalid directory validation logic corrected
+- ✅ Violations reduced from 37 → 36
+
+**ACHIEVED IMPACT:** Zero invalid directory violations
 
 ================================================================================
 SUMMARY METRICS
@@ -268,8 +327,8 @@ SUMMARY METRICS
 - **Epic 4 Old Test Migration: 100% complete (ALL TICKETS ✅)**
 
 **Remaining Work:**
-- 37 violations across 4 tickets (reduced from 6!)
-- Estimated Effort: 22 story points (reduced from 38!)
+- 36 violations across 3 tickets (reduced from 6!)
+- Estimated Effort: 21 story points (reduced from 38!)
 - Epic 4 100% complete - ALL tickets delivered!
 - Comprehensive macro test coverage achieved
 - Clear path to zero violations validated
@@ -282,7 +341,7 @@ SUMMARY METRICS
 - [ ] Clean, enforceable directory structure
 
 **Validation Commands:**
-- ./bin/test.sh lint (track violation reduction: 37 remaining)
+- ./bin/test.sh lint (track violation reduction: 36 remaining)
 - ./bin/test.sh list (verify test discovery)
 - cargo test --test sanity (verify category execution)
 - cargo test --test unit (verify comprehensive coverage)
@@ -297,7 +356,7 @@ STRATEGIC ANALYSIS & NEXT SESSION PRIORITIES
 ✅ **UNPRECEDENTED VALUE:** 14 comprehensive macro tests + 2 xcls tests + 1 stream test + 11 CLI integration tests = MASSIVE coverage
 ✅ **API STABILITY CONFIRMED:** All 5 API-dependent tests required ZERO modifications!
 ✅ **COMPREHENSIVE MACRO COVERAGE:** All RSB macro categories now have complete test coverage
-✅ **CLEAN EXECUTION:** Violations remain at 37 (no regression from massive migration)
+✅ **CLEAN EXECUTION:** Violations reduced to 36 (1 additional violation fixed during reorganization)
 ✅ **APPROACH VALIDATED:** Old test migration is the highest-value, lowest-risk path proven!
 
 🎯 **STRATEGIC RECOMMENDATIONS FOR FINAL PHASE:**
@@ -312,7 +371,7 @@ STRATEGIC ANALYSIS & NEXT SESSION PRIORITIES
 - ✅ Validated direct API testing approach with zero external dependencies
 
 🏆 **EPIC 4 TOTAL IMPACT SUMMARY:**
-✅ **COMPREHENSIVE COVERAGE:** 98 violations fixed (135 → 37 remaining)
+✅ **COMPREHENSIVE COVERAGE:** 99 violations fixed (135 → 36 remaining)
 ✅ **MASSIVE TEST EXPANSION:**
   * 14 comprehensive macro tests (doubled coverage)
   * 2 xcls tests
@@ -326,6 +385,7 @@ STRATEGIC ANALYSIS & NEXT SESSION PRIORITIES
 🎯 **NEXT SESSION STRATEGIC FOCUS:**
 **RECOMMENDED: Execute TICKET-014 (Missing Sanity Tests - Volume Strategy)**
 ✅ **Volume Impact:** Reduces largest violation category (22 → 11 missing sanity tests)
+✅ **Recent Success:** TICKET-017 completed during reorganization (directory validation fixed)
 ✅ **Predictable Success:** Well-understood smoke test implementation pattern
 ✅ **Build on Momentum:** Leverage Epic 4 completion success into high-volume delivery
 ✅ **Clear Path:** 8 story points for 11 missing sanity test creation
