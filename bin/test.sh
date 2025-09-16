@@ -89,118 +89,20 @@ Use './bin/test.sh run <test>' for standard enforcement."
     boxy_display "$warning_text" "warning" "⚠️  Test Organization Override"
 }
 
-# Generate organized violation report
-generate_violation_report() {
-    local naming_violations=("$@")
-    local missing_sanity_violations=()
-    local directory_violations=()
-
-    # Parse the three arrays passed as arguments
-    local parsing_mode="naming"
-    for arg in "$@"; do
-        case "$arg" in
-            "--missing-sanity-start")
-                parsing_mode="missing_sanity"
-                continue
-                ;;
-            "--directory-start")
-                parsing_mode="directory"
-                continue
-                ;;
-        esac
-
-        case "$parsing_mode" in
-            "naming")
-                [[ "$arg" != "--missing-sanity-start" && "$arg" != "--directory-start" ]] && naming_violations+=("$arg")
-                ;;
-            "missing_sanity")
-                missing_sanity_violations+=("$arg")
-                ;;
-            "directory")
-                directory_violations+=("$arg")
-                ;;
-        esac
-    done
-
-    local total_violations=$((${#naming_violations[@]} + ${#missing_sanity_violations[@]} + ${#directory_violations[@]}))
-    local report_text=""
-
-    echo "📋 Test Organization Violations Report ($total_violations total)"
-    echo "================================================================"
-    echo
-
-    # Naming violations section
-    if [[ ${#naming_violations[@]} -gt 0 ]]; then
-        echo "🏷️  NAMING VIOLATIONS (${#naming_violations[@]} files)"
-        echo "────────────────────────────────────────────────────────"
-        echo "Issue: Test wrapper files don't follow naming pattern"
-        echo "Required: <category>_<module>.rs (e.g., sanity_com.rs, uat_math.rs)"
-        echo "Valid categories: unit, sanity, smoke, integration, e2e, uat, chaos, bench"
-        echo
-        for i in "${!naming_violations[@]}"; do
-            printf "%3d. %s\n" $((i + 1)) "${naming_violations[i]}"
-        done
-        echo
-        echo "Fix: Rename files to match pattern (e.g., com_sanity.rs → sanity_com.rs)"
-        echo
-    fi
-
-    # Missing sanity tests section
-    if [[ ${#missing_sanity_violations[@]} -gt 0 ]]; then
-        echo "🚨 MISSING SANITY TESTS (${#missing_sanity_violations[@]} modules)"
-        echo "────────────────────────────────────────────────────────"
-        echo "Issue: Modules without required sanity tests"
-        echo "Required: Every module must have sanity tests for core functionality"
-        echo
-        for i in "${!missing_sanity_violations[@]}"; do
-            printf "%3d. Module '%s' (create: tests/sanity_%s.rs)\n" $((i + 1)) "${missing_sanity_violations[i]}" "${missing_sanity_violations[i]}"
-        done
-        echo
-        echo "Fix: Create sanity test files for each module"
-        echo
-    fi
-
-    # Directory violations section
-    if [[ ${#directory_violations[@]} -gt 0 ]]; then
-        echo "📁 INVALID DIRECTORIES (${#directory_violations[@]} directories)"
-        echo "────────────────────────────────────────────────────────"
-        echo "Issue: Test directories don't match approved organization"
-        echo "Valid: unit/, sanity/, smoke/, integration/, e2e/, uat/, chaos/, bench/, sh/, old/, _archive/"
-        echo
-        for i in "${!directory_violations[@]}"; do
-            printf "%3d. %s\n" $((i + 1)) "${directory_violations[i]}"
-        done
-        echo
-        echo "Fix: Move tests to approved category directories or rename to _archive/"
-        echo
-    fi
-
-    # Summary box
-    local fix_summary="VIOLATION SUMMARY & FIXES
-
-Total Violations: $total_violations
-• Naming issues: ${#naming_violations[@]}
-• Missing sanity tests: ${#missing_sanity_violations[@]}
-• Invalid directories: ${#directory_violations[@]}
-
-QUICK FIXES:
-• Run './bin/test.sh lint' for detailed analysis
-• Use './bin/test.sh --override' for emergency bypass
-• Follow naming pattern: <category>_<module>.rs
-• Create missing sanity tests for all modules"
-
-    boxy_display "$fix_summary" "warning" "📊 Test Organization Fix Guide"
-}
 
 # Test Organization Enforcement (BASHFX Aligned)
 validate_test_structure() {
     # Categorized violation arrays
     local naming_violations=()
     local missing_sanity_violations=()
+    local missing_uat_violations=()
     local directory_violations=()
+    local missing_category_entry_violations=()
+    local unauthorized_root_violations=()
 
     # Valid categories for test organization
     local valid_categories="unit|sanity|smoke|integration|e2e|uat|chaos|bench"
+    local required_category_entries=(sanity smoke unit integration e2e uat chaos bench)
 
     if [[ "$SKIP_ENFORCEMENT" == "true" ]]; then
         return 0
@@ -229,16 +131,11 @@ validate_test_structure() {
         fi
     done
 
-    # Check for required sanity tests
-    for module_path in src/*.rs src/*/mod.rs; do
-        [[ ! -f "$module_path" ]] && continue
-
-        module_name=""
-        if [[ "$module_path" == src/*.rs ]]; then
-            module_name=$(basename "$module_path" .rs)
-        else
-            module_name=$(basename "$(dirname "$module_path")")
-        fi
+    # Check for required sanity tests - look for modules in src/ directory
+    # Pattern 1: src/module.rs files (direct module files)
+    for module_file in src/*.rs; do
+        [[ ! -f "$module_file" ]] && continue
+        module_name=$(basename "$module_file" .rs)
 
         # Skip lib.rs and main.rs
         [[ "$module_name" == "lib" || "$module_name" == "main" ]] && continue
@@ -246,6 +143,63 @@ validate_test_structure() {
         # Check for sanity test existence
         if [[ ! -f "tests/sanity_${module_name}.rs" && ! -f "tests/sanity/${module_name}.rs" ]]; then
             missing_sanity_violations+=("$module_name")
+        fi
+    done
+
+    # Pattern 2: src/module/mod.rs files (directory modules)
+    for module_dir in src/*/; do
+        [[ ! -d "$module_dir" ]] && continue
+        [[ ! -f "${module_dir}mod.rs" ]] && continue
+
+        module_name=$(basename "$module_dir")
+
+        # Check for sanity test existence
+        if [[ ! -f "tests/sanity_${module_name}.rs" && ! -f "tests/sanity/${module_name}.rs" ]]; then
+            missing_sanity_violations+=("$module_name")
+        fi
+
+        # Check for UAT test existence (BOTH sanity AND uat required)
+        if [[ ! -f "tests/uat_${module_name}.rs" && ! -f "tests/uat/${module_name}.rs" ]]; then
+            missing_uat_violations+=("$module_name")
+        fi
+    done
+
+    # Check for required category entry files
+    for category in "${required_category_entries[@]}"; do
+        if [[ ! -f "tests/${category}.rs" ]]; then
+            missing_category_entry_violations+=("$category")
+        fi
+    done
+
+    # Check for unauthorized files in tests/ root
+    for file in tests/*.rs; do
+        [[ ! -f "$file" ]] && continue
+
+        basename="${file##*/}"
+        basename="${basename%.rs}"
+
+        # Skip archive files
+        [[ "$basename" =~ ^_ ]] && continue
+
+        # Check if it's a valid category entry file OR valid module-specific file
+        local is_valid=false
+
+        # Check if it's a category entry file
+        for category in "${required_category_entries[@]}"; do
+            if [[ "$basename" == "$category" ]]; then
+                is_valid=true
+                break
+            fi
+        done
+
+        # Check if it's a valid module-specific file
+        if [[ ! $is_valid == true ]] && [[ "$basename" =~ ^($valid_categories)_[a-z_]+$ ]]; then
+            is_valid=true
+        fi
+
+        # If neither, it's unauthorized
+        if [[ ! $is_valid == true ]]; then
+            unauthorized_root_violations+=("$file")
         fi
     done
 
@@ -262,14 +216,10 @@ validate_test_structure() {
     done
 
     # Calculate total violations
-    local total_violations=$((${#naming_violations[@]} + ${#missing_sanity_violations[@]} + ${#directory_violations[@]}))
+    local total_violations=$((${#naming_violations[@]} + ${#missing_sanity_violations[@]} + ${#missing_uat_violations[@]} + ${#directory_violations[@]} + ${#missing_category_entry_violations[@]} + ${#unauthorized_root_violations[@]}))
 
     # Report violations
     if [[ $total_violations -gt 0 ]]; then
-        local violation_text=""
-        for violation in "${violations[@]}"; do
-            violation_text+="• $violation\n"
-        done
 
         # If --violations flag is used, show organized report and exit
         if [[ "$VIOLATIONS_MODE" == "true" ]]; then
@@ -305,6 +255,51 @@ validate_test_structure() {
                 done
                 echo
                 echo "Fix: Create sanity test files for each module"
+                echo
+            fi
+
+            # Missing UAT tests section
+            if [[ ${#missing_uat_violations[@]} -gt 0 ]]; then
+                echo "🎭 MISSING UAT TESTS (${#missing_uat_violations[@]} modules)"
+                echo "────────────────────────────────────────────────────────"
+                echo "Issue: Modules without required visual UAT/ceremony tests"
+                echo "Required: Every module must have UAT tests for visual demonstrations"
+                echo
+                for i in "${!missing_uat_violations[@]}"; do
+                    printf "%3d. Module '%s' (create: tests/uat_%s.rs)\n" $((i + 1)) "${missing_uat_violations[i]}" "${missing_uat_violations[i]}"
+                done
+                echo
+                echo "Fix: Create UAT test files with visual demonstrations for each module"
+                echo
+            fi
+
+            # Missing category entry files section
+            if [[ ${#missing_category_entry_violations[@]} -gt 0 ]]; then
+                echo "📋 MISSING CATEGORY ENTRY FILES (${#missing_category_entry_violations[@]} categories)"
+                echo "────────────────────────────────────────────────────────"
+                echo "Issue: Missing category-level test orchestrators"
+                echo "Required: Each category needs an entry file (e.g., smoke.rs, unit.rs)"
+                echo
+                for i in "${!missing_category_entry_violations[@]}"; do
+                    printf "%3d. Category '%s' (create: tests/%s.rs)\n" $((i + 1)) "${missing_category_entry_violations[i]}" "${missing_category_entry_violations[i]}"
+                done
+                echo
+                echo "Fix: Create category entry files for cross-module integration tests"
+                echo
+            fi
+
+            # Unauthorized root files section
+            if [[ ${#unauthorized_root_violations[@]} -gt 0 ]]; then
+                echo "🚫 UNAUTHORIZED ROOT FILES (${#unauthorized_root_violations[@]} files)"
+                echo "────────────────────────────────────────────────────────"
+                echo "Issue: Files in tests/ root that don't follow organization rules"
+                echo "Allowed: <category>.rs or <category>_<module>.rs only"
+                echo
+                for i in "${!unauthorized_root_violations[@]}"; do
+                    printf "%3d. %s\n" $((i + 1)) "${unauthorized_root_violations[i]}"
+                done
+                echo
+                echo "Fix: Rename to pattern, move to tests/_adhoc/, or move to tests/_archive/"
                 echo
             fi
 
@@ -345,12 +340,14 @@ QUICK FIXES:
             # HARD FAIL: Tests cannot run with violations in strict mode
             local error_text="🚫 TEST EXECUTION BLOCKED 🚫
 
-Test organization violations detected (${#violations[@]} total):
+Test organization violations detected ($total_violations total):
+• Naming issues: ${#naming_violations[@]}
+• Missing sanity tests: ${#missing_sanity_violations[@]}
+• Invalid directories: ${#directory_violations[@]}
 
-${violation_text}
 SOLUTION OPTIONS:
 • Fix violations and re-run tests
-• Use --violations flag to see complete violation list
+• Use --violations flag to see complete organized list
 • Use --override flag for emergency bypass with warnings
 • Use --skip-enforcement to disable validation entirely
 
@@ -360,16 +357,23 @@ Tests cannot proceed until organization is compliant."
             exit 1
         elif [[ "$OVERRIDE_MODE" == "true" ]]; then
             # OVERRIDE MODE: Show violations but continue with warning
-            local override_text="Proceeding with violations in override mode (${#violations[@]} total):
+            local override_text="Proceeding with violations in override mode ($total_violations total):
 
-${violation_text}Fix these violations when possible.
-Use --violations flag to see complete list."
+• Naming issues: ${#naming_violations[@]}
+• Missing sanity tests: ${#missing_sanity_violations[@]}
+• Invalid directories: ${#directory_violations[@]}
+
+Fix these violations when possible.
+Use --violations flag to see complete organized list."
 
             boxy_display "$override_text" "warning" "⚠️  Organization Violations (Override Active)"
         else
             # PERMISSIVE MODE: Just warn
-            echo "⚠️  Test structure warnings (${#violations[@]} total):"
-            printf "   • %s\n" "${violations[@]}"
+            echo "⚠️  Test structure warnings ($total_violations total):"
+            echo "   • Naming issues: ${#naming_violations[@]}"
+            echo "   • Missing sanity tests: ${#missing_sanity_violations[@]}"
+            echo "   • Invalid directories: ${#directory_violations[@]}"
+            echo "   Use --violations flag for detailed breakdown"
             echo
         fi
     else
