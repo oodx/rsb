@@ -1,0 +1,381 @@
+================================================================================
+RSB TEST ORGANIZATION MIGRATION - TASK BACKLOG
+================================================================================
+Source: China's Analysis (egg.1.rsb-test-cleanup-strategy.txt)
+Created: 2025-09-16
+Status: 135 violations identified - System working correctly, legacy migration needed
+
+================================================================================
+EPIC 1: CRITICAL FOUNDATION (Sprint 1 - Priority: P0)
+================================================================================
+
+TICKET-001: Create Missing Category Orchestrators
+--------------------------------------------------
+**Type:** Feature | **Priority:** P0 | **Story Points:** 2
+**Status:** Ready | **Assignee:** Unassigned
+
+**Description:**
+Create 7 missing category orchestrator files to enable category-level test execution
+
+**Acceptance Criteria:**
+- [ ] Create tests/smoke.rs with proper wrapper pattern
+- [ ] Create tests/unit.rs with proper wrapper pattern
+- [ ] Create tests/integration.rs with proper wrapper pattern
+- [ ] Create tests/e2e.rs with proper wrapper pattern
+- [ ] Create tests/uat.rs with proper wrapper pattern
+- [ ] Create tests/chaos.rs with proper wrapper pattern
+- [ ] Create tests/bench.rs with proper wrapper pattern
+- [ ] Verify ./bin/test.sh list shows new categories
+- [ ] Verify ./bin/test.sh lint violation count reduces by 7
+
+**Implementation Notes:**
+Each file should follow pattern:
+```rust
+#[path = "<category>/<file>.rs"]
+mod <category>_<file>;
+```
+
+**Files to Create:**
+- tests/smoke.rs
+- tests/unit.rs
+- tests/integration.rs
+- tests/e2e.rs
+- tests/uat.rs
+- tests/chaos.rs
+- tests/bench.rs
+
+**Estimated Impact:** Reduces violations by 7, enables category execution
+
+================================================================================
+
+TICKET-002: Fix High-Impact Naming Violations (Batch 1)
+--------------------------------------------------------
+**Type:** Refactor | **Priority:** P0 | **Story Points:** 3
+**Status:** Ready | **Assignee:** Unassigned
+
+**Description:**
+Rename high-impact wrapper files to follow <category>_<module>.rs pattern
+
+**Acceptance Criteria:**
+- [ ] Rename 8 critical files following naming convention
+- [ ] Verify renamed files are discovered by test.sh list
+- [ ] Verify ./bin/test.sh lint violation count reduces by 8
+- [ ] No breaking changes to existing test functionality
+
+**File Operations:**
+```bash
+mv tests/bash_sanity.rs tests/sanity_bash.rs
+mv tests/com_sanity.rs tests/sanity_com.rs
+mv tests/math_sanity.rs tests/sanity_math.rs
+mv tests/threads_sanity.rs tests/sanity_threads.rs
+mv tests/tokens_sanity.rs tests/sanity_tokens.rs
+mv tests/prompts_sanity.rs tests/sanity_prompts.rs
+mv tests/gx_sanity.rs tests/sanity_gx.rs
+mv tests/generators_sanity.rs tests/sanity_generators.rs
+```
+
+**Validation:**
+- Run ./bin/test.sh lint before and after
+- Ensure renamed tests still execute correctly
+
+**Estimated Impact:** Reduces violations by 8, improves test discovery
+
+================================================================================
+
+TICKET-003: Fix Feature Test Naming Violations (Batch 2)
+----------------------------------------------------------
+**Type:** Refactor | **Priority:** P0 | **Story Points:** 2
+**Status:** Ready | **Assignee:** Unassigned
+
+**Description:**
+Rename feature test files to proper category_module pattern
+
+**Acceptance Criteria:**
+- [ ] Rename 4 feature test files to sanity category
+- [ ] Verify renamed files follow wrapper pattern correctly
+- [ ] Verify ./bin/test.sh lint violation count reduces by 4
+- [ ] Tests execute under sanity category
+
+**File Operations:**
+```bash
+mv tests/features_colors.rs tests/sanity_colors.rs
+mv tests/features_param.rs tests/sanity_param.rs
+mv tests/features_string.rs tests/sanity_string.rs
+mv tests/features_date.rs tests/sanity_date.rs
+```
+
+**Dependencies:** None
+**Estimated Impact:** Reduces violations by 4, consolidates feature tests
+
+================================================================================
+EPIC 2: MISSING TESTS CREATION (Sprint 2 - Priority: P1)
+================================================================================
+
+TICKET-004: Create Critical Sanity Tests (Batch 1)
+---------------------------------------------------
+**Type:** Feature | **Priority:** P1 | **Story Points:** 5
+**Status:** Blocked by TICKET-001 | **Assignee:** Unassigned
+
+**Description:**
+Create sanity tests for 5 critical modules lacking core validation
+
+**Acceptance Criteria:**
+- [ ] Create tests/sanity/colors.rs with basic functionality tests
+- [ ] Create tests/sanity_colors.rs wrapper file
+- [ ] Create tests/sanity/math.rs with basic functionality tests
+- [ ] Create tests/sanity_math.rs wrapper file
+- [ ] Create tests/sanity/date.rs with basic functionality tests
+- [ ] Create tests/sanity_date.rs wrapper file
+- [ ] Create tests/sanity/fs.rs with basic functionality tests
+- [ ] Create tests/sanity_fs.rs wrapper file
+- [ ] Create tests/sanity/param.rs with basic functionality tests
+- [ ] Create tests/sanity_param.rs wrapper file
+- [ ] All tests pass via ./bin/test.sh run sanity
+- [ ] Violation count reduces by 5
+
+**Template Pattern:**
+```rust
+// tests/sanity/module.rs
+#[test]
+fn test_basic_functionality() {
+    // Core module functionality validation
+    assert!(true); // Replace with actual tests
+}
+
+// tests/sanity_module.rs
+#[path = "sanity/module.rs"]
+mod sanity_module;
+```
+
+**Modules to Cover:** colors, math, date, fs, param
+**Estimated Impact:** Reduces violations by 10 (5 files + 5 wrappers)
+
+================================================================================
+
+TICKET-005: Create Critical UAT Tests (Batch 1)
+------------------------------------------------
+**Type:** Feature | **Priority:** P1 | **Story Points:** 8
+**Status:** Blocked by TICKET-001 | **Assignee:** Unassigned
+
+**Description:**
+Create UAT visual ceremony tests for 3 critical modules
+
+**Acceptance Criteria:**
+- [ ] Create tests/uat/colors.rs with visual ceremony
+- [ ] Create tests/uat_colors.rs wrapper file
+- [ ] Create tests/uat/strings.rs with visual ceremony
+- [ ] Create tests/uat_strings.rs wrapper file
+- [ ] Create tests/uat/bash.rs with visual ceremony
+- [ ] Create tests/uat_bash.rs wrapper file
+- [ ] All UAT tests show proper println! ceremony
+- [ ] Tests pass via ./bin/test.sh run uat
+- [ ] Visual ceremony compatible with ceremony.sh
+
+**UAT Pattern:**
+```rust
+#[test]
+fn module_uat_ceremony() {
+    println!("Module UAT Ceremony");
+    println!("===================");
+
+    println!("\nUAT 1: Basic Functionality");
+    println!("Command: module_function()");
+    println!("Expected: Expected behavior description");
+    println!("Running...");
+    let result = module_function();
+    println!("Output: {}", result);
+    println!("Status: PASS");
+
+    println!("\nUAT Ceremony Complete");
+}
+```
+
+**Modules to Cover:** colors, strings, bash
+**Estimated Impact:** Reduces violations by 6 (3 files + 3 wrappers)
+
+================================================================================
+
+TICKET-006: Create Remaining Sanity Tests (Batch 2)
+----------------------------------------------------
+**Type:** Feature | **Priority:** P2 | **Story Points:** 13
+**Status:** Blocked by TICKET-004 | **Assignee:** Unassigned
+
+**Description:**
+Create sanity tests for remaining 25 modules lacking core validation
+
+**Acceptance Criteria:**
+- [ ] Create sanity tests for all remaining modules:
+      gx, hosts, macros, parse, progress, streamable, token, xcls,
+      threads, prompts, generators, cli, dev, global, host,
+      options, truth, plus 8 others identified in analysis
+- [ ] Each module has tests/sanity/module.rs + tests/sanity_module.rs wrapper
+- [ ] All tests pass independently
+- [ ] Violation count reduces by 50 (25 files + 25 wrappers)
+
+**Dependencies:** TICKET-004 completion
+**Estimated Impact:** Major violation reduction, core test coverage complete
+
+================================================================================
+
+TICKET-007: Create Remaining UAT Tests (Batch 2)
+-------------------------------------------------
+**Type:** Feature | **Priority:** P2 | **Story Points:** 18
+**Status:** Blocked by TICKET-005 | **Assignee:** Unassigned
+
+**Description:**
+Create UAT visual ceremony tests for remaining 11 modules
+
+**Acceptance Criteria:**
+- [ ] Create UAT tests for remaining modules needing visual ceremony
+- [ ] Each module has tests/uat/module.rs + tests/uat_module.rs wrapper
+- [ ] All UAT tests demonstrate visual ceremony with println! patterns
+- [ ] Compatible with ./tests/sh/ceremony.sh system
+- [ ] Violation count reduces by 22 (11 files + 11 wrappers)
+
+**Dependencies:** TICKET-005 completion
+**Estimated Impact:** Complete UAT coverage, visual ceremony system ready
+
+================================================================================
+EPIC 3: STRUCTURE CLEANUP (Sprint 3 - Priority: P2)
+================================================================================
+
+TICKET-008: Archive Invalid Directories
+----------------------------------------
+**Type:** Cleanup | **Priority:** P2 | **Story Points:** 5
+**Status:** Blocked by TICKET-003 | **Assignee:** Unassigned
+
+**Description:**
+Clean up 8 invalid directory structures and archive legacy organization
+
+**Acceptance Criteria:**
+- [ ] Move content from tests/bash/ to appropriate categories
+- [ ] Move content from tests/com/ to appropriate categories
+- [ ] Move content from tests/features/ to appropriate categories
+- [ ] Archive obsolete structure in tests/_archive/
+- [ ] Update any broken wrapper references
+- [ ] Verify ./bin/test.sh lint violations reduce accordingly
+- [ ] No functionality loss from reorganization
+
+**Cleanup Operations:**
+- Archive tests/features/ directory content
+- Consolidate tests/bash/ and tests/com/ content
+- Preserve working tests during migration
+
+**Estimated Impact:** Reduces violations by 8+, clean directory structure
+
+================================================================================
+
+TICKET-009: Fix Remaining Naming Violations
+--------------------------------------------
+**Type:** Refactor | **Priority:** P3 | **Story Points:** 8
+**Status:** Blocked by TICKET-002,TICKET-003 | **Assignee:** Unassigned
+
+**Description:**
+Fix remaining 26 naming pattern violations (38 total - 12 from Tickets 2&3)
+
+**Acceptance Criteria:**
+- [ ] Rename all remaining non-compliant wrapper files
+- [ ] Follow strict <category>_<module>.rs pattern
+- [ ] Verify all renamed files are discoverable
+- [ ] Zero naming violations remain
+- [ ] All tests execute correctly after rename
+
+**Implementation:**
+- Audit remaining files violating naming convention
+- Batch rename operations to minimize disruption
+- Validate each rename maintains functionality
+
+**Estimated Impact:** Zero naming violations, full pattern compliance
+
+================================================================================
+
+TICKET-010: Archive Unauthorized Root Files
+--------------------------------------------
+**Type:** Cleanup | **Priority:** P3 | **Story Points:** 3
+**Status:** Blocked by TICKET-009 | **Assignee:** Unassigned
+
+**Description:**
+Archive 38 unauthorized root files that don't follow wrapper pattern
+
+**Acceptance Criteria:**
+- [ ] Identify all unauthorized files in tests/ root
+- [ ] Move non-pattern files to tests/_archive/ or tests/_adhoc/
+- [ ] Keep only compliant wrappers in tests/ root
+- [ ] Document archived files for reference
+- [ ] Zero unauthorized file violations
+
+**Cleanup Strategy:**
+- Review each file to determine archive vs adhoc placement
+- Preserve any useful experimental tests in _adhoc/
+- Create archive manifest for future reference
+
+**Estimated Impact:** Zero unauthorized files, clean tests/ root
+
+================================================================================
+SUMMARY METRICS
+================================================================================
+
+**Current State:**
+- Total Violations: 135
+- Categories: 6 violation types
+- Estimated Effort: 66 story points across 10 tickets
+
+**Progress Tracking:**
+- Phase 1 (P0): 7 story points (Tickets 1-3) → ~19 violations fixed
+- Phase 2 (P1): 31 story points (Tickets 4-7) → ~94 violations fixed
+- Phase 3 (P2-P3): 28 story points (Tickets 8-10) → ~22 violations fixed
+
+**Success Criteria:**
+- [ ] Zero violations on ./bin/test.sh lint
+- [ ] All test categories executable
+- [ ] Complete sanity + UAT coverage per module
+- [ ] Clean, enforceable directory structure
+- [ ] Working visual ceremony system
+
+**Validation Commands:**
+- ./bin/test.sh lint (track violation reduction)
+- ./bin/test.sh list (verify test discovery)
+- ./bin/test.sh run sanity (verify sanity coverage)
+- ./bin/test.sh run uat (verify UAT ceremony)
+
+================================================================================
+RISK ASSESSMENT
+================================================================================
+
+**Low Risk:**
+- TICKET-001: Creating new files, no breaking changes
+- TICKET-002, TICKET-003: File renames, predictable impact
+
+**Medium Risk:**
+- TICKET-004, TICKET-005: New test creation, requires domain knowledge
+- TICKET-008: Directory restructure, potential for broken references
+
+**High Risk:**
+- TICKET-006, TICKET-007: Large batch test creation, scope creep potential
+- TICKET-009, TICKET-010: Final cleanup, integration complexity
+
+**Mitigation Strategy:**
+- Validate each ticket completion with ./bin/test.sh lint
+- Test functionality preservation after each batch operation
+- Incremental approach with rollback capability
+
+================================================================================
+NOTES
+================================================================================
+
+**Key Insights from China's Analysis:**
+✅ Test enforcement system is working perfectly
+✅ Documentation is accurate and up-to-date
+✅ This is a "good problem" - shows system integrity
+⚠️  Legacy migration is the primary challenge
+🎯 Clear path to compliance with measurable progress
+
+**Implementation Priority:**
+Focus on P0 tickets first - they provide maximum violation reduction with
+minimal risk and effort. Build momentum before tackling larger test creation.
+
+**Session Handoff:**
+Ready to begin with TICKET-001 (2 story points) for immediate impact.
+All ticket dependencies mapped and actionable.
+
+================================================================================

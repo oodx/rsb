@@ -5,75 +5,85 @@ Branch: main
 Repo: rsb (canonical)
 
 ## Latest Session Summary
-**SESSION_07**: COM Module Restructure & Cleanup (2025-09-16)
-- Restructured `com` module: split into `bool.rs` + `exit.rs`
-- Enhanced exit codes with meaningful failure types
-- Cleaned up ToBool trait (renamed from ToRSBBool)
-- **Issue identified**: `bool` ToBool implementation is identity function - needs warning/removal
-- All tests passing (13 sanity + 10 UAT)
-- Documentation consolidated (LOGIC_REGRESSION → FEATURES_TRUTH)
+**SESSION_08**: Test Documentation System & Migration Planning (2025-09-16)
+- Enhanced comprehensive documentation system (46 docs accessible via test.sh)
+- Updated RSB_ARCH.md, HOWTO_TEST.md, HOWTO_UPDATE_RSB.md with current patterns
+- China analyzed test structure: 135 violations identified, enforcement working perfectly
+- Created TEST_TASKS.txt: 66 story points across 10 tickets for systematic migration
+- Test organization system confirmed accurate - ready for Phase 1 execution
+- All documentation aligned with actual test.sh validation requirements
 
 ## Start here (zero‑context)
 **Read these files first** (in order):
 - `README.md` (Start Here table)
-- `.session/SESSION_07_com_module_restructure.md` (LATEST session - COM module work)
-- `docs/tech/INDEX.md` (feature and dev docs index)
+- `.session/SESSION_08_test_documentation_system.md` (LATEST session - Test system work)
+- `.session/TEST_TASKS.txt` (66 story points of organized migration tasks)
+- `.eggs/egg.1.rsb-test-cleanup-strategy.txt` (China's comprehensive analysis)
+- `docs/tech/development/HOWTO_TEST.md` (complete testing requirements)
+- `docs/tech/development/TEST_ORGANIZATION.md` (structure requirements)
 - `docs/tech/development/MODULE_SPEC.md` (module/spec alignment)
-- `docs/tech/features/FEATURES_TRUTH.md` (truth/boolean module - consolidated)
-- `docs/tech/features/FEATURES_FS.md` (FS module)
-- `docs/tech/features/FEATURES_PROGRESS.md` (progress module)
 - `.session/CONTINUE.md` (this file)
-- `Cargo.toml` (feature flags)
 
 ## Quick Validation Commands
-Test that everything still works:
+Test current state and start migration:
 ```bash
-# Core functionality
-cargo test --test com_sanity        # New COM module tests
-cargo test --test com_uat           # COM demonstrations
-./bin/test.sh run smoke             # Quick smoke test
-cargo test                          # All core tests
-cargo test --features visuals       # Visual features
-cargo test --features progress      # Progress indicators
+# Check current violations (135 total)
+./bin/test.sh lint
+
+# View comprehensive documentation system
+./bin/test.sh docs all
+
+# Check test discovery
+./bin/test.sh list
+
+# Review task backlog
+cat .session/TEST_TASKS.txt
+
+# Start Phase 1 (create category orchestrators)
+# See TICKET-001 in TEST_TASKS.txt
 ```
 
-## Current Module Structure (as of SESSION_07)
+## Current Test Organization Status (as of SESSION_08)
 ```
-src/com/                 # Common/foundational utilities
-├── mod.rs              # Orchestrator - re-exports both modules
-├── bool.rs             # Boolean semantics, parsing, ToBool trait
-├── exit.rs             # Exit codes, AsExit trait
-└── macros.rs           # is_true!/is_false! macros
+Current Violations: 135 (legitimate legacy migration issues)
+System Status: ✅ Working perfectly (enforcement blocking as designed)
+Documentation: ✅ Fully aligned and up-to-date
+Migration Ready: ✅ 66 story points organized across 10 tickets
 
-tests/com/              # New test structure
-├── sanity.rs           # 13 comprehensive tests
-└── uat.rs              # 10 demonstration tests
+tests/ structure needs migration to:
+├── <category>_<module>.rs     # Wrapper files (enforced pattern)
+├── <category>/                # Category directories
+│   └── <module>.rs           # Actual test files
+├── smoke/, sanity/, unit/    # Required categories
+├── integration/, e2e/, uat/  # Additional categories
+├── chaos/, bench/            # Advanced categories
+└── _adhoc/, _archive/        # Special directories
 ```
 
-## Next Tasks (UPDATED - Execution Order)
+## Next Tasks (UPDATED - Test Migration Priority)
 
-### 1. COM Module Polish (Immediate)
-- **Fix `bool` ToBool identity issue**: Currently `impl ToBool for bool` is silly
-- Add compile warning: "Did you really mean to cast bool to bool?"
-- Consider removing the implementation entirely (may break macro compatibility)
-- Alternative: Keep but emit warning in macro expansion
+### 1. IMMEDIATE: Execute TICKET-001 (2 story points)
+- **Create 7 missing category orchestrators**
+- Files: tests/smoke.rs, tests/unit.rs, tests/integration.rs, tests/e2e.rs, tests/uat.rs, tests/chaos.rs, tests/bench.rs
+- Impact: Reduces violations by 7, enables category execution
+- Risk: Low (creating new files)
 
-### 2. Module Naming Decision
-- Consider renaming `com` → `base` (better reflects "foundational utilities")
-- Current: "com" = "common" utilities that can't be optional
-- Proposed: "base" = foundational/base-level utilities
+### 2. HIGH: Execute TICKET-002 (3 story points)
+- **Fix high-impact naming violations (8 renames)**
+- Pattern: bash_sanity.rs → sanity_bash.rs
+- Impact: Reduces violations by 8
+- Risk: Low (file renames)
 
-### 3. json_dict_random Macro Split (High Priority)
-- Move randomness helpers (`rand_*`, `rand_range!`) under `gx` module
-- Keep `json_*`/`dict!`/`gen_dict!`/`rand_dict!` curated
-- Re‑export macros at crate root for compatibility
-- Follows MODULE_SPEC standards
+### 3. HIGH: Execute TICKET-003 (2 story points)
+- **Fix feature test naming (4 renames)**
+- Pattern: features_colors.rs → sanity_colors.rs
+- Impact: Reduces violations by 4
+- Risk: Low (file renames)
 
-### 4. Infrastructure & Maintenance
-- Optional CI: add lanes for smoke + visuals + progress
-- Legacy macro migration audit from `src/macros/` to module-owned files
-- Prelude policy compliance checks
-- Keep README and docs index synchronized
+### 4. MEDIUM: Begin Missing Tests Creation
+- TICKET-004: Create critical sanity tests (5 story points)
+- TICKET-005: Create critical UAT tests (8 story points)
+- See TEST_TASKS.txt for complete dependency chain
 
 ## Important Policies (Unchanged)
 - **Prelude policy**: Optional subsystems do not leak via `rsb::prelude`
