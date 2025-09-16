@@ -11,7 +11,7 @@ fn setup_clean_context() {
 #[test]
 fn test_confirm_with_opt_yes() {
     setup_clean_context();
-    set_var("opt_yes", "1");
+    set_var("opt_yes", "true");
 
     // Should always return true when opt_yes is set
     let result = confirm("Delete important files?");
@@ -23,7 +23,7 @@ fn test_confirm_with_opt_yes() {
 #[test]
 fn test_confirm_with_opt_quiet() {
     setup_clean_context();
-    set_var("opt_quiet", "1");
+    set_var("opt_quiet", "true");
 
     // Should return false in quiet mode (conservative default)
     let result = confirm("Proceed with installation?");
@@ -35,7 +35,7 @@ fn test_confirm_with_opt_quiet() {
 #[test]
 fn test_confirm_default_respects_defaults() {
     setup_clean_context();
-    set_var("opt_quiet", "1");
+    set_var("opt_quiet", "true");
 
     // Should respect the provided default in quiet mode
     let result_true = confirm_default("Continue?", true);
@@ -50,7 +50,7 @@ fn test_confirm_default_respects_defaults() {
 #[test]
 fn test_ask_with_defaults() {
     setup_clean_context();
-    set_var("opt_quiet", "1");
+    set_var("opt_quiet", "true");
 
     // No default provided - should return empty string
     let result_empty = ask("Enter name", None);
@@ -66,7 +66,7 @@ fn test_ask_with_defaults() {
 #[test]
 fn test_select_with_options() {
     setup_clean_context();
-    set_var("opt_quiet", "1");
+    set_var("opt_quiet", "true");
 
     let options = &["red", "green", "blue"];
 
@@ -88,7 +88,7 @@ fn test_select_with_options() {
 #[test]
 fn test_select_empty_options() {
     setup_clean_context();
-    set_var("opt_quiet", "1");
+    set_var("opt_quiet", "true");
 
     let empty_options: &[&str] = &[];
     let result = select("Choose", empty_options, None);
@@ -118,8 +118,8 @@ fn test_opt_yes_overrides_opt_quiet() {
     setup_clean_context();
 
     // Both flags set - opt_yes should take precedence
-    set_var("opt_yes", "1");
-    set_var("opt_quiet", "1");
+    set_var("opt_yes", "true");
+    set_var("opt_quiet", "true");
 
     let result = confirm("Test precedence?");
     assert!(result); // opt_yes wins

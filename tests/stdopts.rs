@@ -21,23 +21,23 @@ fn expands_short_flags_when_feature_enabled() {
 
     // Base short flags present
     // Short flags are stored under their single-letter keys
-    assert_eq!(get_var("opt_d"), "0");
-    assert_eq!(get_var("opt_q"), "0");
-    assert_eq!(get_var("opt_t"), "0");
-    assert_eq!(get_var("opt_D"), "0");
-    assert_eq!(get_var("opt_y"), "0");
-    assert_eq!(get_var("opt_s"), "0");
+    assert_eq!(get_var("opt_d"), "true");
+    assert_eq!(get_var("opt_q"), "true");
+    assert_eq!(get_var("opt_t"), "true");
+    assert_eq!(get_var("opt_D"), "true");
+    assert_eq!(get_var("opt_y"), "true");
+    assert_eq!(get_var("opt_s"), "true");
 
     // Descriptive expansions (active only when built with --features stdopts)
     // If feature disabled, these will be empty; with feature, they must be "true".
     #[cfg(feature = "stdopts")]
     {
-        assert_eq!(get_var("opt_debug"), "0");
-        assert_eq!(get_var("opt_quiet"), "0");
-        assert_eq!(get_var("opt_trace"), "0");
-        assert_eq!(get_var("opt_dev_mode"), "0");
-        assert_eq!(get_var("opt_yes"), "0");
-        assert_eq!(get_var("opt_safe"), "0");
+        assert_eq!(get_var("opt_debug"), "true");
+        assert_eq!(get_var("opt_quiet"), "true");
+        assert_eq!(get_var("opt_trace"), "true");
+        assert_eq!(get_var("opt_dev_mode"), "true");
+        assert_eq!(get_var("opt_yes"), "true");
+        assert_eq!(get_var("opt_safe"), "true");
     }
 
     #[cfg(not(feature = "stdopts"))]

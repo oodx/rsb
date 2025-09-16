@@ -11,7 +11,7 @@ fn setup_test_context() {
 #[test]
 fn test_confirm_macro_exists() {
     setup_test_context();
-    set_var("opt_yes", "1");
+    set_var("opt_yes", "true");
 
     // Test thin macro delegates to function
     let result = confirm!("Test confirmation?");
@@ -23,7 +23,7 @@ fn test_confirm_macro_exists() {
 #[test]
 fn test_confirm_default_macro_exists() {
     setup_test_context();
-    set_var("opt_quiet", "1");
+    set_var("opt_quiet", "true");
 
     // Test with default true
     let result_true = confirm_default!("Install now?", true);
@@ -39,7 +39,7 @@ fn test_confirm_default_macro_exists() {
 #[test]
 fn test_ask_macro_variants() {
     setup_test_context();
-    set_var("opt_quiet", "1");
+    set_var("opt_quiet", "true");
 
     // Test single argument form (no default)
     let result_no_default = ask!("Enter your name");
@@ -55,7 +55,7 @@ fn test_ask_macro_variants() {
 #[test]
 fn test_select_macro_variants() {
     setup_test_context();
-    set_var("opt_quiet", "1");
+    set_var("opt_quiet", "true");
 
     let options = &["alpha", "beta", "gamma"];
 
@@ -73,7 +73,7 @@ fn test_select_macro_variants() {
 #[test]
 fn test_macros_follow_thin_pattern() {
     setup_test_context();
-    set_var("opt_yes", "1");
+    set_var("opt_yes", "true");
 
     // Verify macros delegate to the actual functions
     // by ensuring they return same results as direct function calls

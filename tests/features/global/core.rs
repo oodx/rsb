@@ -20,8 +20,8 @@ fn expansion_basic_substitution() {
 
 #[test]
 fn integer_boolean_helpers() {
-    rsb::global::set_var("opt_quiet", "0");
-    rsb::global::set_var("opt_trace", "1");
+    rsb::global::set_var("opt_quiet", "true");
+    rsb::global::set_var("opt_trace", "false");
     assert!(rsb::global::is_true("opt_quiet"));
     assert!(rsb::global::is_false("opt_trace"));
 }

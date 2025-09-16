@@ -112,9 +112,9 @@ fn test_options_integration_with_comprehensive_params() {
     let args = rsb::cli::Args::new(&test_args);
     options!(&args);
 
-    assert_eq!(param!("opt_verbose"), "0");
+    assert_eq!(param!("opt_verbose"), "true");
     assert_eq!(param!("opt_config"), "test.conf");
-    assert_eq!(param!("opt_d"), "0");
+    assert_eq!(param!("opt_d"), "true");
     assert_eq!(param!("opt_layout"), "k1=v1,k2=v2");
 
     assert_eq!(param!("opt_config", suffix: ".conf"), "test");

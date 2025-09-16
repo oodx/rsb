@@ -12,11 +12,11 @@ fn uat_prompts_demo_and_behaviors() {
         color_enable_with("simple");
         println!("{}", colored("{green}Prompts demo active{reset}"));
     }
-    set_var("opt_yes", "1");
+    set_var("opt_yes", "true");
     let sure = rsb::visual::prompts::confirm("Proceed with operation?");
     println!("auto-yes confirm → {}", if sure { "yes" } else { "no" });
     unset_var("opt_yes");
-    set_var("opt_quiet", "1");
+    set_var("opt_quiet", "true");
     let ok = rsb::visual::prompts::confirm_default("Install now?", false);
     println!("quiet confirm_default(false) → {}", if ok { "yes" } else { "no" });
     let name = rsb::visual::prompts::ask("Enter name", Some("anon"));

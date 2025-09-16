@@ -1,66 +1,68 @@
-# RSB Truth/Booleans (REBEL Semantics)
+# RSB Truth/Booleans (Rust-Native)
 
-Updated: 2025-09-15
+Updated: 2025-09-16
 
 Purpose
-- Define and document RSB's REBEL boolean convention aligned with Unix/POSIX exit codes.
-- Provide consistent macros, helpers, and conversions for booleans across the crate.
+- Use Rust-native booleans (`true`/`false`) across RSB.
+- Provide a clear bridge to Unix/POSIX exit codes where needed.
 
 Summary
-- Numeric truth: 0 = true (success), 1 = false (failure)
-- String forms in the Global store: "0" = true, "1" = false
-- Compatibility: textual aliases are accepted as input ("true"/"false", "yes"/"no", "on"/"off").
-- Macros: `is_true!` and `is_false!` for ergonomic checks.
+- Global store uses textual booleans: `"true"` / `"false"` for flags.
+- Parsers accept common aliases: `yes/no`, `on/off`, and numeric `1/0` (non-zero → true).
+- Macros: `is_true!` and `is_false!` read booleans ergonomically.
+- Exit codes: `ExitCodeKind::{Success,Failure,AnnotatedFailure}` map to 0/1/2 with a simple `AsExit` bridge.
 
 Module & API
 - Module: `rsb::com`
   - Constants:
-    - `com::TRUE: i32 = 0`, `com::FALSE: i32 = 1`
-    - `com::TRUE_STR: &str = "0"`, `com::FALSE_STR: &str = "1"`
+    - `com::TRUE: bool = true`, `com::FALSE: bool = false`
+    - `com::TRUE_STR: &str = "true"`, `com::FALSE_STR: &str = "false"`
   - Helpers:
-    - `com::bool_to_i32_rsb(bool) -> i32`
-    - `com::i32_to_bool_rsb(i32) -> bool`
     - `com::is_true_val(&str) -> bool`, `com::is_false_val(&str) -> bool`
     - `com::is_true(var: &str) -> bool`, `com::is_false(var: &str) -> bool` (reads from Global)
+    - Exit codes: `com::ExitCodeKind::{Success,Failure,AnnotatedFailure}` and `com::AsExit` trait
+    - Exit classification helpers: `com::is_success(i32)`, `com::is_fail(i32)`, `com::is_other_fail(i32)`
   - Trait + conversions:
-    - `com::ToRSBBool` implemented for `bool`, numeric ints, `&str`, `String`
+    - `com::ToRSBBool` implemented for `bool`, integer types (non-zero → true), `&str`, `String`
     - `com::is_true_any(&T)`, `com::is_false_any(&T)` for generic checks
   - Macros (re-exported in prelude):
-    - `is_true!(expr)` / `is_false!(expr)` — accept bool, number, string, or use `var: "KEY"` to read from Global
+    - `is_true!(expr)` / `is_false!(expr)` — accept bool, number, string, or `var: "KEY"` to read from Global
 
 Conventions
 - Options (CLI):
-  - `--flag` sets `opt_flag = "0"` (true)
-  - `--not-flag` sets `opt_flag = "1"` (false)
-  - Short flags `-d -q` set `opt_d = "0"`, `opt_q = "0"`
-  - Multi-flag `--multi=dq!ts` → `opt_d=0`, `opt_q=0`, `opt_t=1`, `opt_s=1`
+  - `--flag` sets `opt_flag = "true"`
+  - `--not-flag` sets `opt_flag = "false"`
+  - Short flags `-d -q` set `opt_d = "true"`, `opt_q = "true"`
+  - Multi-flag `--multi=dq!ts` → `opt_d=true`, `opt_q=true`, `opt_t=false`, `opt_s=false`
 - Environment Modes:
-  - Presence of `DEBUG/DEV/QUIET/TRACE` sets `*_MODE = "0"` (true)
-- Detectors (streamables) return string booleans "0"/"1" for true/false.
+  - Presence of `DEBUG/DEV/QUIET/TRACE` sets `*_MODE = "true"`
 
 Examples
 ```rust
 use rsb::prelude::*;
 
-set_var("opt_quiet", com::TRUE_STR);         // "0"
+set_var("opt_quiet", com::TRUE_STR);         // "true"
 assert!(is_true!(var: "opt_quiet"));
-assert!(is_true!(0));                         // numeric true
-assert!(is_false!(1));                        // numeric false
+assert!(is_true!(1));                         // numeric non-zero → true
+assert!(is_false!(0));                        // numeric zero → false
 assert!(is_true!("yes"));                     // textual alias
+
+// ExitCode bridge
+use std::process::ExitCode;
+use rsb::com::{AsExit, ExitCodeKind};
+
+fn main() -> ExitCode {
+    let ok = true;
+    if ok { ExitCodeKind::Success.as_exit() } else { ExitCodeKind::Failure.as_exit() }
+}
 ```
 
 Migration Notes
-- Prior behavior in some utilities returned textual "true"/"false". These now return "0"/"1".
+- Prior experimental behavior used numeric strings (`"0"`/`"1"`) in the store. We reverted to textual booleans.
 - Use `is_true!` / `is_false!` macros when testing values to avoid string comparisons.
-- If textual booleans are required for interop, map `"0" => "true"`, `"1" => "false"` at boundaries.
-
-Testing
-- Core, smoke, visuals, progress, and dev-pty lanes pass with the new semantics.
-- Updated tests to assert REBEL truth values.
+- For exit status handling use the new `ExitCodeKind` and `AsExit` bridge.
 
 Status
-- MODERN: Yes — module owns truth helpers/macros, single source.
+- MODERN: Yes — single source of truth for booleans and exit codes.
 - SPEC_ALIGNED: Yes — orchestration in `com/mod.rs`, implementation in `com/utils.rs` and `com/macros.rs`.
 
-Note (Status Update)
-- We previously considered fully inverting legacy textual booleans to numeric REBEL values everywhere. After review, this is under active evaluation. The stable contract for consumers is to use `is_true!` / `is_false!` macros (or `com::is_true[_val]` helpers) rather than relying on raw representations. This shields callers if the internal representation is adjusted again. The current default remains REBEL‑aligned (0=true, 1=false) for flags and detectors.

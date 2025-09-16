@@ -36,8 +36,8 @@ fn uat_global_demo() {
     println!("EXPAND2 → {}", path2);
 
     // Boolean helpers
-    rsb::global::set_var("opt_quiet", "1");
-    rsb::global::set_var("opt_trace", "0");
+    rsb::global::set_var("opt_quiet", "true");
+    rsb::global::set_var("opt_trace", "false");
     println!("is_true(opt_quiet) → {}", rsb::global::is_true("opt_quiet"));
     println!("is_false(opt_trace) → {}", rsb::global::is_false("opt_trace"));
 

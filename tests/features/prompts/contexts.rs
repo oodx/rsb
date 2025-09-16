@@ -19,7 +19,7 @@ fn test_prompts_respect_global_context() {
     setup_clean_context();
 
     // Test global context integration through opt flags
-    set_var("opt_quiet", "1");
+    set_var("opt_quiet", "true");
 
     let result = confirm("Global context test?");
     assert!(!result);
@@ -37,13 +37,13 @@ fn test_context_isolation() {
     setup_clean_context();
 
     // Each prompt should read context fresh, not cache
-    set_var("opt_yes", "1");
+    set_var("opt_yes", "true");
     let result1 = confirm("First call?");
     assert!(result1);
 
     // Change context mid-test
     unset_var("opt_yes");
-    set_var("opt_quiet", "1");
+    set_var("opt_quiet", "true");
 
     let result2 = confirm("Second call?");
     assert!(!result2); // Should read new context
@@ -64,7 +64,7 @@ fn test_non_tty_fallback_behavior() {
     // select() returns first option in non-TTY
 
     // These are tested indirectly through opt_quiet which simulates non-TTY
-    set_var("opt_quiet", "1");
+    set_var("opt_quiet", "true");
 
     assert!(!confirm("Non-TTY confirm"));
     assert_eq!(ask("Non-TTY ask", None), "");
@@ -78,7 +78,7 @@ fn test_non_tty_fallback_behavior() {
 fn test_color_integration() {
     let _lock = TEST_LOCK.lock().unwrap();
     setup_clean_context();
-    set_var("opt_quiet", "1"); // Avoid actual TTY interaction
+    set_var("opt_quiet", "true"); // Avoid actual TTY interaction
 
     // Enable colors to test prompt rendering with color codes
     #[cfg(feature = "colors-simple")]
