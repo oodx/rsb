@@ -258,7 +258,7 @@ validate_test_structure() {
         dir_name=$(basename "$test_dir")
 
         # Skip valid directories and archive
-        if [[ ! "$dir_name" =~ ^($valid_categories|sh|old|_archive)$ ]]; then
+        if [[ ! "$dir_name" =~ ^($valid_categories|sh|_archive|_adhoc)$ ]]; then
             directory_violations+=("$test_dir")
         fi
     done
@@ -356,7 +356,7 @@ validate_test_structure() {
                 echo "📁 INVALID DIRECTORIES (${#directory_violations[@]} directories)"
                 echo "────────────────────────────────────────────────────────"
                 echo "Issue: Test directories don't match approved organization"
-                echo "Valid: unit/, sanity/, smoke/, integration/, e2e/, uat/, chaos/, bench/, sh/, old/, _archive/"
+                echo "Valid: unit/, sanity/, smoke/, integration/, e2e/, uat/, chaos/, bench/, regression/, sh/, _archive/, _adhoc/"
                 echo
                 for i in "${!directory_violations[@]}"; do
                     printf "%3d. %s\n" $((i + 1)) "${directory_violations[i]}"

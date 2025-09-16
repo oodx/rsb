@@ -77,3 +77,37 @@ mod features_tokens;
 
 #[path = "unit/options.rs"]
 mod options;
+
+// Domain-specific unit test modules (moved from top-level)
+#[path = "unit/macros/control.rs"]
+mod macros_control;
+
+#[path = "unit/macros/core.rs"]
+mod macros_core;
+
+#[path = "unit/macros/fs_data.rs"]
+mod macros_fs_data;
+
+#[path = "unit/macros/jobs_events.rs"]
+mod macros_jobs_events;
+
+#[path = "unit/macros/json_random.rs"]
+mod macros_json_random;
+
+#[path = "unit/macros/streams_exec.rs"]
+mod macros_streams_exec;
+
+#[path = "unit/macros/text.rs"]
+mod macros_text;
+
+#[path = "unit/macros/time_math.rs"]
+mod macros_time_math;
+
+#[path = "unit/macros/validation.rs"]
+mod macros_validation;
+
+#[path = "unit/streams/core.rs"]
+mod streams_core;
+
+#[path = "unit/xcls/public.rs"]
+mod xcls_public;

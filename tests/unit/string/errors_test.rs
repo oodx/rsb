@@ -14,7 +14,7 @@ fn try_prefix_invalid_pattern_errors() {
 fn case_size_guard_try_variant_errors() {
     // create a string > 64KiB
     let large = "a".repeat(65 * 1024);
-    let err = rsb::string::case::try_to_snake_case(&large).unwrap_err();
+    let err = rsb::prelude_ez::try_to_snake_case(&large).unwrap_err();
     match err {
         rsb::string::error::StringError::SizeLimitExceeded { limit, length } => {
             assert_eq!(limit, 64 * 1024);
