@@ -1,6 +1,6 @@
 # RSB Module Specification (Helpers, Macros, Prelude, Integrations)
 
-Updated: 2025-09-15
+Updated: 2025-09-16
 
 Purpose
 - Define a consistent pattern for how modules expose low-level helpers, macros, errors, guards, and cross‑module integrations.

@@ -37,33 +37,33 @@ RSB uses a **strict, enforced test organization system** following BASHFX Visual
 ```
 tests/
 ├── unit/                    # Fast, isolated module tests (<1s each)
-│   └── <module>/           # One folder per src module
+│   └── strings/            # Example: folder per src module
 │       └── *.rs            # Test files
 │
 ├── sanity/                  # Core functionality validation (REQUIRED)
-│   └── <module>.rs         # One file per module, comprehensive coverage
+│   └── strings.rs          # One file per module, comprehensive coverage
 │
 ├── smoke/                   # Minimal CI tests (<10s total runtime)
 │   └── core.rs             # Essential functionality only
-│   └── <module>.rs         # Optional module smoke tests
+│   └── strings.rs          # Optional module smoke tests
 │
 ├── integration/             # Cross-module interaction tests
-│   └── <feature>.rs        # Tests by feature area (not module)
+│   └── params_strings.rs   # Tests by feature area (cross-module)
 │
 ├── e2e/                     # End-to-end user workflow tests
-│   └── <workflow>.rs       # Complete user scenarios
+│   └── cli_workflow.rs     # Complete user scenarios
 │   └── sh/                 # Shell-based e2e tests
 │       └── *.sh
 │
 ├── uat/                     # User Acceptance Tests (VISUAL CEREMONY)
-│   └── <module>.rs         # Visual demonstrations per module
+│   └── strings.rs          # Visual demonstrations per module
 │
 ├── chaos/                   # Edge cases, stress tests, property tests
-│   └── <module>/           # Module-specific chaos tests
+│   └── strings/            # Module-specific chaos tests
 │       └── *.rs
 │
 ├── bench/                   # Performance benchmarks
-│   └── <module>.rs         # Module benchmarks
+│   └── strings.rs          # Module benchmarks
 │
 ├── _adhoc/                  # Experimental tests (outside enforcement)
 │   └── *.rs, *.sh          # Temporary/experimental test files
@@ -81,13 +81,14 @@ All test wrapper files in `tests/` root must follow the strict naming pattern:
 
 **Valid Examples:**
 - `sanity.rs` → includes all `tests/sanity/*.rs`
-- `sanity_com.rs` → includes `tests/sanity/com.rs`
-- `unit_math.rs` → includes `tests/unit/math/*.rs`
-- `uat_colors.rs` → includes `tests/uat/colors.rs`
+- `sanity_strings.rs` → includes `tests/sanity/strings.rs`
+- `unit_strings.rs` → includes `tests/unit/strings/*.rs`
+- `uat_strings.rs` → includes `tests/uat/strings.rs`
+- `integration_params_strings.rs` → includes `tests/integration/params_strings.rs`
 
 **Invalid Examples (BLOCKED):**
-- `com_sanity.rs` (wrong order)
-- `test_com.rs` (non-standard category)
+- `strings_sanity.rs` (wrong order - category must come first)
+- `test_strings.rs` (non-standard category)
 - `random_name.rs` (no pattern match)
 
 ## Test Runner Commands
@@ -159,8 +160,8 @@ All test wrapper files in `tests/` root must follow the strict naming pattern:
 ### Required Tests Per Module
 
 **Every module MUST have:**
-1. **Sanity tests** - `tests/sanity/<module>.rs`
-2. **UAT tests** - `tests/uat/<module>.rs`
+1. **Sanity tests** - `tests/sanity/strings.rs` (example for strings module)
+2. **UAT tests** - `tests/uat/strings.rs` (example for strings module)
 
 Missing either will block all tests until created.
 
@@ -413,19 +414,19 @@ cargo test --test uat_colors -- --nocapture | boxy --theme info --style rounded 
 ### 1. Create Test Files
 
 ```bash
-# Create the actual test
-touch tests/sanity/new_module.rs
+# Create the actual test (example: strings module)
+touch tests/sanity/strings.rs
 
 # Create the wrapper (REQUIRED)
-touch tests/sanity_new_module.rs
+touch tests/sanity_strings.rs
 ```
 
 ### 2. Wrapper Content
 
 ```rust
-// tests/sanity_new_module.rs
-#[path = "sanity/new_module.rs"]
-mod sanity_new_module;
+// tests/sanity_strings.rs
+#[path = "sanity/strings.rs"]
+mod sanity_strings;
 ```
 
 ### 3. Verify Compliance
@@ -435,7 +436,7 @@ mod sanity_new_module;
 ./bin/test.sh lint
 
 # Run your new test
-./bin/test.sh run sanity_new_module
+./bin/test.sh run sanity_strings
 ```
 
 ## Feature Flags and Visual Tests

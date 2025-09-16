@@ -614,6 +614,7 @@ EOF
         echo "Documentation Targets:"
         echo "  docs org                          Test organization requirements"
         echo "  docs howto                        Testing HOWTO guide"
+        echo "  docs modules                      Module specification and organization patterns"
         echo "  docs rsb                          RSB architecture documentation"
         echo "  docs features                     List all feature documentation"
         echo "  docs <feature>                    Show specific feature (e.g., docs options)"
@@ -1117,6 +1118,7 @@ case "${1:-status}" in
                         echo "  • org         - Test organization requirements and enforcement"
                         echo "  • howto       - Testing HOWTO guide with examples and patterns"
                         echo "  • rsb         - RSB architecture documentation (REBEL + RSB_ARCH)"
+                        echo "  • modules     - Module specification and organization patterns"
                         echo
                         echo "Feature Documentation:"
                         echo
@@ -1129,12 +1131,14 @@ case "${1:-status}" in
                             echo "  • strings     - String manipulation and utilities"
                             echo "  • bash        - Bash integration and execution"
                             echo "  • global      - Global context and state management"
-                            echo "  • (and $(ls "$DOCS_FEATURES_DIR"/*.md 2>/dev/null | wc -l) more...)"
+                            total_features=$(ls "$DOCS_FEATURES_DIR"/*.md 2>/dev/null | wc -l)
+                            echo "  • ($total_features features available)"
                         fi
                         echo
                         echo "Quick Access Examples:"
                         echo "  test.sh docs org       - Show test organization requirements"
                         echo "  test.sh docs howto     - Show testing guide"
+                        echo "  test.sh docs modules   - Show module specification patterns"
                         echo "  test.sh docs features  - List all features"
                         echo "  test.sh docs options   - Show options feature documentation"
                         echo
@@ -1146,6 +1150,7 @@ case "${1:-status}" in
                     echo "  • org         - Test organization requirements and enforcement"
                     echo "  • howto       - Testing HOWTO guide with examples and patterns"
                     echo "  • rsb         - RSB architecture documentation (REBEL + RSB_ARCH)"
+                    echo "  • modules     - Module specification and organization patterns"
                     echo
                     echo "Feature Documentation:"
                     echo "  • features    - List all available feature documentation"
@@ -1157,12 +1162,18 @@ case "${1:-status}" in
                         echo "  • strings     - String manipulation and utilities"
                         echo "  • bash        - Bash integration and execution"
                         echo "  • global      - Global context and state management"
-                        echo "  • (and $(ls "$DOCS_FEATURES_DIR"/*.md 2>/dev/null | wc -l) more...)"
+                        total_features=$(ls "$DOCS_FEATURES_DIR"/*.md 2>/dev/null | wc -l)
+                        if [[ -n "$BOXY" ]]; then
+                            echo "  • ($(echo "$total_features features available" | $BOXY --theme warning --style minimal))"
+                        else
+                            echo "  • ($total_features features available)"
+                        fi
                     fi
                     echo
                     echo "Quick Access Examples:"
                     echo "  test.sh docs org       - Show test organization requirements"
                     echo "  test.sh docs howto     - Show testing guide"
+                    echo "  test.sh docs modules   - Show module specification patterns"
                     echo "  test.sh docs features  - List all features"
                     echo "  test.sh docs options   - Show options feature documentation"
                     echo
@@ -1179,10 +1190,14 @@ case "${1:-status}" in
                 DOC_PATH="$DOCS_DEV_DIR/HOWTO_TEST.md"
                 DOC_TITLE="🧪 RSB Testing HOWTO Guide"
                 ;;
+            "modules"|"module"|"mod")
+                DOC_PATH="$DOCS_DEV_DIR/MODULE_SPEC.md"
+                DOC_TITLE="📦 RSB Module Specification"
+                ;;
             "rsb"|"arch"|"architecture")
                 # Show both REBEL and RSB_ARCH docs
-                REBEL_PATH="$DOCS_DEV_DIR/REBEL.md"
-                ARCH_PATH="$DOCS_DEV_DIR/RSB_ARCH.md"
+                REBEL_PATH="$DOCS_REFERENCE_DIR/REBEL.md"
+                ARCH_PATH="$DOCS_REFERENCE_DIR/RSB_ARCH.md"
 
                 if [[ -f "$REBEL_PATH" && -f "$ARCH_PATH" ]]; then
                     echo "🏗️ RSB ARCHITECTURE DOCUMENTATION"
@@ -1263,6 +1278,7 @@ case "${1:-status}" in
                     echo "Available options:"
                     echo "  org, organization    - Test organization requirements"
                     echo "  howto, test         - Testing HOWTO guide"
+                    echo "  modules, module, mod - Module specification and organization patterns"
                     echo "  rsb, arch           - RSB architecture documentation"
                     echo "  features            - List all feature documentation"
                     echo "  <feature-name>      - Show specific feature documentation"
@@ -1270,6 +1286,7 @@ case "${1:-status}" in
                     echo "Examples:"
                     echo "  test.sh docs org"
                     echo "  test.sh docs howto"
+                    echo "  test.sh docs modules"
                     echo "  test.sh docs rsb"
                     echo "  test.sh docs features"
                     echo "  test.sh docs options"

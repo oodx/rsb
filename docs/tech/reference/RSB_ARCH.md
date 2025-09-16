@@ -5,7 +5,9 @@
 RSB is inspired by and builds upon **BashFX** - a mature bash scripting architecture that emphasizes function ordinality, rewindable operations, and systematic script organization. BashFX has proven itself through years of production bash script development, providing battle-tested patterns for building maintainable automation tools.
 
 
-> NOTE: Important RSB references and patterns have been moved to `docs/references` and `docs/patterns` respectively. Tactical summaries in `docs/tactical`
+> **NOTE**: Important RSB references and patterns have been moved to `docs/references` and `docs/patterns` respectively. Tactical summaries in `docs/tactical`.
+>
+> **TESTING**: RSB uses a strict, enforced test organization system. See `docs/tech/development/HOWTO_TEST.md` for complete requirements and `./bin/test.sh docs` for quick access to testing documentation.
 
 
 RSB translates BashFX's proven architectural concepts into Rust, maintaining the same emphasis on:
@@ -436,39 +438,53 @@ src/
 ├── main.rs              // Entry point with standard RSB interface
 ├── lib.rs               // Optional - only if publishing library functions
 ├── prelude.rs           // User convenience imports
-├── myapp.rs             // Nice neighbor for myapp/ directory  
-├── myapp/               // Implementation namespace
-│   ├── core.rs          // Core business logic (_helper functions)
-│   ├── utils.rs         // Low-level utilities (__blind_faith functions)  
-│   ├── adapters/        // Type abstraction layer (optional)
-│   │   ├── mod.rs       // Adapter module interface
-│   │   ├── database.rs  // SQL abstraction
-│   │   └── http.rs      // HTTP client abstraction
+├── myapp.rs             // Nice neighbor for myapp/ directory
+├── myapp/               // Implementation namespace (see MODULE_SPEC.md)
+│   ├── mod.rs           // Orchestrator and re-exports, curated public surface
+│   ├── utils.rs         // Curated low-level helpers ("utils" namespace)
+│   ├── helpers.rs       // Internal implementations (optional)
+│   ├── macros.rs        // Module-owned macros (value + var forms)
+│   ├── error.rs         // Typed error enums for consistent messaging
+│   ├── myapp_other_adapter.rs  // Cross-module integrations (see MODULE_SPEC.md)
 │   └── queries/         // SQL files (when using database adapter)
 │       ├── users.sql
 │       └── reports.sql
-└── tests/               // Integration tests (separate from src/)
-    ├── common/
-    └── integration_tests.rs
+└── tests/               // Structured test organization (see HOWTO_TEST.md)
+    ├── unit/            // Fast, isolated module tests (<1s each)
+    ├── sanity/          // Core functionality validation (REQUIRED)
+    ├── smoke/           // Minimal CI tests (<10s total)
+    ├── integration/     // Cross-module interaction tests
+    ├── e2e/             // End-to-end user workflow tests
+    ├── uat/             // User Acceptance Tests (visual ceremony)
+    ├── chaos/           // Edge cases, stress tests
+    ├── bench/           // Performance benchmarks
+    ├── _adhoc/          // Experimental tests
+    └── sh/              // Shell scripts for test ceremony
 ```
 
 **Library Project Structure:**
-```  
+```
 src/
 ├── lib.rs               // Public API and re-exports
 ├── prelude.rs           // User convenience imports
 ├── mylib.rs             // Nice neighbor pattern
-└── mylib/               // Implementation namespace
-    ├── core.rs          // Public API functions
-    ├── internal.rs      // Private helpers
-    └── adapters/        // Type abstractions
+└── mylib/               // Implementation namespace (see MODULE_SPEC.md)
+    ├── mod.rs           // Orchestrator and re-exports, curated public surface
+    ├── utils.rs         // Curated low-level helpers ("utils" namespace)
+    ├── helpers.rs       // Internal implementations (optional)
+    ├── macros.rs        // Module-owned macros (value + var forms)
+    ├── error.rs         // Typed error enums for consistent messaging
+    └── mylib_other_adapter.rs  // Cross-module integrations (see MODULE_SPEC.md)
 ```
 
 **Key Principles:**
 - **Binary OR Library** - typically not both in same project
-- **Tests outside src/** - integration tests in `tests/` directory
+- **Module organization** - follows RSB Module Specification patterns (see MODULE_SPEC.md)
+- **Cross-module integrations** - use adapter pattern to avoid circular dependencies
+- **Structured test organization** - enforced via `test.sh` runner (see HOWTO_TEST.md)
+- **Test ceremony system** - shell-based visual test execution with boxy integration
+- **Required test coverage** - every module MUST have sanity and UAT tests
 - **SQL files separate** - queries in dedicated directory, loaded as constants
-- **Adapters optional** - only when integrating complex external libraries
 
 ### 3.2 SQL Integration Pattern
 
@@ -561,68 +577,106 @@ RETURNING id;
 
 ### 3.3 Module Interface Standards
 
-```rust
-// src/lib.rs - Public API only
-pub mod prelude;
+Following MODULE_SPEC.md patterns for consistent module organization:
 
-// Re-export user-facing items only
-pub use crate::myapp::core::*;          // Main functions
-pub use crate::myapp::utils::*;         // Helper functions
-// DON'T export adapters - they're implementation details
+```rust
+// src/myapp/mod.rs - Orchestrator and re-exports (curated public surface)
+pub mod utils;      // Curated low-level helpers
+pub mod macros;     // Module-owned macros (value + var forms)
+pub mod error;      // Typed error enums
+
+#[cfg(feature = "other")]
+pub use self::myapp_other_adapter::*;   // Cross-module integrations
+
+// Re-export user-facing items only via curated public surface
+pub use self::utils::*;                 // Low-level helpers
+pub use self::macros::*;                // Module macros
+// DON'T export helpers.rs - they're internal implementations
 
 // src/prelude.rs - Convenience imports
 pub use crate::*;
 pub use rsb::prelude::*;                // Include RSB framework
+
+// src/lib.rs - Public API only
+pub mod prelude;
+pub use crate::myapp::*;                // Re-export curated module surface
 ```
 
 ## Part V: Testing Philosophy
 
-### 4.1 Function-First Testing
+> **Important**: RSB uses a **strict, enforced test organization system** following BASHFX Visual Friendliness Principles. See `docs/tech/development/HOWTO_TEST.md` for complete requirements and `./bin/test.sh docs` for quick access.
 
-Test each function independently before integration:
+### 4.1 Structured Test Organization
+
+RSB enforces a **systematic test organization** that scales from simple utilities to complex systems:
+
+**Test Categories (all enforced by `test.sh`):**
+- **smoke** - Minimal CI tests (<10s total runtime)
+- **sanity** - Core functionality validation (REQUIRED for every module)
+- **unit** - Fast, isolated module tests (<1s each)
+- **integration** - Cross-module interaction tests
+- **e2e** - End-to-end user workflow tests
+- **uat** - User Acceptance Tests with visual ceremony (REQUIRED for every module)
+- **chaos** - Edge cases, stress tests, property tests
+- **bench** - Performance benchmarks
+
+### 4.2 Test Runner and Ceremony
+
+All testing flows through the `test.sh` runner - **no direct `cargo test`**:
+
+```bash
+# Core test commands
+./bin/test.sh                    # Show test status and help
+./bin/test.sh run sanity         # Run sanity tests
+./bin/test.sh run uat            # Run UAT with visual ceremony
+./bin/test.sh lint               # Check test organization compliance
+
+# Visual test ceremonies using shell-based boxy integration
+./tests/sh/ceremony.sh sanity    # Sanity tests with ceremony
+./tests/sh/ceremony.sh uat       # UAT with visual demonstrations
+./tests/sh/ceremony.sh all       # Complete test ceremony
+```
+
+### 4.3 Function-First Testing with RSB Patterns
 
 ```rust
-#[cfg(test)]
-mod tests {
-    use super::*;
+// tests/sanity/strings.rs - Simple, demonstrative tests
+#[test]
+fn test_string_operations() {
+    let result = snake_case!("CamelCase");
+    assert_eq!(result, "camel_case");
 
-    // ✅ Test individual functions
-    #[test]
-    fn test_extract_ip() {
-        let log_line = "192.168.1.1 - - [25/Dec/2023] GET /index.html";
-        assert_eq!(extract_ip(log_line), "192.168.1.1");
-    }
+    let trimmed = trim!("  spaces  ");
+    assert_eq!(trimmed, "spaces");
+}
 
-    #[test]
-    fn test_validate_ip() {
-        assert!(validate_ip("192.168.1.1"));
-        assert!(!validate_ip("invalid.ip"));
-        assert!(!validate_ip(""));
-    }
+// tests/uat/strings.rs - User Acceptance Tests with ceremony
+#[test]
+fn strings_uat_ceremony() {
+    println!("Strings Module UAT Ceremony");
+    println!("===========================");
 
-    // ✅ Test business logic
-    #[test]
-    fn test_process_single_log_line() {
-        let result = _process_log_line("192.168.1.1 - ERROR - Connection failed");
-        assert!(result.contains("192.168.1.1"));
-        assert!(result.contains("ERROR"));
-    }
+    println!("\nUAT 1: Snake Case Conversion");
+    println!("Command: snake_case!(\"CamelCase\")");
+    println!("Expected: Convert CamelCase to snake_case");
+    println!("Running...");
+    let result = snake_case!("CamelCase");
+    println!("Output: {}", result);
+    println!("Status: PASS");
 
-    // ✅ Integration tests after unit tests pass
-    #[test]
-    fn test_full_log_processing_workflow() {
-        write_file("test.log", "192.168.1.1 - ERROR - Test\n10.0.0.1 - INFO - Normal");
-        
-        let result = do_process(Args::from(&["", "test.log"]));
-        assert_eq!(result, 0);
-        
-        // Verify expected side effects
-        assert!(test!(-f "alerts.txt"));
-    }
+    println!("\nUAT Ceremony Complete");
 }
 ```
 
-### 4.2 AI Code Generation Guidelines
+### 4.4 Required Test Coverage
+
+**Every module MUST have:**
+1. **Sanity tests** - `tests/sanity/module_name.rs`
+2. **UAT tests** - `tests/uat/module_name.rs`
+
+Missing either will block all tests until created. The test organization is strictly enforced.
+
+### 4.5 AI Code Generation Guidelines
 
 When using LLMs to generate code, enforce REBEL patterns:
 
@@ -647,10 +701,15 @@ fn do_backup_files(args: Args) -> i32 {
     }
 }
 
-// Each helper is independently testable
+// Each helper is independently testable via test.sh
 fn _count_files(dir: &str) -> i32 { /* ... */ }
-fn _copy_files(src: &str, dest: &str) -> i32 { /* ... */ }  
+fn _copy_files(src: &str, dest: &str) -> i32 { /* ... */ }
 fn _verify_backup(dir: &str) -> i32 { /* ... */ }
+
+// Testing with RSB test organization:
+// tests/sanity/backup.rs - Test core backup functionality
+// tests/uat/backup.rs - Demonstrate backup process visually
+// Run via: ./bin/test.sh run sanity_backup
 ```
 
 ## Part VII: Patterns and Anti-Patterns
@@ -889,12 +948,13 @@ RSB Architecture ensures that Rust tools remain accessible to practitioners by:
 
 1. **Following BashFX ordinality** with proper Rust scoping alignment
 2. **Hiding complexity** behind string-biased interfaces following Unix philosophy
-3. **Enforcing testability** through function-based development
-4. **Maintaining standard structure** with clear project organization
+3. **Enforcing testability** through function-based development and structured test organization
+4. **Maintaining standard structure** with clear project organization and test enforcement
 5. **Using shell-style exit codes** (0 = success, non-zero = failure)
 6. **Enabling automation** through consistent, LLM-friendly patterns
-7. **Providing stepping stones** to more complex Rust patterns when needed
-8. **Offering standard adapters** through the broader Oxidex ecosystem *(planned)*
+7. **Providing systematic testing** via `test.sh` runner with visual ceremony system
+8. **Providing stepping stones** to more complex Rust patterns when needed
+9. **Offering standard adapters** through the broader Oxidex ecosystem *(planned)*
 
 **Note**: RSB doesn't yet implement BashFX's rewindable operations and friendly script principles - these patterns are planned for future development as the architecture matures.
 
@@ -956,10 +1016,10 @@ use rsb::prelude::*;
 ```
 
 #### ⚠️ **Exception: Test Files**
-Test files that directly test RSB functionality may require their own RSB imports since they don't inherit from main.rs:
+Test files following RSB test organization may require their own RSB imports since they don't inherit from main.rs:
 
 ```rust
-// tests/config_tests.rs - Exception case
+// tests/sanity/config.rs - Exception case for RSB test patterns
 use rsb::prelude::*;  // OK for testing RSB patterns
 
 #[test]
@@ -967,14 +1027,17 @@ fn test_config_param_expansion() {
     let result = param!("TEST_VAR", default: "test");
     assert_eq!(result, "test");
 }
+
+// Run via: ./bin/test.sh run sanity_config
 ```
 
 ### **Implementation Notes**
 
 - **Single Source of Truth**: main.rs serves as the RSB gateway for the entire application
-- **Cleaner Module Files**: Reduces import noise and maintains focus on business logic  
+- **Cleaner Module Files**: Reduces import noise and maintains focus on business logic
 - **Crate Import Pattern**: Modules use `use crate::rsb` or similar patterns to access RSB functionality
 - **Testing Flexibility**: Test files can import RSB directly when testing RSB-specific functionality
+- **Test Organization**: All testing follows structured organization enforced by `test.sh` (see HOWTO_TEST.md)
 
 This pattern reduces boilerplate while maintaining RSB's string-first philosophy throughout the codebase.
 
