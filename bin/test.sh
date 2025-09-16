@@ -109,8 +109,8 @@ validate_test_structure() {
     local unauthorized_root_violations=()
 
     # Valid categories for test organization
-    local valid_categories="unit|sanity|smoke|integration|e2e|uat|chaos|bench"
-    local required_category_entries=(sanity smoke unit integration e2e uat chaos bench)
+    local valid_categories="unit|sanity|smoke|integration|e2e|uat|chaos|bench|regression"
+    local required_category_entries=(sanity smoke unit integration e2e uat chaos bench regression)
 
     if [[ "$SKIP_ENFORCEMENT" == "true" ]]; then
         return 0

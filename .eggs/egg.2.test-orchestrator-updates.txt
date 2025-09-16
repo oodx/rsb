@@ -1,0 +1,269 @@
+================================================================================
+ 🐔 CHINA'S TEST ORCHESTRATOR UPDATE EGG #2 🥚
+================================================================================
+
+Date/Time: 2025-09-16
+Agent: xnull
+Purpose: Analyze test file organization and provide exact module declarations
+         for unit.rs and sanity.rs orchestrator files
+
+================================================================================
+ 📋 EXECUTIVE SUMMARY
+================================================================================
+
+Analysis complete! I found a well-organized test structure with files moved
+into proper categories. The unit.rs orchestrator is currently empty (just
+comments), while sanity.rs has some modules but is missing the new gx/, math/,
+and tokens/ subdirectories.
+
+Key Discovery: Mixed organization pattern - some files are in subdirectories
+(param/, prompts/, colors/, etc.) while others remain at the unit/ root level.
+
+================================================================================
+ 🔍 DETAILED FILE INVENTORY
+================================================================================
+
+UNIT TEST STRUCTURE:
+--------------------
+📁 tests/unit/param/         → 3 files (helpers.rs, param_test.rs, macro_import.rs)
+📁 tests/unit/prompts/       → 3 files (functions.rs, contexts.rs, macros.rs)
+📁 tests/unit/colors/        → 2 files (runtime.rs, sanity.rs)
+📁 tests/unit/global/        → 1 file (core.rs)
+📁 tests/unit/date/          → 1 file (date_test.rs)
+📁 tests/unit/string/        → 6 files (string_test.rs, invalid_glob_test.rs, ascii_filter_test.rs, macros.rs, errors_test.rs, case_test.rs)
+📁 tests/unit/tokens/        → 1 file (comprehensive.rs)
+
+📄 Root unit files:          → 8 standalone files (features_prompts.rs, args_processing.rs, etc.)
+
+SANITY TEST STRUCTURE:
+----------------------
+📁 tests/sanity/gx/          → 3 files (string.rs, collection.rs, id.rs)
+📁 tests/sanity/math/        → 8 files (basic.rs, random.rs, integers.rs, aggregators.rs, percentage.rs, expressions.rs, base.rs, predicates.rs)
+📁 tests/sanity/tokens/      → 1 file (basic.rs)
+
+📄 Root sanity files:        → 9 standalone files (already in sanity.rs)
+
+================================================================================
+ 🎯 EXACT MODULE DECLARATIONS NEEDED
+================================================================================
+
+FOR tests/unit.rs (ADD ALL OF THESE):
+-------------------------------------
+
+// Subdirectory-based modules
+#[path = "unit/param/helpers.rs"]
+mod param_helpers;
+
+#[path = "unit/param/param_test.rs"]
+mod param_test;
+
+#[path = "unit/param/macro_import.rs"]
+mod param_macro_import;
+
+#[path = "unit/prompts/functions.rs"]
+mod prompts_functions;
+
+#[path = "unit/prompts/contexts.rs"]
+mod prompts_contexts;
+
+#[path = "unit/prompts/macros.rs"]
+mod prompts_macros;
+
+#[path = "unit/colors/runtime.rs"]
+mod colors_runtime;
+
+#[path = "unit/colors/sanity.rs"]
+mod colors_sanity;
+
+#[path = "unit/global/core.rs"]
+mod global_core_unit;
+
+#[path = "unit/date/date_test.rs"]
+mod date_test;
+
+#[path = "unit/string/string_test.rs"]
+mod string_test;
+
+#[path = "unit/string/invalid_glob_test.rs"]
+mod string_invalid_glob_test;
+
+#[path = "unit/string/ascii_filter_test.rs"]
+mod string_ascii_filter_test;
+
+#[path = "unit/string/macros.rs"]
+mod string_macros;
+
+#[path = "unit/string/errors_test.rs"]
+mod string_errors_test;
+
+#[path = "unit/string/case_test.rs"]
+mod string_case_test;
+
+#[path = "unit/tokens/comprehensive.rs"]
+mod tokens_comprehensive;
+
+// Root-level unit files
+#[path = "unit/features_prompts.rs"]
+mod features_prompts;
+
+#[path = "unit/args_processing.rs"]
+mod args_processing;
+
+#[path = "unit/adapter_global_light.rs"]
+mod adapter_global_light;
+
+#[path = "unit/global_namespace.rs"]
+mod global_namespace;
+
+#[path = "unit/features_dispatch.rs"]
+mod features_dispatch;
+
+#[path = "unit/global_core.rs"]
+mod global_core_root;
+
+#[path = "unit/features_tokens.rs"]
+mod features_tokens;
+
+#[path = "unit/options.rs"]
+mod options;
+
+FOR tests/sanity.rs (ADD THESE NEW ONES):
+------------------------------------------
+
+// NEW: GX module subdirectory
+#[path = "sanity/gx/string.rs"]
+mod gx_string;
+
+#[path = "sanity/gx/collection.rs"]
+mod gx_collection;
+
+#[path = "sanity/gx/id.rs"]
+mod gx_id;
+
+// NEW: Math module subdirectory
+#[path = "sanity/math/basic.rs"]
+mod math_basic;
+
+#[path = "sanity/math/random.rs"]
+mod math_random;
+
+#[path = "sanity/math/integers.rs"]
+mod math_integers;
+
+#[path = "sanity/math/aggregators.rs"]
+mod math_aggregators;
+
+#[path = "sanity/math/percentage.rs"]
+mod math_percentage;
+
+#[path = "sanity/math/expressions.rs"]
+mod math_expressions;
+
+#[path = "sanity/math/base.rs"]
+mod math_base;
+
+#[path = "sanity/math/predicates.rs"]
+mod math_predicates;
+
+// NEW: Tokens module subdirectory
+#[path = "sanity/tokens/basic.rs"]
+mod tokens_basic;
+
+// MISSING: Add these existing files too!
+#[path = "sanity/macro_smoke.rs"]
+mod macro_smoke;
+
+#[path = "sanity/core_smoke_tests.rs"]
+mod core_smoke_tests;
+
+================================================================================
+ ⚠️  IMPORTANT NAMING STRATEGY
+================================================================================
+
+I used a PREFIX-BASED naming strategy to avoid module name conflicts:
+- param_* for param/ subdirectory files
+- prompts_* for prompts/ subdirectory files
+- colors_* for colors/ subdirectory files
+- string_* for string/ subdirectory files
+- gx_* for gx/ subdirectory files
+- math_* for math/ subdirectory files
+- tokens_* for tokens/ subdirectory files
+
+This prevents collisions like having both "unit/global/core.rs" and
+"unit/global_core.rs" trying to use the same module name.
+
+================================================================================
+ 🥚 KEY TAKEAWAYS
+================================================================================
+
+1. The unit.rs orchestrator needs COMPLETE population - it's basically empty!
+2. The sanity.rs orchestrator is missing 3 new subdirectories (12 total files)
+3. Mixed organization: some files in subdirs, others at root - this is fine
+4. Use descriptive module names to prevent conflicts
+5. All #[path] declarations use relative paths from the orchestrator file location
+
+================================================================================
+ ❓ ANSWERS TO SPECIFIC QUESTIONS
+================================================================================
+
+Q: Should it be #[path = "unit/param/helpers.rs"] mod param_helpers;?
+A: YES! Exactly that pattern. Use descriptive module names with prefixes.
+
+Q: Or organized by subdirectory?
+A: The #[path] handles subdirectory organization. Module names should be
+   descriptive to avoid conflicts (hence param_helpers, not just helpers).
+
+Q: What needs to be added to each orchestrator?
+A: unit.rs needs ALL 25+ module declarations (it's empty!)
+   sanity.rs needs 12 new declarations for the 3 new subdirectories
+
+================================================================================
+ 🔍 VERIFICATION PERFORMED
+================================================================================
+
+✅ Found all test files in both unit/ and sanity/ hierarchies
+✅ Analyzed existing sanity.rs structure for pattern consistency
+✅ Identified naming conflict risks and proposed resolution
+✅ Provided exact #[path] syntax for all discovered files
+✅ Counted and categorized all files needing orchestration
+
+================================================================================
+ 📚 REFERENCES
+================================================================================
+
+- Current working directory: /home/xnull/repos/code/rust/oodx/rsb
+- Analyzed files: tests/unit.rs, tests/sanity.rs
+- File discovery via: find command on tests/unit and tests/sanity
+
+================================================================================
+ ⚖️  DISCLAIMER
+================================================================================
+
+This summary reflects the current state of test files as discovered on
+2025-09-16. The module declarations provided follow Rust conventions but
+should be tested for compilation. Additional source verification may be
+needed to ensure all test files are properly structured and importable.
+
+The naming strategy prevents obvious conflicts but doesn't guarantee against
+all possible issues. Consider running `cargo test` after updates to verify
+everything compiles and executes correctly.
+
+================================================================================
+ 📊 EGG METADATA
+================================================================================
+
+Files Analyzed: 2 orchestrator files
+Files Discovered: 37 test files total
+Subdirectories: 7 in unit/, 3 in sanity/
+New Declarations Needed: 25+ for unit.rs, 12+ for sanity.rs
+Pattern Used: #[path = "category/subdir/file.rs"] mod descriptive_name;
+
+================================================================================
+ 🐔 CHINA'S SIGN-OFF BANNER
+================================================================================
+
+"From scattered test files to organized flocks - that's how this hen
+ rolls! These modules are ready to fly in formation! 🥚✨"
+
+ - China the Summary Chicken, Test Organization Specialist
+================================================================================
