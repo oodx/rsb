@@ -1,7 +1,7 @@
 use rsb::prelude::*;
 
 #[test]
-fn uat_bash_demo() {
+fn uat_bash_basic_demo() {
     println!("\n=== UAT: Bash Commands (curl/tar/zip) ===\n");
 
     // Network

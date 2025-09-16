@@ -341,11 +341,45 @@ Notes
 
 ## Running Tests Quickly
 
+### Basic Testing Commands
 - List suites: `./bin/test.sh list`
 - Sanity: `./bin/test.sh run sanity`
 - Host env UAT: `./bin/test.sh run host-env`
 - Host paths UAT: `./bin/test.sh run host-paths`
 - CLI macros E2E: `./bin/test.sh run cli`
+
+### Module-Based Testing (New)
+RSB now supports targeted testing by category and module for more efficient development:
+
+```bash
+# Run all math UAT tests
+./bin/test.sh run uat math
+
+# Run all tokens sanity tests
+./bin/test.sh run sanity tokens
+
+# Run all UAT tests across modules
+./bin/test.sh run uat
+
+# Run all sanity tests across modules
+./bin/test.sh run sanity
+
+# Legacy syntax still supported
+./bin/test.sh run sanity
+./bin/test.sh run uat-math
+```
+
+### Test Function Naming Standards
+All tests must follow standardized naming patterns for module-based discovery:
+
+- **UAT functions**: `uat_<module>_<description>()` (e.g., `uat_math_basic_demo`, `uat_tokens_validation_demo`)
+- **SANITY functions**: `sanity_<module>_<description>()` (e.g., `sanity_math_basic`, `sanity_tokens_parsing`)
+
+### Benefits of Module-Based Testing
+- **Targeted Development**: Test only the module you're working on
+- **Faster Feedback**: Skip unrelated test suites during development
+- **Better Organization**: Clear separation between module testing categories
+- **Easier Debugging**: Isolate issues to specific functional areas
 
 ## License
 

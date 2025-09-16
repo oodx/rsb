@@ -3,7 +3,7 @@
 use rsb::token::{tokenize_string, is_token_streamable, TokenStreamable, utils};
 
 #[test]
-fn uat_basic_token_parsing_demo() {
+fn uat_tokens_basic_parsing_demo() {
     println!("\n=== Token Parsing Demo ===");
 
     // Demo 1: Basic token parsing
@@ -43,7 +43,7 @@ fn uat_basic_token_parsing_demo() {
 }
 
 #[test]
-fn uat_validation_demo() {
+fn uat_tokens_validation_demo() {
     println!("\n=== Token Validation Demo ===");
 
     let test_cases = vec![
@@ -79,7 +79,7 @@ fn uat_validation_demo() {
 }
 
 #[test]
-fn uat_quote_stripping_demo() {
+fn uat_tokens_quote_stripping_demo() {
     println!("\n=== Quote Stripping Demo ===");
 
     let test_cases = vec![
@@ -107,7 +107,7 @@ fn uat_quote_stripping_demo() {
 }
 
 #[test]
-fn uat_namespace_operations_demo() {
+fn uat_tokens_namespace_demo() {
     println!("\n=== Namespace Operations Demo ===");
 
     let config_input = r#"
@@ -168,7 +168,7 @@ fn uat_namespace_operations_demo() {
 }
 
 #[test]
-fn uat_error_handling_demo() {
+fn uat_tokens_error_handling_demo() {
     println!("\n=== Error Handling Demo ===");
 
     let error_cases = vec![
@@ -201,7 +201,7 @@ fn uat_error_handling_demo() {
 }
 
 #[test]
-fn uat_xstream_compatibility_demo() {
+fn uat_tokens_xstream_demo() {
     println!("\n=== XStream Compatibility Demo ===");
 
     // Show that RSB can parse XStream-style token formats

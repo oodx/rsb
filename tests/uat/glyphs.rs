@@ -4,7 +4,7 @@ use rsb::visual::colors::{color_enable_with, color_mode, colored, color};
 use rsb::visual::glyphs::{glyph_enable, glyph, get_all_glyphs};
 
 #[test]
-fn uat_glyphs_demo() {
+fn uat_visual_glyphs_demo() {
     color_mode("always");
     color_enable_with("simple,status");
     #[cfg(feature = "glyphs")]

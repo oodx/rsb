@@ -2,7 +2,7 @@ use rsb::prelude::*;
 use assert_fs::TempDir;
 
 #[test]
-fn uat_host_paths_demo() {
+fn uat_hosts_paths_demo() {
     println!("\n=== UAT: Host Paths (XDG + RSB) ===");
     let tmp = TempDir::new().unwrap();
     std::env::set_var("HOME", tmp.path());

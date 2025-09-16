@@ -1,7 +1,7 @@
 use rsb::prelude::*;
 
 #[test]
-fn uat_threads_demo() {
+fn uat_threads_basic_demo() {
     println!("\n=== UAT: Threads (sleep, bench, jobs) ===\n");
 
     // Sleep demo

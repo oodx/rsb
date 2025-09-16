@@ -42,3 +42,11 @@ mod tokens;
 
 #[path = "uat/visual.rs"]
 mod visual;
+
+// Date module UAT tests
+#[path = "uat/date.rs"]
+mod date;
+
+// Math module UAT tests
+#[path = "uat/math.rs"]
+mod math;

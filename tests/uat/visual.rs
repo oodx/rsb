@@ -5,7 +5,7 @@ use rsb::visual::colors::{color_enable_with, color_mode, color, bg, colored, col
 use rsb::visual::glyphs::glyph_enable;
 
 #[test]
-fn uat_visual_combo() {
+fn uat_visual_combo_demo() {
     color_mode("always");
     color_enable_with("simple,status,named,bg,glyphs");
     #[cfg(feature = "glyphs")]

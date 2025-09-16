@@ -1,7 +1,7 @@
 use rsb::prelude::*;
 
 #[test]
-fn uat_global_demo() {
+fn uat_global_basic_demo() {
     // Visible demo of global store and expansion
     rsb::global::set_var("PROJECT", "rsb");
     rsb::global::set_var("ENV", "dev");

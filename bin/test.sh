@@ -589,6 +589,7 @@ show_help() {
         cat <<-EOF | $BOXY --theme info --title "🧪 RSB Test Runner (BASHFX Aligned)" --width max
 Available Commands:
   test.sh [options] run <test>      Run specific test
+  test.sh [options] run <category> <module>  Run module tests (e.g., run uat math)
   test.sh list                      List available tests
   test.sh adhoc [test]              Run or list adhoc/experimental tests
   test.sh list-adhoc                List adhoc tests only
@@ -623,6 +624,16 @@ Test Categories (BASHFX Organization):
   chaos                  Edge cases, stress tests, property tests
   bench                  Performance benchmarks
 
+Module-Based Testing (New):
+  test.sh run uat math              Run all math UAT tests
+  test.sh run sanity tokens         Run all tokens sanity tests
+  test.sh run uat                   Run all UAT tests
+  test.sh run sanity                Run all sanity tests
+
+Test Function Naming Requirements:
+  UAT functions:    uat_<module>_<description>()     (e.g., uat_math_basic_demo)
+  SANITY functions: sanity_<module>_<description>()  (e.g., sanity_math_basic)
+
 Legacy Tests (Transitioning):
   param                  Parameter expansion comprehensive tests
   macros                 Basic macro functionality tests
@@ -641,6 +652,7 @@ EOF
         echo
         echo "Available Commands:"
         echo "  test.sh [options] run <test>      Run specific test"
+        echo "  test.sh [options] run <category> <module>  Run module tests (e.g., run uat math)"
         echo "  test.sh list                      List available tests"
         echo "  test.sh adhoc [test]              Run or list adhoc/experimental tests"
         echo "  test.sh list-adhoc                List adhoc tests only"
@@ -678,6 +690,16 @@ EOF
         echo "  uat                    User Acceptance Tests (with visual ceremony)"
         echo "  chaos                  Edge cases, stress tests, property tests"
         echo "  bench                  Performance benchmarks"
+        echo
+        echo "Module-Based Testing (New):"
+        echo "  test.sh run uat math              Run all math UAT tests"
+        echo "  test.sh run sanity tokens         Run all tokens sanity tests"
+        echo "  test.sh run uat                   Run all UAT tests"
+        echo "  test.sh run sanity                Run all sanity tests"
+        echo
+        echo "Test Function Naming Requirements:"
+        echo "  UAT functions:    uat_<module>_<description>()     (e.g., uat_math_basic_demo)"
+        echo "  SANITY functions: sanity_<module>_<description>()  (e.g., sanity_math_basic)"
         echo
         echo "Legacy Tests (Transitioning):"
         echo "  param                  Parameter expansion comprehensive tests"
@@ -875,12 +897,59 @@ run_adhoc_test() {
     esac
 }
 
+# Enhanced run_test function with module filtering support
+run_module_tests() {
+    local category="$1"
+    local module="$2"
+
+    echo "🎯 Running $category tests for module: $module"
+    echo
+
+    case "$category" in
+        "uat")
+            if [[ -f "$TEST_DIR/uat.rs" ]]; then
+                echo "ℹ️  Filtering UAT tests for module: $module"
+                ctest test --test uat uat_${module}_ -- --nocapture
+            else
+                echo "❌ Error: UAT test file not found"
+                exit 1
+            fi
+            ;;
+        "sanity")
+            if [[ -f "$TEST_DIR/sanity.rs" ]]; then
+                echo "ℹ️  Filtering SANITY tests for module: $module"
+                ctest test --test sanity sanity_${module}_ -- --nocapture
+            else
+                echo "❌ Error: SANITY test file not found"
+                exit 1
+            fi
+            ;;
+        *)
+            echo "❌ Error: Module filtering not supported for category: $category"
+            echo "Supported categories: uat, sanity"
+            exit 1
+            ;;
+    esac
+}
+
 run_test() {
     local test_name="$1"
-    
+    local module_name="$2"
+
+    # Check if this is a module filtering request
+    if [[ -n "$module_name" ]]; then
+        case "$test_name" in
+            "uat"|"sanity"|"unit"|"smoke"|"integration")
+                run_module_tests "$test_name" "$module_name"
+                return
+                ;;
+        esac
+    fi
+
     if [[ -z "$test_name" ]]; then
         echo "❌ Error: Test name required"
         echo "Use: test.sh run <test>"
+        echo "Use: test.sh run <category> <module>  # For module filtering"
         echo "Available tests: ${!TESTS[*]}"
         exit 1
     fi
@@ -1120,7 +1189,7 @@ case "${1:-status}" in
         if [[ "$SKIP_ENFORCEMENT" != "true" ]]; then
             validate_test_structure
         fi
-        run_test "$2"
+        run_test "$2" "$3"
         ;;
     "list")
         list_tests

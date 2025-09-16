@@ -2,7 +2,7 @@
 use rsb::prelude::*;
 
 #[test]
-fn uat_param_usage_demo() {
+fn uat_params_usage_demo() {
     println!("\n=== UAT: param! usage demo ===\n");
     set_var("FOO", "/home/user/file.txt");
     set_var("EMPTY", "");

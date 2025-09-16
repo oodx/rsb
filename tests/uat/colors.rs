@@ -2,7 +2,7 @@
 use rsb::visual::colors::{color_enable_with, color_mode, color, colorize, colored, get_all_colors, bg, colorize_bg};
 
 #[test]
-fn uat_colors_demo() {
+fn uat_colors_basic_demo() {
     color_mode("always");
     color_enable_with("simple,status,named,bg");
     println!("\n=== UAT: RSB Colors Demo ===\n");

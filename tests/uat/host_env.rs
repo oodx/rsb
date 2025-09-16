@@ -1,7 +1,7 @@
 use rsb::prelude::*;
 
 #[test]
-fn uat_host_env_demo() {
+fn uat_hosts_env_demo() {
     println!("\n=== UAT: Host Env ===");
     println!("Setting TEST_UAT_A in process env to '123'");
     std::env::set_var("TEST_UAT_A", "123");

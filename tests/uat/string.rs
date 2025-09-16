@@ -1,7 +1,7 @@
 use rsb::prelude::*;
 
 #[test]
-fn uat_string_demo() {
+fn uat_strings_basic_demo() {
     // Case transforms
     assert_eq!(rsb::string::to_dot_case("Log File Name"), "log.file.name");
     assert_eq!(rsb::string::to_kebab_case("Hello World"), "hello-world");

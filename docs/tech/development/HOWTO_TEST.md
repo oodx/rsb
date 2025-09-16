@@ -20,6 +20,12 @@
 ./bin/test.sh run smoke
 ./bin/test.sh run uat
 
+# NEW: Module-based testing (v2.0)
+./bin/test.sh run uat math        # Run all math UAT tests
+./bin/test.sh run sanity tokens   # Run all tokens sanity tests
+./bin/test.sh run uat            # Run all UAT tests across modules
+./bin/test.sh run sanity         # Run all sanity tests across modules
+
 # List all available tests
 ./bin/test.sh list
 
@@ -27,6 +33,69 @@
 ./bin/test.sh adhoc
 ./bin/test.sh adhoc my_experiment
 ```
+
+## Module-Based Testing System (New in v2.0)
+
+RSB now supports **module filtering subcommands** that allow targeted testing by category and module for more efficient development workflows.
+
+### New Subcommand Syntax
+
+```bash
+# General syntax
+./bin/test.sh run <category> <module>
+
+# Examples
+./bin/test.sh run uat math        # Run all math UAT tests
+./bin/test.sh run sanity tokens   # Run all tokens sanity tests
+./bin/test.sh run uat            # Run all UAT tests across modules
+./bin/test.sh run sanity         # Run all sanity tests across modules
+
+# Legacy syntax still supported
+./bin/test.sh run sanity         # Traditional command
+./bin/test.sh run uat-math       # Legacy module syntax
+```
+
+### Function Naming Requirements
+
+**CRITICAL**: All test functions must follow standardized naming patterns for module-based discovery:
+
+#### UAT Functions
+```rust
+// Pattern: uat_<module>_<description>()
+fn uat_math_basic_demo() { /* Visual demonstration of math basics */ }
+fn uat_math_floating_point_demo() { /* Float operations demo */ }
+fn uat_tokens_validation_demo() { /* Token validation showcase */ }
+fn uat_tokens_parsing_edge_cases() { /* Edge case demonstrations */ }
+```
+
+#### SANITY Functions
+```rust
+// Pattern: sanity_<module>_<description>()
+fn sanity_math_basic() { /* Core math functionality tests */ }
+fn sanity_math_operations() { /* Mathematical operation tests */ }
+fn sanity_tokens_parsing() { /* Token parsing validation */ }
+fn sanity_tokens_generation() { /* Token generation tests */ }
+```
+
+#### Other Categories
+```rust
+// UNIT tests
+fn unit_<module>_<description>() { /* Fast isolated tests */ }
+
+// SMOKE tests
+fn smoke_<module>_<description>() { /* Essential functionality */ }
+
+// INTEGRATION tests (cross-module)
+fn integration_<feature>_<description>() { /* Feature-based testing */ }
+```
+
+### Benefits of Module-Based Testing
+
+- **Targeted Development**: Test only the module you're working on
+- **Faster Feedback**: Skip unrelated test suites during development
+- **Better Organization**: Clear separation between module testing categories
+- **Easier Debugging**: Isolate issues to specific functional areas
+- **Parallel Development**: Teams can work on different modules independently
 
 ## Test Organization System
 
@@ -101,6 +170,11 @@ All test wrapper files in `tests/` root must follow the strict naming pattern:
 
 # Run specific tests
 ./bin/test.sh run <test_name>
+
+# NEW: Module-based testing
+./bin/test.sh run <category> <module>    # Run module tests in category
+./bin/test.sh run uat math              # Run all math UAT tests
+./bin/test.sh run sanity tokens         # Run all tokens sanity tests
 
 # List available tests
 ./bin/test.sh list
@@ -449,6 +523,67 @@ export RSB_COLOR="always"
 
 # Direct cargo equivalents (NOT RECOMMENDED - use test.sh)
 cargo test --features visuals --test uat_main -- --nocapture
+```
+
+## Module-Based Development Workflow
+
+### Typical Development Cycle
+
+When working on a specific module, use the new module-based commands for efficient testing:
+
+```bash
+# 1. Work on a module (e.g., math)
+vim src/math.rs
+
+# 2. Test only that module quickly
+./bin/test.sh run sanity math    # Core functionality
+./bin/test.sh run uat math       # Visual demonstrations
+
+# 3. Test related modules if needed
+./bin/test.sh run sanity tokens  # If math affects tokens
+./bin/test.sh run sanity strings # If math affects strings
+
+# 4. Full category testing before commit
+./bin/test.sh run sanity        # All sanity tests
+./bin/test.sh run uat          # All UAT tests
+```
+
+### Module Development Best Practices
+
+1. **Start with Sanity**: Write sanity tests first for core functionality
+2. **Add UAT Demonstrations**: Create visual tests showing module capabilities
+3. **Follow Naming**: Use `<category>_<module>_<description>()` pattern
+4. **Test Incrementally**: Use module filtering during development
+5. **Validate Organization**: Run `./bin/test.sh lint` regularly
+
+### Creating Tests for New Modules
+
+```bash
+# 1. Create test files for new module 'example'
+touch tests/sanity/example.rs
+touch tests/uat/example.rs
+
+# 2. Create wrappers (REQUIRED)
+touch tests/sanity_example.rs
+touch tests/uat_example.rs
+
+# 3. Implement functions with proper naming
+# In tests/sanity/example.rs:
+#[test]
+fn sanity_example_basic() {
+    // Core functionality tests
+}
+
+# In tests/uat/example.rs:
+#[test]
+fn uat_example_demo() {
+    // Visual demonstrations
+}
+
+# 4. Verify compliance and run
+./bin/test.sh lint
+./bin/test.sh run sanity example
+./bin/test.sh run uat example
 ```
 
 ## Working with Adhoc Tests

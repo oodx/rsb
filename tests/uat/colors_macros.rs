@@ -3,7 +3,7 @@ use rsb::visual::colors::{color_enable_with, color_mode};
 use rsb::colored;
 
 #[test]
-fn uat_colored_macro_inline_tags() {
+fn uat_colors_macros_inline_tags() {
     color_mode("always");
     color_enable_with("simple,status,named,bg");
     let s = colored!("{red}hello{reset}");
@@ -20,7 +20,7 @@ fn uat_colored_macro_inline_tags() {
 }
 
 #[test]
-fn uat_colored_macro_with_glyphs_optional() {
+fn uat_colors_macros_glyphs() {
     color_mode("always");
     color_enable_with("simple,status,bg,glyphs");
     let line = colored!("{green}{g:pass}{reset} PASS");

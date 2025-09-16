@@ -3,7 +3,7 @@ use rsb::prelude::*;
 use rsb::{confirm, ask, select};
 
 #[test]
-fn uat_prompts_demo_and_behaviors() {
+fn uat_prompts_demo() {
     println!("\n=== UAT: Prompts (confirm/ask/select) ===\n");
     #[cfg(feature = "visual")]
     {

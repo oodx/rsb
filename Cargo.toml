@@ -7,7 +7,7 @@ repository = "https://github.com/oodx/rsb"
 edition = "2021"
 
 [features]
-default = []
+default = ["visual", "colors-simple", "colors-named", "colors-status", "glyphs", "prompts"]
 
 # Visual enhancements package
 visual = []

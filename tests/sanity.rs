@@ -63,3 +63,11 @@ mod math_predicates;
 // NEW: Tokens module subdirectory
 #[path = "sanity/tokens/basic.rs"]
 mod tokens_basic;
+
+// Date module sanity tests
+#[path = "sanity/date.rs"]
+mod date;
+
+// Math module sanity tests
+#[path = "sanity/math.rs"]
+mod math;
