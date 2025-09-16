@@ -1,125 +1,151 @@
 # RSB Continuation Guide (Next Session)
 
-Date: 2025-09-15
+Date: 2025-09-16 (UPDATED)
 Branch: main
 Repo: rsb (canonical)
 
-Quick snapshot
-- Logger: `stderrx` is the internal non‑visual logger (shim for `glyph_stderr` retained).
-- CLI: `pre_dispatch!` now auto‑registers handlers and supports `desc:` like `dispatch!`.
-- Progress: integrated behind `progress` feature; rate formatting policy unchanged (>=1.0 → 1 decimal, <1.0 → 2 decimals).
-- Docs: README “Start Here” + docs index use table format with relative links; Progress and FS feature docs added.
-- Deps: `rsb::deps` supports per‑dependency flags and an umbrella (`deps-all`, alias `deps`).
+## Latest Session Summary
+**SESSION_07**: COM Module Restructure & Cleanup (2025-09-16)
+- Restructured `com` module: split into `bool.rs` + `exit.rs`
+- Enhanced exit codes with meaningful failure types
+- Cleaned up ToBool trait (renamed from ToRSBBool)
+- **Issue identified**: `bool` ToBool implementation is identity function - needs warning/removal
+- All tests passing (13 sanity + 10 UAT)
+- Documentation consolidated (LOGIC_REGRESSION → FEATURES_TRUTH)
 
-New since last session
-- Truth model (REBEL booleans): 0=true, 1=false. Centralized in `rsb::com` with macros `is_true!`/`is_false!`.
-  - Docs: `docs/tech/features/FEATURES_TRUTH.md`; regression advisory: `docs/tech/development/LOGIC_REGRESSION.md`.
-  - CLI options: flags set to "0", negations to "1"; detectors return "0"/"1".
-- Generators (GX): adapters + data under `src/gx/data/dict/*`; tests added; docs `FEATURES_GENERATORS.md`.
-- Parse/FS: file sed lives in `parse::sed_file` (composes streams+fs). `wc` counters in FS; streaming variants added.
-- FS moduleization: `src/fs/{mod.rs,utils.rs,macros.rs}` (legacy `fs_data` removed). `FEATURES_FS.md` updated with wc.
-- Dev PTY (feature `dev-pty`): `rsb::dev::pty` sanity; HOWTO updated. Runner supports timeout via `RSB_TEST_TIMEOUT`.
-- Macro ownership: host info/path under `hosts::macros`; streams under `streams::macros`; OS pid/lock under `os::macros`.
+## Start here (zero‑context)
+**Read these files first** (in order):
+- `README.md` (Start Here table)
+- `.session/SESSION_07_com_module_restructure.md` (LATEST session - COM module work)
+- `docs/tech/INDEX.md` (feature and dev docs index)
+- `docs/tech/development/MODULE_SPEC.md` (module/spec alignment)
+- `docs/tech/features/FEATURES_TRUTH.md` (truth/boolean module - consolidated)
+- `docs/tech/features/FEATURES_FS.md` (FS module)
+- `docs/tech/features/FEATURES_PROGRESS.md` (progress module)
+- `.session/CONTINUE.md` (this file)
+- `Cargo.toml` (feature flags)
 
-Start here (zero‑context)
-- Read:
-  - README “Start Here” table: `README.md`
-  - Docs index: `docs/tech/INDEX.md`
-  - Module spec: `docs/tech/development/MODULE_SPEC.md`
-  - Progress, FS & Colors feature docs:
-    - `docs/tech/features/FEATURES_PROGRESS.md`
-    - `docs/tech/features/FEATURES_FS.md`
-    - `docs/tech/features/FEATURES_COLORS.md`
-  - Session summary: `.session/SESSION_05_progress_integration_and_deps.md`
+## Quick Validation Commands
+Test that everything still works:
+```bash
+# Core functionality
+cargo test --test com_sanity        # New COM module tests
+cargo test --test com_uat           # COM demonstrations
+./bin/test.sh run smoke             # Quick smoke test
+cargo test                          # All core tests
+cargo test --features visuals       # Visual features
+cargo test --features progress      # Progress indicators
+```
 
-Validate environment
-- List wrappers: `./bin/test.sh list`
-- Quick lane: `./bin/test.sh run smoke`
-- Core tests: `cargo test`
-- Visuals: `cargo test --features visuals`
-- Progress: `cargo test --features progress`
-- Dev PTY: `cargo test --features dev-pty --test dev_pty`
+## Current Module Structure (as of SESSION_07)
+```
+src/com/                 # Common/foundational utilities
+├── mod.rs              # Orchestrator - re-exports both modules
+├── bool.rs             # Boolean semantics, parsing, ToBool trait
+├── exit.rs             # Exit codes, AsExit trait
+└── macros.rs           # is_true!/is_false! macros
 
-Feature flags cheat
-- Visual umbrella: `--features visuals` (colors + glyphs + prompts)
-- Progress: `--features progress`
-- Deps:
-  - Per‑dep: `--features deps-chrono` (then `use rsb::deps::chrono;`)
-  - All deps: `--features deps` (then `use rsb::deps::*;`)
+tests/com/              # New test structure
+├── sanity.rs           # 13 comprehensive tests
+└── uat.rs              # 10 demonstration tests
+```
 
-Next tasks (execution order)
-1) Split `json_dict_random` macros per MODULE_SPEC
-   - Move randomness helpers (`rand_*`, `rand_range!`) under `gx` (string/id/collection).
-   - Keep `json_*`/`dict!`/`gen_dict!`/`rand_dict!` curated (either small `json` helper or under `gx`).
-   - Re‑export macros at crate root; behavior unchanged.
-2) Optional CI: add lanes for smoke + visuals + progress (document in HOWTO_TEST if added).
-3) Legacy macro migration audit & prelude policy checks.
-4) Keep README and docs index in sync when adding modules/features.
+## Next Tasks (UPDATED - Execution Order)
 
-Important policies
-- Prelude policy: do not export optional subsystems via `rsb::prelude`.
-- Progress rate formatting must remain as is (two‑mode). Discuss via RFC before any behavior change.
+### 1. COM Module Polish (Immediate)
+- **Fix `bool` ToBool identity issue**: Currently `impl ToBool for bool` is silly
+- Add compile warning: "Did you really mean to cast bool to bool?"
+- Consider removing the implementation entirely (may break macro compatibility)
+- Alternative: Keep but emit warning in macro expansion
 
-Useful paths
-- FS module: `src/fs/{mod.rs,utils.rs,macros.rs}`
-- CLI dispatch helpers: `src/cli/{macros.rs,dispatch.rs}`
-- Logger and helpers: `src/utils.rs`, `src/macros/{stderr.rs,visual.rs}`
-- Progress module: `src/progress/{mod.rs,core.rs,manager.rs,terminal.rs,styles.rs}`
-- Deps surface: `src/deps.rs`, feature flags in `Cargo.toml`
+### 2. Module Naming Decision
+- Consider renaming `com` → `base` (better reflects "foundational utilities")
+- Current: "com" = "common" utilities that can't be optional
+- Proposed: "base" = foundational/base-level utilities
 
-How to resume quickly
-- Run:
-  - `./bin/test.sh run smoke`
-  - `cargo test`
-  - `cargo test --features visuals`
-  - `cargo test --features progress`
-  - optional: `cargo test --features dev-pty --test dev_pty`
-- Skim: `.session/SESSION_05_progress_integration_and_deps.md` and this file.
-- Begin with the `json_dict_random` split (above), or add CI lanes.
+### 3. json_dict_random Macro Split (High Priority)
+- Move randomness helpers (`rand_*`, `rand_range!`) under `gx` module
+- Keep `json_*`/`dict!`/`gen_dict!`/`rand_dict!` curated
+- Re‑export macros at crate root for compatibility
+- Follows MODULE_SPEC standards
 
-Rehydration prompt (paste this to resume context)
+### 4. Infrastructure & Maintenance
+- Optional CI: add lanes for smoke + visuals + progress
+- Legacy macro migration audit from `src/macros/` to module-owned files
+- Prelude policy compliance checks
+- Keep README and docs index synchronized
 
+## Important Policies (Unchanged)
+- **Prelude policy**: Optional subsystems do not leak via `rsb::prelude`
+- **Function symmetry**: Keep `is_true_*`/`is_false_*` pairs (user preference)
+- **Progress rate formatting**: Unchanged (>=1.0 → 1 decimal, <1.0 → 2 decimals)
+- **RFC requirement**: Brief discussion for user-visible output changes
+
+## Key Paths (Updated)
+```
+src/com/                             # Restructured common utilities
+├── bool.rs                         # Boolean semantics (NEW)
+├── exit.rs                         # Exit code modeling (NEW)
+└── macros.rs                       # Truthiness macros
+
+src/fs/{mod.rs,utils.rs,macros.rs}  # File system module
+src/progress/                        # Progress indicators
+src/cli/{macros.rs,dispatch.rs}     # CLI helpers
+docs/tech/features/FEATURES_TRUTH.md # Truth module docs (consolidated)
+```
+
+## Feature Flags Reference
+```bash
+# Visual umbrella
+--features visuals                   # colors + glyphs + prompts
+
+# Individual features
+--features progress                  # Progress indicators
+--features dev-pty                   # PTY utilities
+
+# Dependencies
+--features deps-chrono              # Per-dependency
+--features deps                     # All dependencies umbrella
+```
+
+## Rehydration Prompt (Copy-Paste to Resume)
+
+```
 You are working in the RSB repo. CWD: rsb (project root). Branch: main.
 
-Context rehydration (read these first)
-- README.md (Start Here table)
-- docs/tech/INDEX.md (feature and dev docs index)
-- docs/tech/development/MODULE_SPEC.md (module/spec alignment)
-- docs/tech/features/FEATURES_FS.md (FS module)
-- docs/tech/features/FEATURES_PROGRESS.md (progress module)
-- .session/SESSION_05_progress_integration_and_deps.md (last session summary)
-- .session/CONTINUE.md (this continuation guide)
-- .session/SESSION_CURRENT.md (latest status)
-- .session/TASKS.txt (current tasks)
-- Cargo.toml (feature flags)
+IMPORTANT: Read these files first for context:
+- README.md (project overview)
+- .session/SESSION_07_com_module_restructure.md (LATEST session - COM module work)
+- docs/tech/features/FEATURES_TRUTH.md (truth/boolean module docs)
+- docs/tech/development/MODULE_SPEC.md (module standards)
 
-Current state
-- FS moduleized (mod.rs orchestrator, utils.rs impl, macros.rs). Legacy fs_data removed.
-- Dev PTY feature added (rsb::dev::pty) with sanity test.
-- Progress integrated behind feature; rate formatting policy unchanged.
-- Logger: utils::stderrx; shim glyph_stderr retained for compatibility.
-- CLI: pre_dispatch! supports desc and auto registers handlers.
-- Deps: rsb::deps supports per-dep and umbrella features.
+Current state (SESSION_07):
+- COM module restructured: bool.rs + exit.rs + macros.rs
+- ToBool trait cleaned up (but bool impl is identity function - needs fix)
+- Enhanced exit codes with meaningful failure types
+- All tests passing (cargo test --test com_sanity)
+- Documentation consolidated
 
-Policies
-- Prelude policy: optional subsystems do not leak via rsb::prelude.
-- Progress rate formatting unchanged.
-- Open brief RFC for any user-visible output changes.
+IMMEDIATE PRIORITY: Fix bool ToBool identity issue - add warning or remove implementation.
 
-Quick validation
-- ./bin/test.sh run smoke
-- cargo test
-- cargo test --features visuals
-- cargo test --features progress
-- optional: cargo test --features dev-pty --test dev_pty
+Quick validation: cargo test --test com_sanity && ./bin/test.sh run smoke
+```
 
-Next tasks
-1) Gate parse-fs adapter with a feature flag; add streaming wc macros.
-2) Showcase/UAT for Generators using `src/gx/data/dict` files.
-3) Optional CI lanes for smoke/visuals/progress (document in HOWTO_TEST).
-4) Math audit: ensure MODERN orchestrator-only `mod.rs`; move any logic into submodules.
-5) Continue macro migration audit and prelude policy checks.
+## Current State Summary
+- ✅ **COM module restructured**: Clean separation between boolean logic and exit codes
+- ✅ **All tests passing**: Comprehensive test coverage with sanity + UAT tests
+- ✅ **Documentation consolidated**: FEATURES_TRUTH.md is the single source of truth
+- ⚠️ **Issue**: `bool` ToBool implementation is identity function (needs fix)
+- ⚠️ **Consideration**: Rename `com` → `base` for clarity
 
-Agents / tooling
-- No special services needed; use Cargo and the provided test runner.
-- This repo’s coding agent previously performed the refactors; you can proceed directly with the checklist.
+## Session Notes Archive
+- `SESSION_07_com_module_restructure.md` - Latest (COM cleanup)
+- `SESSION_06_com_module_cleanup.md` - Previous
+- Earlier sessions in numbered sequence
+
+## Agents / Tooling Used
+- **China the Summary Chicken** (#china): Analysis and verification
+- **TodoWrite**: Task tracking
+- Standard Claude Code tools (Read, Write, Edit, MultiEdit, Bash, etc.)
+
+The repo is in excellent shape - well-tested, documented, and ready for the next development phase!

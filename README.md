@@ -85,6 +85,7 @@ Index of Feature Modules
 
 | Feature | Description | Documentation |
 |---------|-------------|---------------|
+| **Truth/Booleans** | Rust-native boolean semantics and exit codes | [`FEATURES_TRUTH.md`](docs/tech/features/FEATURES_TRUTH.md) |
 | **Global** | Global store and configuration management | [`FEATURES_GLOBAL.md`](docs/tech/features/FEATURES_GLOBAL.md) |
 | **Strings** | String helpers, macros, Unicode behavior | [`FEATURES_STRINGS.md`](docs/tech/features/FEATURES_STRINGS.md) |
 | **Parameters** | Parameter expansion (bash-like `${var}` patterns) | [`FEATURES_PARAMS.md`](docs/tech/features/FEATURES_PARAMS.md) |

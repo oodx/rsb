@@ -23,6 +23,25 @@ Module Layout (per module)
 - `<module>/error.rs` — typed error enums for consistent messaging.
 - Streams integration — per-line wrappers for heavy transforms (e.g., case conversions) to process large inputs safely.
 
+Cross Module Integration
+- try to keep module files pure as in they dont depend on other RSB modules; this enables progressive enhancement with feature flags
+- when you need to create functions that dep on other modules use the cross module integration pattern (these are non exhaustive examples) =>
+  consider 4 modules
+  (mod A) apple.rs
+  (mod B) banana.rs
+  (mod C) knife.rs
+  (mod D) hammer.rs
+  This pattern requires you to create seperate integration modules in the parent module. 
+  Examples:
+    apple.rs uses knife.rs
+      - LITERAL SMOOSH  => apple_knife.rs  (A + C)
+      - DESCRIPTIVE     => apple_cutter.rs (what C applies to A)
+      - ADAPTER         => apple_knifer_adp.rs (add _adp suffix)
+    knife.rs uses hammer.rs (maybe just the handle)
+      - PART EXTRACTION => knife_grip.rs (A uses a part of C only)
+    apple.rs uses banana.rs
+      - MISC UTILS      => apple_banana_utils (utils using A+B)
+
 Prelude Policy (Amendment A)
 - Re-export user-facing items and module-owned macros via `rsb::prelude::*`.
 - Do not re-export internal submodules unless intentionally public and stable.
