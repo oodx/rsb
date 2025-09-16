@@ -6,7 +6,15 @@ set -e
 
 # Configuration
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+PROJECT_ROOT="$ROOT_DIR"
 TEST_DIR="$ROOT_DIR/tests"
+
+# Documentation paths (configurable)
+# Override these variables to customize documentation locations
+DOCS_BASE_DIR="${RSB_DOCS_BASE_DIR:-$PROJECT_ROOT/docs}"
+DOCS_DEV_DIR="${RSB_DOCS_DEV_DIR:-$DOCS_BASE_DIR/tech/development}"
+DOCS_FEATURES_DIR="${RSB_DOCS_FEATURES_DIR:-$DOCS_BASE_DIR/tech/features}"
+DOCS_REFERENCE_DIR="${RSB_DOCS_REFERENCE_DIR:-$DOCS_BASE_DIR/tech/reference}"
 
 # Try to find boxy for pretty output (optional)
 BOXY=""
@@ -164,19 +172,21 @@ validate_test_structure() {
         fi
     done
 
-    # Check for required category entry files
+    # Check for required category entry files (can be .rs or .sh)
     for category in "${required_category_entries[@]}"; do
-        if [[ ! -f "tests/${category}.rs" ]]; then
+        if [[ ! -f "tests/${category}.rs" && ! -f "tests/${category}.sh" ]]; then
             missing_category_entry_violations+=("$category")
         fi
     done
 
-    # Check for unauthorized files in tests/ root
-    for file in tests/*.rs; do
+    # Check for unauthorized files in tests/ root (both .rs and .sh)
+    for file in tests/*.rs tests/*.sh; do
         [[ ! -f "$file" ]] && continue
 
         basename="${file##*/}"
+        # Remove both .rs and .sh extensions
         basename="${basename%.rs}"
+        basename="${basename%.sh}"
 
         # Skip archive files
         [[ "$basename" =~ ^_ ]] && continue
@@ -324,6 +334,9 @@ validate_test_structure() {
 Total Violations: $total_violations
 • Naming issues: ${#naming_violations[@]}
 • Missing sanity tests: ${#missing_sanity_violations[@]}
+• Missing UAT tests: ${#missing_uat_violations[@]}
+• Missing category entries: ${#missing_category_entry_violations[@]}
+• Unauthorized root files: ${#unauthorized_root_violations[@]}
 • Invalid directories: ${#directory_violations[@]}
 
 QUICK FIXES:
@@ -343,6 +356,9 @@ QUICK FIXES:
 Test organization violations detected ($total_violations total):
 • Naming issues: ${#naming_violations[@]}
 • Missing sanity tests: ${#missing_sanity_violations[@]}
+• Missing UAT tests: ${#missing_uat_violations[@]}
+• Missing category entries: ${#missing_category_entry_violations[@]}
+• Unauthorized root files: ${#unauthorized_root_violations[@]}
 • Invalid directories: ${#directory_violations[@]}
 
 SOLUTION OPTIONS:
@@ -361,6 +377,9 @@ Tests cannot proceed until organization is compliant."
 
 • Naming issues: ${#naming_violations[@]}
 • Missing sanity tests: ${#missing_sanity_violations[@]}
+• Missing UAT tests: ${#missing_uat_violations[@]}
+• Missing category entries: ${#missing_category_entry_violations[@]}
+• Unauthorized root files: ${#unauthorized_root_violations[@]}
 • Invalid directories: ${#directory_violations[@]}
 
 Fix these violations when possible.
@@ -372,6 +391,9 @@ Use --violations flag to see complete organized list."
             echo "⚠️  Test structure warnings ($total_violations total):"
             echo "   • Naming issues: ${#naming_violations[@]}"
             echo "   • Missing sanity tests: ${#missing_sanity_violations[@]}"
+            echo "   • Missing UAT tests: ${#missing_uat_violations[@]}"
+            echo "   • Missing category entries: ${#missing_category_entry_violations[@]}"
+            echo "   • Unauthorized root files: ${#unauthorized_root_violations[@]}"
             echo "   • Invalid directories: ${#directory_violations[@]}"
             echo "   Use --violations flag for detailed breakdown"
             echo
@@ -530,9 +552,19 @@ show_help() {
 Available Commands:
   test.sh [options] run <test>      Run specific test
   test.sh list                      List available tests
+  test.sh adhoc [test]              Run or list adhoc/experimental tests
+  test.sh list-adhoc                List adhoc tests only
   test.sh lint                      Check test organization compliance
   test.sh report                    Generate test organization report
+  test.sh docs [target]             Display documentation hub (or org, howto, rsb, features, <feature>)
   test.sh help                      Show this help
+
+Documentation Targets:
+  docs org                          Test organization requirements
+  docs howto                        Testing HOWTO guide
+  docs rsb                          RSB architecture documentation
+  docs features                     List all feature documentation
+  docs <feature>                    Show specific feature (e.g., docs options)
 
 Options:
   --comprehensive        Run full validation test suite
@@ -572,9 +604,19 @@ EOF
         echo "Available Commands:"
         echo "  test.sh [options] run <test>      Run specific test"
         echo "  test.sh list                      List available tests"
+        echo "  test.sh adhoc [test]              Run or list adhoc/experimental tests"
+        echo "  test.sh list-adhoc                List adhoc tests only"
         echo "  test.sh lint                      Check test organization compliance"
         echo "  test.sh report                    Generate test organization report"
+        echo "  test.sh docs [target]             Display documentation hub (or org, howto, rsb, features, <feature>)"
         echo "  test.sh help                      Show this help"
+        echo
+        echo "Documentation Targets:"
+        echo "  docs org                          Test organization requirements"
+        echo "  docs howto                        Testing HOWTO guide"
+        echo "  docs rsb                          RSB architecture documentation"
+        echo "  docs features                     List all feature documentation"
+        echo "  docs <feature>                    Show specific feature (e.g., docs options)"
         echo
         echo "Options:"
         echo "  --comprehensive        Run full validation test suite"
@@ -671,6 +713,124 @@ list_tests() {
             echo "  • $base"
         done
     fi
+}
+
+# Adhoc test discovery and management
+list_adhoc_tests() {
+    local adhoc_dir="$TEST_DIR/_adhoc"
+
+    if [[ ! -d "$adhoc_dir" ]]; then
+        echo "📁 No adhoc test directory found"
+        echo "Create tests/_adhoc/ for experimental tests"
+        return 0
+    fi
+
+    local adhoc_tests=()
+
+    # Find .rs and .sh files in _adhoc directory
+    while IFS= read -r -d '' file; do
+        local basename
+        basename="$(basename "$file")"
+        adhoc_tests+=("$basename")
+    done < <(find "$adhoc_dir" -maxdepth 1 \( -name "*.rs" -o -name "*.sh" \) -print0 | sort -z)
+
+    if [[ ${#adhoc_tests[@]} -eq 0 ]]; then
+        if [[ -n "$BOXY" ]]; then
+            echo "No adhoc tests found in tests/_adhoc/" | $BOXY --theme info --title "🧪 Adhoc Tests" --width max
+        else
+            echo "🧪 ADHOC TESTS"
+            echo "=============="
+            echo "No adhoc tests found in tests/_adhoc/"
+        fi
+        return 0
+    fi
+
+    if [[ -n "$BOXY" ]]; then
+        {
+            echo "Experimental tests in tests/_adhoc/:"
+            echo
+            for test in "${adhoc_tests[@]}"; do
+                echo "  • $test"
+            done
+            echo
+            echo "Usage: test.sh adhoc <test_name>"
+            echo "Example: test.sh adhoc my_experiment"
+        } | $BOXY --theme info --title "🧪 Adhoc Tests (${#adhoc_tests[@]} found)" --width max
+    else
+        echo "🧪 ADHOC TESTS (${#adhoc_tests[@]} found)"
+        echo "=========================="
+        echo "Experimental tests in tests/_adhoc/:"
+        for test in "${adhoc_tests[@]}"; do
+            echo "  • $test"
+        done
+        echo
+        echo "Usage: test.sh adhoc <test_name>"
+        echo "Example: test.sh adhoc my_experiment"
+    fi
+}
+
+run_adhoc_test() {
+    local test_name="$1"
+    local adhoc_dir="$TEST_DIR/_adhoc"
+
+    if [[ -z "$test_name" ]]; then
+        echo "❌ Error: Adhoc test name required"
+        echo "Use: test.sh adhoc <test_name>"
+        list_adhoc_tests
+        exit 1
+    fi
+
+    if [[ ! -d "$adhoc_dir" ]]; then
+        echo "❌ Error: Adhoc test directory not found"
+        echo "Create tests/_adhoc/ for experimental tests"
+        exit 1
+    fi
+
+    # Try to find the test file (.rs or .sh)
+    local test_file=""
+    if [[ -f "$adhoc_dir/$test_name.rs" ]]; then
+        test_file="$adhoc_dir/$test_name.rs"
+    elif [[ -f "$adhoc_dir/$test_name.sh" ]]; then
+        test_file="$adhoc_dir/$test_name.sh"
+    elif [[ -f "$adhoc_dir/$test_name" ]]; then
+        test_file="$adhoc_dir/$test_name"
+    fi
+
+    if [[ -z "$test_file" ]]; then
+        echo "❌ Error: Adhoc test not found: $test_name"
+        echo "Available adhoc tests:"
+        list_adhoc_tests
+        exit 1
+    fi
+
+    echo "🧪 Running adhoc test: $test_name"
+    echo "📁 Location: $test_file"
+    echo
+
+    # Determine how to run the test based on file extension
+    case "$test_file" in
+        *.rs)
+            # For .rs files, assume it's a Rust test
+            local test_basename
+            test_basename="$(basename "$test_file" .rs)"
+            echo "🦀 Executing Rust test via cargo: $test_basename"
+            cd "$PROJECT_ROOT" || exit 1
+            cargo test --test "_adhoc_$test_basename" -- --nocapture
+            ;;
+        *.sh)
+            # For .sh files, execute via bash (consistent with test.sh runner pattern)
+            echo "🐚 Executing shell test via bash: $test_name"
+            cd "$PROJECT_ROOT" || exit 1
+            bash "$test_file"
+            ;;
+        *)
+            # Unknown file type - require shell wrapper
+            echo "❌ Error: Unsupported test file type: $test_file"
+            echo "Only .rs and .sh files are supported for adhoc tests"
+            echo "Create a .sh wrapper if you need to run other file types"
+            exit 1
+            ;;
+    esac
 }
 
 run_test() {
@@ -912,7 +1072,7 @@ run_test() {
 }
 
 # Main command dispatch
-case "${1:-help}" in
+case "${1:-status}" in
     "run")
         # Validate structure before running tests (unless skipped)
         if [[ "$SKIP_ENFORCEMENT" != "true" ]]; then
@@ -923,11 +1083,244 @@ case "${1:-help}" in
     "list")
         list_tests
         ;;
+    "adhoc")
+        if [[ -n "$2" ]]; then
+            run_adhoc_test "$2"
+        else
+            list_adhoc_tests
+        fi
+        ;;
+    "list-adhoc")
+        list_adhoc_tests
+        ;;
     "lint")
         lint_tests
         ;;
     "report")
         report_tests
+        ;;
+    "docs")
+        # Display documentation with optional argument
+        DOC_TARGET="${2:-}"  # No default - show helper if no argument provided
+
+        case "$DOC_TARGET" in
+            "")
+                # Show documentation overview when no argument provided
+                echo "📚 RSB DOCUMENTATION OVERVIEW"
+                echo "============================="
+                echo
+
+                if [[ -n "$BOXY" ]]; then
+                    {
+                        echo "Core Documentation:"
+                        echo
+                        echo "  • org         - Test organization requirements and enforcement"
+                        echo "  • howto       - Testing HOWTO guide with examples and patterns"
+                        echo "  • rsb         - RSB architecture documentation (REBEL + RSB_ARCH)"
+                        echo
+                        echo "Feature Documentation:"
+                        echo
+                        echo "  • features    - List all available feature documentation"
+
+                        # Show first few features as examples
+                        if [[ -d "$DOCS_FEATURES_DIR" ]]; then
+                            echo "  • options     - Options macro and stdopts feature"
+                            echo "  • colors      - Color system and visual output"
+                            echo "  • strings     - String manipulation and utilities"
+                            echo "  • bash        - Bash integration and execution"
+                            echo "  • global      - Global context and state management"
+                            echo "  • (and $(ls "$DOCS_FEATURES_DIR"/*.md 2>/dev/null | wc -l) more...)"
+                        fi
+                        echo
+                        echo "Quick Access Examples:"
+                        echo "  test.sh docs org       - Show test organization requirements"
+                        echo "  test.sh docs howto     - Show testing guide"
+                        echo "  test.sh docs features  - List all features"
+                        echo "  test.sh docs options   - Show options feature documentation"
+                        echo
+                        echo "Architecture Overview:"
+                        echo "  test.sh docs rsb       - Complete RSB architecture docs"
+                    } | $BOXY --theme info --title "📚 RSB Documentation Hub" --width max
+                else
+                    echo "Core Documentation:"
+                    echo "  • org         - Test organization requirements and enforcement"
+                    echo "  • howto       - Testing HOWTO guide with examples and patterns"
+                    echo "  • rsb         - RSB architecture documentation (REBEL + RSB_ARCH)"
+                    echo
+                    echo "Feature Documentation:"
+                    echo "  • features    - List all available feature documentation"
+
+                    # Show first few features as examples
+                    if [[ -d "$DOCS_FEATURES_DIR" ]]; then
+                        echo "  • options     - Options macro and stdopts feature"
+                        echo "  • colors      - Color system and visual output"
+                        echo "  • strings     - String manipulation and utilities"
+                        echo "  • bash        - Bash integration and execution"
+                        echo "  • global      - Global context and state management"
+                        echo "  • (and $(ls "$DOCS_FEATURES_DIR"/*.md 2>/dev/null | wc -l) more...)"
+                    fi
+                    echo
+                    echo "Quick Access Examples:"
+                    echo "  test.sh docs org       - Show test organization requirements"
+                    echo "  test.sh docs howto     - Show testing guide"
+                    echo "  test.sh docs features  - List all features"
+                    echo "  test.sh docs options   - Show options feature documentation"
+                    echo
+                    echo "Architecture Overview:"
+                    echo "  test.sh docs rsb       - Complete RSB architecture docs"
+                fi
+                exit 0
+                ;;
+            "org"|"organization")
+                DOC_PATH="$DOCS_DEV_DIR/TEST_ORGANIZATION.md"
+                DOC_TITLE="📋 RSB Test Organization Requirements"
+                ;;
+            "howto"|"test")
+                DOC_PATH="$DOCS_DEV_DIR/HOWTO_TEST.md"
+                DOC_TITLE="🧪 RSB Testing HOWTO Guide"
+                ;;
+            "rsb"|"arch"|"architecture")
+                # Show both REBEL and RSB_ARCH docs
+                REBEL_PATH="$DOCS_DEV_DIR/REBEL.md"
+                ARCH_PATH="$DOCS_DEV_DIR/RSB_ARCH.md"
+
+                if [[ -f "$REBEL_PATH" && -f "$ARCH_PATH" ]]; then
+                    echo "🏗️ RSB ARCHITECTURE DOCUMENTATION"
+                    echo "=================================="
+                    echo
+                    if [[ -n "$BOXY" ]]; then
+                        cat "$REBEL_PATH" | $BOXY --theme info --title "📐 REBEL Architecture" --width max
+                        echo
+                        cat "$ARCH_PATH" | $BOXY --theme success --title "🏛️ RSB Architecture" --width max
+                    else
+                        echo "📐 REBEL ARCHITECTURE"
+                        echo "===================="
+                        cat "$REBEL_PATH"
+                        echo
+                        echo "🏛️ RSB ARCHITECTURE"
+                        echo "=================="
+                        cat "$ARCH_PATH"
+                    fi
+                    echo
+                    echo "📄 Document paths:"
+                    echo "   REBEL: $REBEL_PATH"
+                    echo "   RSB:   $ARCH_PATH"
+                else
+                    echo "❌ Error: Architecture documents not found"
+                    echo "   Looking for: $REBEL_PATH"
+                    echo "            or: $ARCH_PATH"
+                fi
+                exit 0
+                ;;
+            "features")
+                # List all feature documentation files
+                if [[ -d "$DOCS_FEATURES_DIR" ]]; then
+                    echo "🎯 RSB FEATURE DOCUMENTATION"
+                    echo "============================"
+                    echo
+                    if [[ -n "$BOXY" ]]; then
+                        {
+                            echo "Available feature documentation:"
+                            echo
+                            for feature_file in "$DOCS_FEATURES_DIR"/*.md; do
+                                if [[ -f "$feature_file" ]]; then
+                                    basename_file=$(basename "$feature_file" .md)
+                                    echo "  • $basename_file"
+                                fi
+                            done
+                            echo
+                            echo "Usage: test.sh docs <feature-name>"
+                            echo "Example: test.sh docs options"
+                        } | $BOXY --theme info --title "🎯 Available Features" --width max
+                    else
+                        echo "Available feature documentation:"
+                        for feature_file in "$DOCS_FEATURES_DIR"/*.md; do
+                            if [[ -f "$feature_file" ]]; then
+                                basename_file=$(basename "$feature_file" .md)
+                                echo "  • $basename_file"
+                            fi
+                        done
+                        echo
+                        echo "Usage: test.sh docs <feature-name>"
+                        echo "Example: test.sh docs options"
+                    fi
+                    echo
+                    echo "📄 Directory path: $DOCS_FEATURES_DIR"
+                else
+                    echo "❌ Error: Features directory not found at $DOCS_FEATURES_DIR"
+                fi
+                exit 0
+                ;;
+            *)
+                # Try to find a specific feature document
+                FEATURE_PATH="$DOCS_FEATURES_DIR/FEATURES_${DOC_TARGET^^}.md"
+                if [[ -f "$FEATURE_PATH" ]]; then
+                    DOC_PATH="$FEATURE_PATH"
+                    DOC_TITLE="🎯 RSB Feature: ${DOC_TARGET^^}"
+                else
+                    echo "❌ Error: Unknown documentation target: $DOC_TARGET"
+                    echo
+                    echo "Available options:"
+                    echo "  org, organization    - Test organization requirements"
+                    echo "  howto, test         - Testing HOWTO guide"
+                    echo "  rsb, arch           - RSB architecture documentation"
+                    echo "  features            - List all feature documentation"
+                    echo "  <feature-name>      - Show specific feature documentation"
+                    echo
+                    echo "Examples:"
+                    echo "  test.sh docs org"
+                    echo "  test.sh docs howto"
+                    echo "  test.sh docs rsb"
+                    echo "  test.sh docs features"
+                    echo "  test.sh docs options"
+                    exit 1
+                fi
+                ;;
+        esac
+
+        # Display the selected document
+        if [[ ! -f "$DOC_PATH" ]]; then
+            echo "❌ Error: Document not found at $DOC_PATH"
+            exit 1
+        fi
+
+        if [[ -n "$BOXY" ]]; then
+            cat "$DOC_PATH" | $BOXY --theme info --title "$DOC_TITLE" --width max
+        else
+            echo "$DOC_TITLE"
+            echo "$(echo "$DOC_TITLE" | sed 's/./-/g')"
+            echo
+            cat "$DOC_PATH"
+        fi
+
+        echo
+        echo "📄 Document path: $DOC_PATH"
+        ;;
+    "status")
+        # Default behavior - show help AND test organization status
+        show_help
+        echo
+        echo
+
+        echo "🔍 Test Organization Status"
+        echo "=========================="
+        echo
+
+        # Check for violations and show summary counts
+        if ! validate_test_structure 2>/dev/null; then
+            echo "⚠️ Found test organization violations - use 'test.sh lint' or 'test.sh --violations' for details"
+            echo
+        else
+            echo "✅ Test organization is compliant"
+            echo
+        fi
+
+        # Show available tests
+        list_tests
+        echo
+
+        # Show adhoc tests
+        list_adhoc_tests
         ;;
     "help"|"--help"|"-h")
         show_help

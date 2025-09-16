@@ -1,148 +1,506 @@
-# RSB Tests: Structure and Conventions
+# RSB Testing: HOWTO Guide
 
-Goals
-- Make tests self‑documenting and easy to run via `bin/test.sh`.
-- Avoid editing `test.sh` every time by using predictable wrappers and folders.
-- Support suites that matter to humans (sanity, uat) and to CI/AI (smoke, integration).
+**Updated**: 2025-09-16
+**Status**: Current Implementation
 
-Directory Layout
+## Quick Start
 
+```bash
+# View test organization requirements
+./bin/test.sh docs
+
+# Check test organization compliance
+./bin/test.sh lint
+
+# Run tests with status overview (default when no command given)
+./bin/test.sh
+
+# Run specific test categories
+./bin/test.sh run sanity
+./bin/test.sh run smoke
+./bin/test.sh run uat
+
+# List all available tests
+./bin/test.sh list
+
+# Work with experimental tests
+./bin/test.sh adhoc
+./bin/test.sh adhoc my_experiment
+```
+
+## Test Organization System
+
+RSB uses a **strict, enforced test organization system** following BASHFX Visual Friendliness Principles. All tests must follow the prescribed structure or they will be blocked from running.
+
+### Directory Structure (ENFORCED)
+
+```
 tests/
-- sanity/
-  - baseline.rs            # Visible demos (user‑friendly outputs)
-- features/
-  - colors/
-    - sanity.rs           # Functional coverage
-    - runtime.rs          # Env toggles, backgrounds, glyph behavior
-  - param/
-    - param_test.rs       # Comprehensive param! behaviors
-    - helpers.rs          # Helper layer tests
-- uat/
-  - colors.rs, colors_macros.rs, glyphs.rs, prompts.rs, visual.rs, param_uat.rs
-- sh/
-  - <name>.sh             # Shell‑based tests (executed directly)
-- old/                    # Legacy tests kept for reference
+├── unit/                    # Fast, isolated module tests (<1s each)
+│   └── <module>/           # One folder per src module
+│       └── *.rs            # Test files
+│
+├── sanity/                  # Core functionality validation (REQUIRED)
+│   └── <module>.rs         # One file per module, comprehensive coverage
+│
+├── smoke/                   # Minimal CI tests (<10s total runtime)
+│   └── core.rs             # Essential functionality only
+│   └── <module>.rs         # Optional module smoke tests
+│
+├── integration/             # Cross-module interaction tests
+│   └── <feature>.rs        # Tests by feature area (not module)
+│
+├── e2e/                     # End-to-end user workflow tests
+│   └── <workflow>.rs       # Complete user scenarios
+│   └── sh/                 # Shell-based e2e tests
+│       └── *.sh
+│
+├── uat/                     # User Acceptance Tests (VISUAL CEREMONY)
+│   └── <module>.rs         # Visual demonstrations per module
+│
+├── chaos/                   # Edge cases, stress tests, property tests
+│   └── <module>/           # Module-specific chaos tests
+│       └── *.rs
+│
+├── bench/                   # Performance benchmarks
+│   └── <module>.rs         # Module benchmarks
+│
+├── _adhoc/                  # Experimental tests (outside enforcement)
+│   └── *.rs, *.sh          # Temporary/experimental test files
+│
+├── _archive/                # Deprecated tests (prefixed with _)
+│   └── *.rs
+│
+└── sh/                      # Shell scripts for complex workflows
+    └── *.sh
+```
 
-Wrappers (Cargo integration tests)
-- Create a top‑level wrapper file for each module/suite you want to run from `test.sh`:
-  - `tests/<module>_<suite>.rs` (preferred) or named wrapper like `features_colors.rs`.
-  - Inside the wrapper, include submodules using `#[path = "<folder>/<file>.rs"]`.
-  - Examples:
-    - `tests/features_colors.rs` includes `features/colors/{sanity.rs,runtime.rs}`
-    - `tests/features_param.rs` includes `features/param/{param_test.rs,helpers.rs}`
-    - `tests/uat_main.rs` includes all files under `tests/uat/`
-    - `tests/sanity_main.rs` includes `sanity.rs` (core) and `sanity/baseline.rs`
+### Wrapper Files (tests/*.rs) - REQUIRED PATTERN
 
-Suites (per module)
-- `sanity`: quick but meaningful functional checks, with visible output where helpful
-- `smoke`: extremely fast checks (subset of sanity) for CI/AI fast lanes
-- `uat`: demos of user experience (color/glyph/prompt/visual/param demos)
-- `integration`: end‑to‑end or multi‑module flows
+All test wrapper files in `tests/` root must follow the strict naming pattern:
 
-Naming Convention (recommended)
-- Wrapper filename: `<module>_<suite>.rs`
-- Folder: `tests/<module>/<suite>/*.rs` (optional if you want more granularity)
-- `test.sh` auto‑discovers wrappers in `tests/*.rs` and runs them by wrapper base name.
-- Example: add `tests/pronto_sanity.rs`, then run `./bin/test.sh run pronto_sanity`.
+**Valid Examples:**
+- `sanity.rs` → includes all `tests/sanity/*.rs`
+- `sanity_com.rs` → includes `tests/sanity/com.rs`
+- `unit_math.rs` → includes `tests/unit/math/*.rs`
+- `uat_colors.rs` → includes `tests/uat/colors.rs`
 
-Feature Flags & Visuals
-- Visual tests require `--features visuals`. `test.sh` passes the right features for UAT and color suites.
-- Keep UAT and visuals out of default builds to avoid noisy output in CI unless explicitly requested.
+**Invalid Examples (BLOCKED):**
+- `com_sanity.rs` (wrong order)
+- `test_com.rs` (non-standard category)
+- `random_name.rs` (no pattern match)
 
-IMPORTANT! all tests must implement a sanity test (check core assumptions), and a visual uat test (show the commands being called and show the outputs)
+## Test Runner Commands
 
-Shell‑Based Tests
-- Place scripts under `tests/sh/`. They are runnable via `test.sh` by name:
-  - `./bin/test.sh run ceremony_runner` → runs `tests/sh/ceremony_runner.sh`.
-  - `./bin/test.sh run cli` → runs `tests/sh/cli_macros_e2e.sh` (CLI macros end‑to‑end)
+### Core Commands
 
-How to add a new test suite (example: tokens module)
-1) Create folder: `tests/tokens/sanity/*.rs` (optional: or just a single file).
-2) Add wrapper: `tests/tokens_sanity.rs` with:
-   ```rust
-   #[path = "tokens/sanity/basic.rs"]
-   mod tokens_sanity_basic;
-   ```
-3) Run: `./bin/test.sh list` (wrapper auto‑appears) then `./bin/test.sh run tokens_sanity`.
+```bash
+# Show help and current test status (default)
+./bin/test.sh
 
-Notes
-- Keep tests small and focused; baseline and UAT should demonstrate outputs clearly.
-- Prefer `#[cfg(feature = "...")]` guards for feature‑gated areas to keep default profile clean.
-- When reorganizing, wrappers let you change folder contents without updating `test.sh`.
- - For macro E2E coverage, see `tests/sh/cli_macros_e2e.sh` which drives `examples/cli_e2e.rs`.
+# Run specific tests
+./bin/test.sh run <test_name>
 
+# List available tests
+./bin/test.sh list
 
-# HOWTO: Run and Add Tests in RSB
+# Check test organization compliance
+./bin/test.sh lint
 
-Updated: 2025-09-15
+# Show detailed violation report
+./bin/test.sh --violations
 
-Purpose
-- Provide a quick, reliable way to run core and feature-gated tests.
-- Explain the test layout and how to add new suites without editing scripts.
+# Generate test organization report
+./bin/test.sh report
 
-Test Layout
-- Wrappers live at `tests/*.rs` and organize real tests under subfolders:
-  - Sanity: `tests/sanity_main.rs` includes `tests/sanity/*.rs`
-  - Features: `tests/features_<module>.rs` includes `tests/features/<module>/*.rs`
-  - UAT: `tests/uat_main.rs` includes `tests/uat/*.rs`
-  - Shell tests: `tests/sh/*.sh`
-- Keep tests small and visible. Prefer helper functions in modules over heavy test logic.
+# Display test organization requirements
+./bin/test.sh docs
+```
 
-Runner Usage (`bin/test.sh`)
-- `./bin/test.sh list` — list mapped and auto-discovered wrappers
-- `./bin/test.sh run smoke` — fast checks (core; skips visuals)
-- `./bin/test.sh run all` — full checks (enables visuals where needed)
-- Targeted runs (examples):
-  - `./bin/test.sh run sanity`
-  - `./bin/test.sh run param`
-  - `./bin/test.sh run colors`
-  - `./bin/test.sh run uat-colors`
-  - `./bin/test.sh run uat-visual`
-- Flags:
-  - `--verbose` — pass `-- --nocapture` to cargo where applicable
-  - `--comprehensive` — hint for broader runs (informational)
-  
-Timeouts and Non‑TTY
-- The runner uses a best‑effort timeout wrapper when `timeout`/`gtimeout` is available.
-  - Set `RSB_TEST_TIMEOUT=<seconds>` to override the default (600 seconds).
-- Interactive prompts are TTY‑aware and tests use non‑TTY fallbacks.
-  - In CI/non‑TTY, prompts return defaults immediately.
-  - You can also force non‑interactive behavior in tests by setting the global
-    context variable `opt_quiet` to `1`.
+### Enforcement Modes
 
-Cargo Equivalents
-- Default core tests (no visuals):
-  - `cargo test`
-- With visuals umbrella (colors + glyphs + prompts):
-  - `cargo test --features visuals`
-- With PTY-backed dev tests (optional):
-  - `cargo test --features dev-pty`
-- Individual wrappers:
-  - `cargo test --test sanity_main`
-  - `cargo test --features visuals --test features_colors`
-  - `cargo test --features visuals --test uat_main -- --nocapture`
+```bash
+# Strict mode (DEFAULT) - blocks tests if violations exist
+./bin/test.sh run sanity
 
-Visual Tests and Env
-- Visual suites require feature flags. The runner enables them; with cargo, add `--features visuals`.
-- Useful env vars (set before running):
-  - `RSB_COLOR=always|auto|never` — color policy
-  - `RSB_COLORS=simple,status,named[,bg]` — enable color sets and optional backgrounds
-- Glyphs and prompts are part of `visuals`. Use the umbrella unless optimizing footprint.
+# Override mode - run despite violations with warnings
+./bin/test.sh --override run sanity
 
-PTY-backed Tests (dev-only)
-- Enable the optional feature: `--features dev-pty`.
-- The PTY wrapper lives under `rsb::dev::pty` and is intended for testing real TTY behavior.
-- Example: run the included PTY sanity test
-  - `./bin/test.sh run dev_pty` (auto-discovers `tests/dev_pty.rs`)
-  - or `cargo test --test dev_pty --features dev-pty`
-  
+# Skip enforcement entirely (emergency bypass)
+./bin/test.sh --skip-enforcement run sanity
+```
 
-Adding New Suites
-- Create a wrapper: `tests/<module>_<suite>.rs` (e.g., `tests/features_string.rs`).
-- Place tests in `tests/<module>/<suite>/*.rs` (e.g., `tests/features/string/*.rs`).
-- The runner will auto-discover wrappers; no changes to `bin/test.sh` needed.
+### Adhoc Tests (Experimental)
 
-Conventions
-- Always add a minimal sanity test for each module.
-- For visual components, add a UAT that prints sample output; gate via features.
-- Keep module docs in `docs/tech/features/FEATURES_<NAME>.md` in sync with tests.
+```bash
+# List experimental tests
+./bin/test.sh adhoc
+
+# Run specific adhoc test
+./bin/test.sh adhoc my_experiment
+
+# Only list adhoc tests
+./bin/test.sh list-adhoc
+```
+
+## Test Categories
+
+| Category | Purpose | Max Runtime | Requirements |
+|----------|---------|-------------|--------------|
+| **sanity** | Core functionality validation | <30s total | **REQUIRED** for every module |
+| **smoke** | Minimal CI tests | <10s total | Essential functionality only |
+| **unit** | Fast, isolated tests per module | <1s each | One test per function/component |
+| **integration** | Cross-module interactions | <60s total | Feature-based organization |
+| **e2e** | Complete user workflows | <300s total | Real-world scenarios |
+| **uat** | Visual demonstrations | No limit | **REQUIRED** for every module |
+| **chaos** | Edge cases, stress tests | No limit | Property/fuzz testing |
+| **bench** | Performance benchmarks | No limit | Baseline measurements |
+
+### Required Tests Per Module
+
+**Every module MUST have:**
+1. **Sanity tests** - `tests/sanity/<module>.rs`
+2. **UAT tests** - `tests/uat/<module>.rs`
+
+Missing either will block all tests until created.
+
+## Visual Ceremony System
+
+RSB uses **shell-based ceremony** (not inline Rust code) following BASHFX principles with the boxy orchestrator for consistent visual presentation.
+
+### Ceremony Runner
+
+```bash
+# Run visual test ceremonies
+./tests/sh/ceremony.sh sanity          # Core functionality validation
+./tests/sh/ceremony.sh uat             # UAT with visual demonstrations
+./tests/sh/ceremony.sh smoke           # Quick CI tests
+./tests/sh/ceremony.sh all             # Complete test ceremony
+
+# List available ceremonies
+./tests/sh/ceremony.sh --list
+
+# Generate ceremony report
+./tests/sh/ceremony.sh --report
+```
+
+### Boxy Orchestrator Usage
+
+Use the shell ceremony system for boxy formatting - keep Rust tests simple:
+
+```bash
+# In your shell ceremony scripts, use the boxy orchestrator from test.sh
+source ./bin/test.sh
+
+# Available themes: info, success, warning, error
+boxy_display "Content text" "info" "Title"
+boxy_display "Success message" "success" "Results"
+boxy_display "Warning text" "warning" "Notice"
+boxy_display "Error details" "error" "Failure"
+
+# Nested boxy pattern for complex ceremonies
+echo "Inner content" | boxy --theme info --style ascii --width 80 | boxy --style rounded --width max
+```
+
+### UAT Test Pattern (REQUIRED FORMAT)
+
+UAT tests should be **simple Rust tests** that output clean text - let the ceremony system handle formatting:
+
+```rust
+#[test]
+fn uat_color_demonstrations() {
+    println!("Colors Module UAT Ceremony");
+    println!("==========================");
+
+    // UAT 1: Basic Color Output
+    println!("\nUAT 1: Basic Color Output");
+    println!("Command: red_text!(\"Error message\")");
+    println!("Expected: Red colored text output");
+    println!("Running...");
+    let result = red_text!("Error message");
+    println!("Output: {}", result);
+    println!("Status: PASS");
+
+    // UAT 2: Multiple Color Combinations
+    println!("\nUAT 2: Multiple Color Combinations");
+    println!("Command: green_text!(\"Success\") + yellow_text!(\"Warning\")");
+    println!("Expected: Green text followed by yellow text");
+    println!("Running...");
+    println!("Output: {} {}", green_text!("Success"), yellow_text!("Warning"));
+    println!("Status: PASS");
+
+    // UAT 3: Color with Background
+    println!("\nUAT 3: Color with Background");
+    println!("Command: bg_red!(\"Alert message\")");
+    println!("Expected: Text with red background");
+    println!("Running...");
+    println!("Output: {}", bg_red!("Alert message"));
+    println!("Status: PASS");
+
+    println!("\nUAT Ceremony Complete");
+}
+```
+
+### UAT Multiple Variations Pattern
+
+For testing multiple command variations - simple and clean:
+
+```rust
+#[test]
+fn uat_param_expansion_variations() {
+    println!("Parameter Expansion UAT Ceremony");
+    println!("=================================");
+
+    let test_cases = vec![
+        ("param!(\"HOME\")", "Environment variable expansion"),
+        ("param!(\"USER.name\")", "Nested property access"),
+        ("param!(\"app.version\", \"1.0.0\")", "Default value fallback"),
+    ];
+
+    for (i, (command, description)) in test_cases.iter().enumerate() {
+        println!("\nUAT {}: {}", i + 1, description);
+        println!("Command: {}", command);
+        println!("Expected: {}", description);
+        println!("Running...");
+
+        // Execute the actual command
+        let result = match i {
+            0 => param!("HOME"),
+            1 => param!("USER.name"),
+            2 => param!("app.version", "1.0.0"),
+            _ => unreachable!(),
+        };
+
+        println!("Output: {}", result);
+        println!("Status: PASS");
+    }
+
+    println!("\nUAT Ceremony Complete");
+}
+```
+
+### UAT Shell Script Pattern
+
+For shell-based UAT tests using nested boxy structure:
+
+```bash
+#!/usr/bin/env bash
+# tests/_adhoc/uat_example.sh
+
+# Build UAT sections with nested boxy
+build_uat_section() {
+    local content="$1"
+    local theme="$2"
+    echo "$content" | boxy --theme "$theme" --style ascii --width 80 | boxy --style rounded --width max
+}
+
+# Main ceremony container
+ceremony_content=""
+
+# UAT 1: Basic functionality
+uat1_content="
+UAT 1: Basic Command Execution
+Command: rsb param HOME
+Expected: User's home directory path
+Running...
+$(result=$(rsb param HOME); echo "Output: $result")
+Status: PASS"
+
+ceremony_content+=$(build_uat_section "$uat1_content" "info")
+
+# UAT 2: Error handling
+uat2_content="
+UAT 2: Error Handling
+Command: rsb param NONEXISTENT
+Expected: Error message with fallback
+Running...
+$(result=$(rsb param NONEXISTENT 2>&1 || echo "Error handled gracefully"); echo "Output: $result")
+Status: PASS"
+
+ceremony_content+=$(build_uat_section "$uat2_content" "warning")
+
+# UAT 3: Complex scenario
+uat3_content="
+UAT 3: Complex Parameter Chain
+Command: rsb param 'user.config.theme' 'dark'
+Expected: Theme setting with default fallback
+Running...
+$(result=$(rsb param 'user.config.theme' 'dark'); echo "Output: $result")
+Status: PASS"
+
+ceremony_content+=$(build_uat_section "$uat3_content" "success")
+
+# Output complete ceremony
+final_ceremony="RSB UAT: Example Module Demonstration
+
+$ceremony_content
+
+UAT Summary: All demonstrations completed successfully"
+
+echo "$final_ceremony" | boxy --style thick --width max --title "Example Module UAT Ceremony"
+```
+
+### Ceremony Integration
+
+The ceremony runner captures Rust test output and applies boxy formatting:
+
+```rust
+// tests/uat/colors.rs - Simple Rust test
+use rsb::prelude::*;
+
+#[test]
+fn colors_uat_ceremony() {
+    println!("Colors Module UAT Ceremony");
+    println!("==========================");
+
+    // UAT 1-3: Basic color functions
+    uat_basic_colors();
+
+    // UAT 4: Color combinations
+    uat_color_combinations();
+
+    // UAT 5: Background colors
+    uat_background_colors();
+
+    println!("\nUAT Ceremony Complete");
+}
+
+fn uat_basic_colors() {
+    let commands = vec![
+        ("red_text!(\"Error\")", red_text!("Error")),
+        ("green_text!(\"Success\")", green_text!("Success")),
+        ("blue_text!(\"Info\")", blue_text!("Info")),
+    ];
+
+    for (i, (cmd, output)) in commands.iter().enumerate() {
+        println!("\nUAT {}: Basic Color Function", i + 1);
+        println!("Command: {}", cmd);
+        println!("Expected: Colored text output");
+        println!("Running...");
+        println!("Output: {}", output);
+        println!("Status: PASS");
+    }
+}
+
+fn uat_color_combinations() {
+    println!("\nUAT 4: Color Combinations");
+    println!("Command: green_text!(\"Success\") + yellow_text!(\"Warning\")");
+    println!("Expected: Multiple colored outputs");
+    println!("Running...");
+    println!("Output: {} {}", green_text!("Success"), yellow_text!("Warning"));
+    println!("Status: PASS");
+}
+
+fn uat_background_colors() {
+    println!("\nUAT 5: Background Colors");
+    println!("Command: bg_red!(\"Alert\")");
+    println!("Expected: Text with colored background");
+    println!("Running...");
+    println!("Output: {}", bg_red!("Alert"));
+    println!("Status: PASS");
+}
+```
+
+Then the ceremony runner handles the visual formatting:
+
+```bash
+# The ceremony runner pipes Rust output through boxy
+cargo test --test uat_colors -- --nocapture | boxy --theme info --style rounded --width max
+```
+
+## Adding New Tests
+
+### 1. Create Test Files
+
+```bash
+# Create the actual test
+touch tests/sanity/new_module.rs
+
+# Create the wrapper (REQUIRED)
+touch tests/sanity_new_module.rs
+```
+
+### 2. Wrapper Content
+
+```rust
+// tests/sanity_new_module.rs
+#[path = "sanity/new_module.rs"]
+mod sanity_new_module;
+```
+
+### 3. Verify Compliance
+
+```bash
+# Check compliance
+./bin/test.sh lint
+
+# Run your new test
+./bin/test.sh run sanity_new_module
+```
+
+## Feature Flags and Visual Tests
+
+```bash
+# Visual tests with features
+export RSB_COLORS="simple,status,named"
+export RSB_COLOR="always"
+./bin/test.sh run uat-colors
+
+# Direct cargo equivalents (NOT RECOMMENDED - use test.sh)
+cargo test --features visuals --test uat_main -- --nocapture
+```
+
+## Working with Adhoc Tests
+
+For experimental or temporary tests that don't fit the organization:
+
+```bash
+# Create experimental test
+echo '#!/bin/bash\necho "Experimental test"' > tests/_adhoc/experiment.sh
+
+# Run it
+./bin/test.sh adhoc experiment
+
+# Clean up when done
+rm tests/_adhoc/experiment.sh
+```
+
+## Troubleshooting
+
+### Test Organization Violations
+
+```bash
+# See all violations with fix instructions
+./bin/test.sh --violations
+
+# Emergency bypass (shows warnings)
+./bin/test.sh --override run sanity
+
+# Skip enforcement entirely
+./bin/test.sh --skip-enforcement run sanity
+```
+
+### Common Issues
+
+1. **Missing sanity/UAT tests** - Every module needs both
+2. **Wrong wrapper naming** - Must follow `<category>_<module>.rs` pattern
+3. **Unauthorized root files** - Only approved patterns allowed in `tests/`
+4. **Missing category entries** - Need `sanity.rs`, `smoke.rs`, etc.
+
+## Key Principles
+
+1. **No Direct Cargo** - All testing flows through `test.sh`
+2. **Pattern Enforcement** - Strict naming and structure compliance
+3. **Visual Ceremony** - Shell-based visual presentation using boxy
+4. **Progressive Testing** - smoke → sanity → integration → e2e progression
+5. **Required Coverage** - Every module needs sanity AND UAT tests
+
+## Documentation
+
+- **Complete Requirements**: `./bin/test.sh docs`
+- **Organization Standard**: `docs/tech/development/TEST_ORGANIZATION.md`
+- **Module Specification**: `docs/tech/development/MODULE_SPEC.md`
+
+---
+
+**Remember**: The test organization system is **strictly enforced**. Tests will be blocked if the organization doesn't comply. Use `./bin/test.sh docs` to understand the complete requirements.
