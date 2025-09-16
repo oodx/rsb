@@ -130,6 +130,9 @@ validate_test_structure() {
         basename="${file##*/}"
         basename="${basename%.rs}"
 
+        # Skip excluded test files (starting with _ or dev_)
+        [[ "$basename" =~ ^(_|dev_) ]] && continue
+
         # Skip archive files
         [[ "$basename" =~ ^_ ]] && continue
 
@@ -139,17 +142,46 @@ validate_test_structure() {
         fi
     done
 
+    # Exclusion patterns for modules that don't need tests
+    # - Modules starting with _ are not ready
+    # - dev_* modules are experimental (except 'dev' itself which is a real module)
+    # - prelude* modules are re-exports
+    # - dummy_* modules are test helpers
+    local excluded_patterns=(
+        "_*"           # Not ready/WIP modules
+        "dev_*"        # Experimental modules (but 'dev' itself is real)
+        "prelude*"     # Re-export modules
+        "dummy_*"      # Test helper modules
+        "lib"          # Library entry point
+        "main"         # Binary entry point
+    )
+
+    # Function to check if module should be excluded
+    is_excluded_module() {
+        local module="$1"
+        for pattern in "${excluded_patterns[@]}"; do
+            if [[ "$module" == $pattern ]]; then
+                # Special case: 'dev' itself is not excluded, only dev_*
+                if [[ "$pattern" == "dev_*" && "$module" == "dev" ]]; then
+                    return 1  # Not excluded
+                fi
+                return 0  # Excluded
+            fi
+        done
+        return 1  # Not excluded
+    }
+
     # Check for required sanity tests - look for modules in src/ directory
     # Pattern 1: src/module.rs files (direct module files)
     for module_file in src/*.rs; do
         [[ ! -f "$module_file" ]] && continue
         module_name=$(basename "$module_file" .rs)
 
-        # Skip lib.rs and main.rs
-        [[ "$module_name" == "lib" || "$module_name" == "main" ]] && continue
+        # Skip excluded modules
+        is_excluded_module "$module_name" && continue
 
-        # Check for sanity test existence
-        if [[ ! -f "tests/sanity_${module_name}.rs" && ! -f "tests/sanity/${module_name}.rs" ]]; then
+        # Check for sanity test existence (3 patterns: wrapper, direct, or prefixed in folder)
+        if [[ ! -f "tests/sanity_${module_name}.rs" && ! -f "tests/sanity/${module_name}.rs" && ! -f "tests/sanity/sanity_${module_name}.rs" ]]; then
             missing_sanity_violations+=("$module_name")
         fi
     done
@@ -161,13 +193,16 @@ validate_test_structure() {
 
         module_name=$(basename "$module_dir")
 
-        # Check for sanity test existence
-        if [[ ! -f "tests/sanity_${module_name}.rs" && ! -f "tests/sanity/${module_name}.rs" ]]; then
+        # Skip excluded modules
+        is_excluded_module "$module_name" && continue
+
+        # Check for sanity test existence (3 patterns: wrapper, direct, or prefixed in folder)
+        if [[ ! -f "tests/sanity_${module_name}.rs" && ! -f "tests/sanity/${module_name}.rs" && ! -f "tests/sanity/sanity_${module_name}.rs" ]]; then
             missing_sanity_violations+=("$module_name")
         fi
 
-        # Check for UAT test existence (BOTH sanity AND uat required)
-        if [[ ! -f "tests/uat_${module_name}.rs" && ! -f "tests/uat/${module_name}.rs" ]]; then
+        # Check for UAT test existence (3 patterns: wrapper, direct, or prefixed in folder)
+        if [[ ! -f "tests/uat_${module_name}.rs" && ! -f "tests/uat/${module_name}.rs" && ! -f "tests/uat/uat_${module_name}.rs" ]]; then
             missing_uat_violations+=("$module_name")
         fi
     done
@@ -187,6 +222,9 @@ validate_test_structure() {
         # Remove both .rs and .sh extensions
         basename="${basename%.rs}"
         basename="${basename%.sh}"
+
+        # Skip excluded test files (starting with _ or dev_)
+        [[ "$basename" =~ ^(_|dev_) ]] && continue
 
         # Skip archive files
         [[ "$basename" =~ ^_ ]] && continue
