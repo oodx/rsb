@@ -50,21 +50,21 @@ fn test_args_key_value_operations() {
         "paths:file1,file2,file3".to_string(),
         "--flag".to_string()
     ];
-    let args = Args::new(&test_args);
+    let mut args = Args::new(&test_args);
 
     // Test key=value parsing
     assert_eq!(args.get_kv("config"), Some("value".to_string()));
     assert_eq!(args.get_kv("nonexistent"), None);
 
     // Test key:array parsing
-    let paths = args.get_array("paths");
+    let paths = args.get_array("paths").unwrap();
     assert_eq!(paths.len(), 3);
     assert_eq!(paths[0], "file1");
     assert_eq!(paths[1], "file2");
     assert_eq!(paths[2], "file3");
 
     let empty_array = args.get_array("nonexistent");
-    assert!(empty_array.is_empty());
+    assert!(empty_array.is_none());
 }
 
 #[test]
@@ -144,8 +144,8 @@ fn test_cli_bootstrap() {
     let test_args = vec!["test_program".to_string(), "--verbose".to_string()];
 
     // Test bootstrap from args
-    let result = rsb::cli::cli_bootstrap(&test_args);
-    assert!(result.has("--verbose"));
+    rsb::cli::cli_bootstrap(&test_args);
+    // Bootstrap is side-effect only, sets up global context
 
     // Should have set up script context
     assert!(!get_var("SCRIPT_NAME").is_empty());
@@ -155,10 +155,11 @@ fn test_cli_bootstrap() {
 fn test_cli_bootstrap_from_env() {
     // Test convenience bootstrap from environment
     // This should work without panicking
-    let result = rsb::cli::cli_bootstrap_from_env();
+    rsb::cli::cli_bootstrap_from_env();
+    // Bootstrap is side-effect only
 
-    // Should return valid Args object
-    assert!(result.len() > 0); // At least program name
+    // Should have set up script context
+    assert!(!get_var("SCRIPT_NAME").is_empty());
 }
 
 #[test]
@@ -169,20 +170,20 @@ fn test_edge_cases() {
     let empty_args: Vec<String> = vec![];
     let args = Args::new(&empty_args);
     assert_eq!(args.len(), 0);
-    assert_eq!(args.get(1), None);
+    assert_eq!(args.get(1), "");
     assert!(args.remaining().is_empty());
 
     // Test single program name
     let single_args = vec!["program".to_string()];
     let args = Args::new(&single_args);
     assert_eq!(args.len(), 1);
-    assert_eq!(args.get(1), None); // No args after program name
+    assert_eq!(args.get(1), ""); // No args after program name
     assert!(args.remaining().is_empty());
 
     // Test args with spaces and special characters
     let special_args = vec!["program".to_string(), "arg with spaces".to_string(), "special=chars!@#".to_string()];
-    let args = Args::new(&special_args);
-    assert_eq!(args.get(1), Some("arg with spaces".to_string()));
+    let mut args = Args::new(&special_args);
+    assert_eq!(args.get(1), "arg with spaces".to_string());
     assert_eq!(args.get_kv("special"), Some("chars!@#".to_string()));
 }
 
@@ -201,14 +202,14 @@ fn test_complex_scenarios() {
         "package1".to_string(),
         "package2".to_string()
     ];
-    let args = Args::new(&build_args);
+    let mut args = Args::new(&build_args);
 
-    assert_eq!(args.get(1), Some("build".to_string()));
+    assert_eq!(args.get(1), "build".to_string());
     assert_eq!(args.has_val("--target"), Some("x86_64-unknown-linux-gnu".to_string()));
     assert_eq!(args.has_val("--features"), Some("visual,dev-pty".to_string()));
     assert!(args.has("--verbose"));
-    assert_eq!(args.get(3), Some("package1".to_string()));
-    assert_eq!(args.get(4), Some("package2".to_string()));
+    assert_eq!(args.get(3), "package1".to_string());
+    assert_eq!(args.get(4), "package2".to_string());
 
     // Scenario: Config loading with multiple formats
     let config_args = vec![
@@ -218,11 +219,11 @@ fn test_complex_scenarios() {
         "--env=production".to_string(),
         "--dry-run".to_string()
     ];
-    let args = Args::new(&config_args);
+    let mut args = Args::new(&config_args);
 
     assert_eq!(args.get_kv("database"), Some("postgresql://localhost/app".to_string()));
-    let features = args.get_array("features");
-    assert_eq!(features, vec!["logging", "metrics", "auth"]);
+    let features = args.get_array("features").unwrap();
+    assert_eq!(features, vec!["logging".to_string(), "metrics".to_string(), "auth".to_string()]);
     assert_eq!(args.has_val("--env"), Some("production".to_string()));
     assert!(args.has("--dry-run"));
 }

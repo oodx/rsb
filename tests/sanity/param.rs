@@ -221,13 +221,15 @@ fn test_complex_param_scenarios() {
     assert!(config_path.contains("/myapp/config.production.json"));
 
     // Extract environment from config filename
-    let env = param!("CONFIG_FILE", prefix: "config.", suffix: ".json");
+    let env = param!("CONFIG_FILE", prefix: "config.");
+    let env = rsb::string::str_suffix(&env, ".json", false); // Chain operations
     assert_eq!(env, "production");
 
     // Scenario: Log file processing
     set_var("LOG_FILE", "app.2025-01-15.error.log");
 
-    let date_part = param!("LOG_FILE", prefix: "app.", suffix: ".error.log");
+    let date_part = param!("LOG_FILE", prefix: "app.");
+    let date_part = rsb::string::str_suffix(&date_part, ".error.log", false); // Chain operations
     assert_eq!(date_part, "2025-01-15");
 
     let extension = param!("LOG_FILE", prefix: "*.");
