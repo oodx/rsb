@@ -8,8 +8,8 @@
 //! Callers should not depend on these helpers directly unless building custom behavior.
 //! They exist to keep `param!` implementation clean and to allow staged evolution.
 
-pub mod basic;
 pub mod advanced;
+pub mod basic;
 pub mod macros;
 
 // Curated low-level surface for consumers

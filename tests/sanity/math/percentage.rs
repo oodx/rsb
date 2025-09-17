@@ -14,10 +14,10 @@ mod tests {
 
     #[test]
     fn test_percent_change() {
-        assert_eq!(percent_change(100.0, 150.0), 50.0);  // 50% increase
-        assert_eq!(percent_change(100.0, 75.0), -25.0);  // 25% decrease
-        assert_eq!(percent_change(100.0, 100.0), 0.0);   // no change
-        assert_eq!(percent_change(50.0, 100.0), 100.0);  // 100% increase
+        assert_eq!(percent_change(100.0, 150.0), 50.0); // 50% increase
+        assert_eq!(percent_change(100.0, 75.0), -25.0); // 25% decrease
+        assert_eq!(percent_change(100.0, 100.0), 0.0); // no change
+        assert_eq!(percent_change(50.0, 100.0), 100.0); // 100% increase
 
         // Edge case: from zero
         assert_eq!(percent_change(0.0, 0.0), 0.0);
@@ -67,6 +67,6 @@ mod tests {
         let width = 1920.0;
         let height = 1080.0;
         let aspect_ratio = ratio(width, height).unwrap();
-        assert!((aspect_ratio - 16.0/9.0).abs() < 0.001);
+        assert!((aspect_ratio - 16.0 / 9.0).abs() < 0.001);
     }
 }

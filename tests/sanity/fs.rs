@@ -209,7 +209,7 @@ fn test_file_metadata_operations() {
 
     // Parse meta keys
     rsb::fs::parse_meta_keys(test_file, "output.txt"); // Function returns (), doesn't return keys
-    // parse_meta_keys returns (), removed assertion
+                                                       // parse_meta_keys returns (), removed assertion
 
     // Clean up
     let _ = std::fs::remove_file(test_file);
@@ -233,7 +233,10 @@ fn test_directory_copy_operations() {
     // Verify copy worked
     assert!(rsb::fs::is_dir(target_dir));
     assert!(rsb::fs::is_file(&format!("{}/file1.txt", target_dir)));
-    assert!(rsb::fs::is_file(&format!("{}/subdir/file2.txt", target_dir)));
+    assert!(rsb::fs::is_file(&format!(
+        "{}/subdir/file2.txt",
+        target_dir
+    )));
 
     // Clean up
     rsb::fs::rm_rf(source_dir);

@@ -7,7 +7,9 @@ fn main() {
     if pre_dispatch!(&args, {
         "init" => cmd_init,
         "check" => cmd_check
-    }) { return; }
+    }) {
+        return;
+    }
 
     dispatch!(&args, {
         "greet" => cmd_greet,
@@ -24,7 +26,7 @@ fn cmd_init(_args: Args) -> i32 {
     0
 }
 
-fn cmd_check(_args: Args) -> i32 { 
+fn cmd_check(_args: Args) -> i32 {
     if !is_command("echo") {
         stderr!("echo not found in PATH");
         return 1;
@@ -48,7 +50,10 @@ fn cmd_greet(args: Args) -> i32 {
 fn cmd_add(args: Args) -> i32 {
     let a = args.get_or(1, "0");
     let b = args.get_or(2, "0");
-    if a.is_empty() || b.is_empty() { stderr!("Usage: add <a> <b>"); return 1; }
+    if a.is_empty() || b.is_empty() {
+        stderr!("Usage: add <a> <b>");
+        return 1;
+    }
     let sum = to_number!(&a) + to_number!(&b);
     echo!("{}", sum);
     0

@@ -89,9 +89,9 @@ fn sanity_global_function_registry() {
     register_function("test_func", "Test function description");
 
     let functions = list_functions();
-    let test_func_found = functions.iter().any(|(name, desc)| {
-        name == "test_func" && desc == "Test function description"
-    });
+    let test_func_found = functions
+        .iter()
+        .any(|(name, desc)| name == "test_func" && desc == "Test function description");
     assert!(test_func_found);
 }
 

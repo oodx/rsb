@@ -6,14 +6,15 @@ use rsb::prelude::*;
 #[cfg(feature = "dev-pty")]
 #[test]
 fn test_pty_basic_operations() {
-    use rsb::dev::{PtyOptions, spawn_pty};
+    use rsb::dev::{spawn_pty, PtyOptions};
 
     // Test basic PTY spawning and execution
-    let mut session = spawn_pty("echo hello", &PtyOptions::default())
-        .expect("PTY spawn should work");
+    let mut session =
+        spawn_pty("echo hello", &PtyOptions::default()).expect("PTY spawn should work");
 
     // Read output with timeout
-    let output = session.read_for(std::time::Duration::from_millis(500))
+    let output = session
+        .read_for(std::time::Duration::from_millis(500))
         .expect("Should be able to read PTY output");
 
     assert!(output.contains("hello"));
@@ -25,15 +26,15 @@ fn test_pty_basic_operations() {
 #[cfg(feature = "dev-pty")]
 #[test]
 fn test_pty_options_configuration() {
-    use rsb::dev::{PtyOptions, spawn_pty};
+    use rsb::dev::{spawn_pty, PtyOptions};
 
     // Test with custom PTY options
     let pty_opts = PtyOptions::default(); // Using defaults for now
 
-    let mut session = spawn_pty("printf test", &pty_opts)
-        .expect("PTY with options should work");
+    let mut session = spawn_pty("printf test", &pty_opts).expect("PTY with options should work");
 
-    let output = session.read_for(std::time::Duration::from_millis(300))
+    let output = session
+        .read_for(std::time::Duration::from_millis(300))
         .expect("Should read output");
 
     assert!(output.contains("test"));
@@ -44,20 +45,22 @@ fn test_pty_options_configuration() {
 #[cfg(feature = "dev-pty")]
 #[test]
 fn test_pty_session_lifecycle() {
-    use rsb::dev::{PtyOptions, spawn_pty};
+    use rsb::dev::{spawn_pty, PtyOptions};
 
     // Test complete PTY session lifecycle
-    let mut session = spawn_pty("echo lifecycle", &PtyOptions::default())
-        .expect("PTY spawn should work");
+    let mut session =
+        spawn_pty("echo lifecycle", &PtyOptions::default()).expect("PTY spawn should work");
 
     // Test reading
-    let output = session.read_for(std::time::Duration::from_millis(500))
+    let output = session
+        .read_for(std::time::Duration::from_millis(500))
         .expect("Should read successfully");
 
     assert!(output.contains("lifecycle"));
 
     // Test waiting for completion
-    let exit_status = session.wait()
+    let exit_status = session
+        .wait()
         .expect("Should be able to wait for completion");
 
     // Command should complete successfully
@@ -67,16 +70,16 @@ fn test_pty_session_lifecycle() {
 #[cfg(feature = "dev-pty")]
 #[test]
 fn test_pty_multiple_commands() {
-    use rsb::dev::{PtyOptions, spawn_pty};
+    use rsb::dev::{spawn_pty, PtyOptions};
 
     // Test running multiple commands
     let commands = vec!["echo first", "echo second", "printf third"];
 
     for cmd in commands {
-        let mut session = spawn_pty(cmd, &PtyOptions::default())
-            .expect("Command should spawn");
+        let mut session = spawn_pty(cmd, &PtyOptions::default()).expect("Command should spawn");
 
-        let output = session.read_for(std::time::Duration::from_millis(300))
+        let output = session
+            .read_for(std::time::Duration::from_millis(300))
             .expect("Should read output");
 
         assert!(!output.is_empty());
@@ -118,7 +121,7 @@ fn test_dev_module_feature_gating() {
 #[cfg(feature = "dev-pty")]
 #[test]
 fn test_pty_error_handling() {
-    use rsb::dev::{PtyOptions, spawn_pty};
+    use rsb::dev::{spawn_pty, PtyOptions};
 
     // Test with invalid command (should handle gracefully)
     let result = spawn_pty("nonexistent_command_12345", &PtyOptions::default());
@@ -137,7 +140,7 @@ fn test_pty_error_handling() {
 #[cfg(feature = "dev-pty")]
 #[test]
 fn test_pty_timeout_behavior() {
-    use rsb::dev::{PtyOptions, spawn_pty};
+    use rsb::dev::{spawn_pty, PtyOptions};
 
     // Test PTY timeout behavior
     let mut session = spawn_pty("sleep 0.1 && echo done", &PtyOptions::default())
@@ -158,15 +161,16 @@ fn test_pty_timeout_behavior() {
 #[cfg(feature = "dev-pty")]
 #[test]
 fn test_pty_integration_patterns() {
-    use rsb::dev::{PtyOptions, spawn_pty};
+    use rsb::dev::{spawn_pty, PtyOptions};
 
     // Test common PTY integration patterns
 
     // Pattern 1: Command with arguments
-    let mut session1 = spawn_pty("echo hello world", &PtyOptions::default())
-        .expect("Echo with args should work");
+    let mut session1 =
+        spawn_pty("echo hello world", &PtyOptions::default()).expect("Echo with args should work");
 
-    let output1 = session1.read_for(std::time::Duration::from_millis(300))
+    let output1 = session1
+        .read_for(std::time::Duration::from_millis(300))
         .expect("Should read output");
 
     assert!(output1.contains("hello"));
@@ -175,10 +179,11 @@ fn test_pty_integration_patterns() {
     let _ = session1.wait();
 
     // Pattern 2: Command with special characters
-    let mut session2 = spawn_pty("printf 'special\\nchars'", &PtyOptions::default())
-        .expect("Printf should work");
+    let mut session2 =
+        spawn_pty("printf 'special\\nchars'", &PtyOptions::default()).expect("Printf should work");
 
-    let output2 = session2.read_for(std::time::Duration::from_millis(300))
+    let output2 = session2
+        .read_for(std::time::Duration::from_millis(300))
         .expect("Should read printf output");
 
     assert!(output2.contains("special"));
@@ -193,7 +198,7 @@ fn test_dev_module_documentation_compliance() {
 
     #[cfg(feature = "dev-pty")]
     {
-        use rsb::dev::{PtyOptions, PtySession, spawn_pty};
+        use rsb::dev::{spawn_pty, PtyOptions, PtySession};
 
         // Test that the documented types exist
         let _options: PtyOptions = PtyOptions::default();

@@ -8,14 +8,5 @@
 //! See docs/development/MODULE_SPECIFICATION.md for module exposure guidelines.
 
 pub use crate::param::basic::{
-    get,
-    sub as sub_abs,
-    sub_rel,
-    prefix,
-    suffix,
-    replace,
-    upper,
-    lower,
-    len,
+    get, len, lower, prefix, replace, sub as sub_abs, sub_rel, suffix, upper,
 };
-

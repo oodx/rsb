@@ -1,6 +1,6 @@
 //! Token UAT - User Acceptance Tests demonstrating token processing functionality
 
-use rsb::token::{tokenize_string, is_token_streamable, TokenStreamable, utils};
+use rsb::token::{is_token_streamable, tokenize_string, utils, TokenStreamable};
 
 #[test]
 fn uat_tokens_basic_parsing_demo() {
@@ -14,16 +14,21 @@ fn uat_tokens_basic_parsing_demo() {
         Ok(tokens) => {
             println!("✅ Parsed {} tokens:", tokens.len());
             for (i, token) in tokens.iter().enumerate() {
-                println!("  {}. {} = {} (namespace: {:?})",
-                    i + 1, token.key, token.value,
-                    token.namespace.as_ref().map(|ns| ns.to_string()));
+                println!(
+                    "  {}. {} = {} (namespace: {:?})",
+                    i + 1,
+                    token.key,
+                    token.value,
+                    token.namespace.as_ref().map(|ns| ns.to_string())
+                );
             }
         }
         Err(e) => println!("❌ Parse error: {}", e),
     }
 
     // Demo 2: Namespace parsing
-    let input2 = r#"app="MyApp"; db:host="database.example.com"; db:port="5432"; cache:enabled="true";"#;
+    let input2 =
+        r#"app="MyApp"; db:host="database.example.com"; db:port="5432"; cache:enabled="true";"#;
     println!("\nInput with namespaces: {}", input2);
 
     match tokenize_string(input2) {
@@ -207,9 +212,18 @@ fn uat_tokens_xstream_demo() {
     // Show that RSB can parse XStream-style token formats
     let xstream_examples = vec![
         (r#"host="localhost"; port="8080";"#, "Basic key=value"),
-        (r#"user="admin"; pass="secret"; ns=database; host="db.local";"#, "Mixed with ns= tokens"),
-        (r#"item="value1"; ns=animals; dog="fido"; cat="fluffy"; ns=global; final="done";"#, "Namespace switching"),
-        (r#"config.db:host="localhost"; auth.session:timeout="3600";"#, "Hierarchical namespaces"),
+        (
+            r#"user="admin"; pass="secret"; ns=database; host="db.local";"#,
+            "Mixed with ns= tokens",
+        ),
+        (
+            r#"item="value1"; ns=animals; dog="fido"; cat="fluffy"; ns=global; final="done";"#,
+            "Namespace switching",
+        ),
+        (
+            r#"config.db:host="localhost"; auth.session:timeout="3600";"#,
+            "Hierarchical namespaces",
+        ),
     ];
 
     for (input, description) in xstream_examples {

@@ -1,28 +1,24 @@
 // --- I/O Macros (core, visual macros split to macros/visual.rs) ---
 // Namespaced re-exports for selective imports
-pub use crate::{readline, stderr, echo, printf};
+pub use crate::{echo, printf, readline, stderr};
 #[macro_export]
 macro_rules! readline {
-    () => {
-        {
-            let mut input = String::new();
-            match std::io::stdin().read_line(&mut input) {
-                Ok(_) => input.trim().to_string(),
-                Err(_) => String::new(),
-            }
+    () => {{
+        let mut input = String::new();
+        match std::io::stdin().read_line(&mut input) {
+            Ok(_) => input.trim().to_string(),
+            Err(_) => String::new(),
         }
-    };
-    ($prompt:expr) => {
-        {
-            eprint!("{}", $prompt);
-            let _ = std::io::stderr().flush();
-            let mut input = String::new();
-            match std::io::stdin().read_line(&mut input) {
-                Ok(_) => input.trim().to_string(),
-                Err(_) => String::new(),
-            }
+    }};
+    ($prompt:expr) => {{
+        eprint!("{}", $prompt);
+        let _ = std::io::stderr().flush();
+        let mut input = String::new();
+        match std::io::stdin().read_line(&mut input) {
+            Ok(_) => input.trim().to_string(),
+            Err(_) => String::new(),
         }
-    };
+    }};
 }
 
 #[macro_export]

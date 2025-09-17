@@ -1,5 +1,5 @@
-use rsb::prelude::*;
 use assert_fs::TempDir;
+use rsb::prelude::*;
 
 #[test]
 fn uat_hosts_env_demo() {
@@ -19,12 +19,21 @@ fn uat_hosts_env_demo() {
 
     println!("env_bootstrap(): import + modes");
     rsb::hosts::env_bootstrap();
-    println!("is_true(QUIET_MODE) => {}", rsb::global::is_true("QUIET_MODE"));
+    println!(
+        "is_true(QUIET_MODE) => {}",
+        rsb::global::is_true("QUIET_MODE")
+    );
 
     println!("Mirroring via set_env_var('TEST_UAT_B','xyz')...");
     rsb::hosts::set_env_var("TEST_UAT_B", "xyz");
-    println!("Global TEST_UAT_B => {}", rsb::global::get_var("TEST_UAT_B"));
-    println!("Env TEST_UAT_B => {}", std::env::var("TEST_UAT_B").unwrap_or_default());
+    println!(
+        "Global TEST_UAT_B => {}",
+        rsb::global::get_var("TEST_UAT_B")
+    );
+    println!(
+        "Env TEST_UAT_B => {}",
+        std::env::var("TEST_UAT_B").unwrap_or_default()
+    );
 
     assert_eq!(v, "123");
     assert!(rsb::global::is_true("QUIET_MODE"));
@@ -35,7 +44,18 @@ fn uat_hosts_paths_demo() {
     println!("\n=== UAT: Host Paths (XDG + RSB) ===");
     let tmp = TempDir::new().unwrap();
     std::env::set_var("HOME", tmp.path());
-    for k in ["XDG_CONFIG_HOME","XDG_CACHE_HOME","XDG_DATA_HOME","XDG_HOME","XDG_LIB_HOME","XDG_ETC_HOME","XDG_BIN_HOME","XDG_TMP"] { std::env::remove_var(k); }
+    for k in [
+        "XDG_CONFIG_HOME",
+        "XDG_CACHE_HOME",
+        "XDG_DATA_HOME",
+        "XDG_HOME",
+        "XDG_LIB_HOME",
+        "XDG_ETC_HOME",
+        "XDG_BIN_HOME",
+        "XDG_TMP",
+    ] {
+        std::env::remove_var(k);
+    }
 
     println!("Calling setup_xdg_paths()...");
     rsb::hosts::setup_xdg_paths();

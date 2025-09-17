@@ -2,55 +2,105 @@
 
 #[macro_export]
 macro_rules! chmod {
-    ($path:expr, $mode:expr) => { $crate::fs::chmod($path, $mode).ok() };
+    ($path:expr, $mode:expr) => {
+        $crate::fs::chmod($path, $mode).ok()
+    };
 }
 
 #[macro_export]
 macro_rules! backup {
-    ($path:expr, $suffix:expr) => { $crate::fs::backup_file($path, $suffix).ok() };
+    ($path:expr, $suffix:expr) => {
+        $crate::fs::backup_file($path, $suffix).ok()
+    };
 }
 
 #[macro_export]
 macro_rules! tmp {
-    () => { $crate::fs::create_temp_file_path("random") };
-    ($type:ident) => { $crate::fs::create_temp_file_path(stringify!($type)) };
+    () => {
+        $crate::fs::create_temp_file_path("random")
+    };
+    ($type:ident) => {
+        $crate::fs::create_temp_file_path(stringify!($type))
+    };
 }
 
 #[macro_export]
-macro_rules! cap_stream { ($stream:expr) => { $crate::fs::capture_stream_to_temp_file(&mut $stream) }; }
+macro_rules! cap_stream {
+    ($stream:expr) => {
+        $crate::fs::capture_stream_to_temp_file(&mut $stream)
+    };
+}
 #[macro_export]
-macro_rules! subst { ($stream:expr) => { $crate::cap_stream!($stream) }; }
+macro_rules! subst {
+    ($stream:expr) => {
+        $crate::cap_stream!($stream)
+    };
+}
 
 // --- Dictionary Macros ---
 #[macro_export]
 macro_rules! dict {
-    ($path:expr) => { $crate::fs::load_dict_from_file($path) };
+    ($path:expr) => {
+        $crate::fs::load_dict_from_file($path)
+    };
 }
 
 // --- WC-like counters (string and file) ---
 #[macro_export]
-macro_rules! wc { ($content:expr) => { $crate::fs::wc_string($content) }; }
+macro_rules! wc {
+    ($content:expr) => {
+        $crate::fs::wc_string($content)
+    };
+}
 
 #[macro_export]
-macro_rules! wc_lines { ($content:expr) => { $crate::fs::count_lines_str($content) }; }
+macro_rules! wc_lines {
+    ($content:expr) => {
+        $crate::fs::count_lines_str($content)
+    };
+}
 
 #[macro_export]
-macro_rules! wc_words { ($content:expr) => { $crate::fs::count_words_str($content) }; }
+macro_rules! wc_words {
+    ($content:expr) => {
+        $crate::fs::count_words_str($content)
+    };
+}
 
 #[macro_export]
-macro_rules! wc_chars { ($content:expr) => { $crate::fs::count_chars_str($content) }; }
+macro_rules! wc_chars {
+    ($content:expr) => {
+        $crate::fs::count_chars_str($content)
+    };
+}
 
 #[macro_export]
-macro_rules! wc_file { ($path:expr) => { $crate::fs::wc_file_string($path) }; }
+macro_rules! wc_file {
+    ($path:expr) => {
+        $crate::fs::wc_file_string($path)
+    };
+}
 
 #[macro_export]
-macro_rules! wc_lines_file { ($path:expr) => { $crate::fs::count_lines_file($path) }; }
+macro_rules! wc_lines_file {
+    ($path:expr) => {
+        $crate::fs::count_lines_file($path)
+    };
+}
 
 #[macro_export]
-macro_rules! wc_words_file { ($path:expr) => { $crate::fs::count_words_file($path) }; }
+macro_rules! wc_words_file {
+    ($path:expr) => {
+        $crate::fs::count_words_file($path)
+    };
+}
 
 #[macro_export]
-macro_rules! wc_chars_file { ($path:expr) => { $crate::fs::count_chars_file($path) }; }
+macro_rules! wc_chars_file {
+    ($path:expr) => {
+        $crate::fs::count_chars_file($path)
+    };
+}
 
 // File-based sed macros moved to parse::macros as an adapter over fs
 
@@ -170,7 +220,11 @@ macro_rules! unpack {
 
 // --- Path utility macros ---
 #[macro_export]
-macro_rules! path_canon { ($path:expr) => {{ $crate::fs::path_canon($path).unwrap_or_default() }}; }
+macro_rules! path_canon {
+    ($path:expr) => {{
+        $crate::fs::path_canon($path).unwrap_or_default()
+    }};
+}
 
 #[macro_export]
 macro_rules! path_split {
@@ -184,4 +238,8 @@ macro_rules! path_split {
 
 // --- Metadata parsing macro ---
 #[macro_export]
-macro_rules! meta_keys { ($path:expr, into: $name:expr) => {{ $crate::fs::parse_meta_keys($path, $name); }}; }
+macro_rules! meta_keys {
+    ($path:expr, into: $name:expr) => {{
+        $crate::fs::parse_meta_keys($path, $name);
+    }};
+}

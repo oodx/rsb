@@ -14,4 +14,3 @@ fn uat_bash_basic_demo() {
     let zip_list = rsb::bash::list_zip("/no/such/file.zip");
     println!("unzip -l status: {}", zip_list.status);
 }
-

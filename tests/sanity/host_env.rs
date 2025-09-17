@@ -13,7 +13,10 @@ fn sanity_host_env() {
     rsb::hosts::setup_standard_modes();
 
     // Visible outputs
-    println!("ENV SANITY_ENV_K => {}", rsb::global::get_var("SANITY_ENV_K"));
+    println!(
+        "ENV SANITY_ENV_K => {}",
+        rsb::global::get_var("SANITY_ENV_K")
+    );
     println!("MODE QUIET_MODE => {}", rsb::global::get_var("QUIET_MODE"));
 
     // Sanity asserts

@@ -1,5 +1,5 @@
-use rsb::prelude::*;
 use assert_fs::TempDir;
+use rsb::prelude::*;
 
 #[test]
 fn sanity_host_paths() {
@@ -7,7 +7,18 @@ fn sanity_host_paths() {
     // Use ephemeral HOME
     let tmp = TempDir::new().unwrap();
     std::env::set_var("HOME", tmp.path());
-    for k in ["XDG_CONFIG_HOME","XDG_CACHE_HOME","XDG_DATA_HOME","XDG_HOME","XDG_LIB_HOME","XDG_ETC_HOME","XDG_BIN_HOME","XDG_TMP"] { std::env::remove_var(k); }
+    for k in [
+        "XDG_CONFIG_HOME",
+        "XDG_CACHE_HOME",
+        "XDG_DATA_HOME",
+        "XDG_HOME",
+        "XDG_LIB_HOME",
+        "XDG_ETC_HOME",
+        "XDG_BIN_HOME",
+        "XDG_TMP",
+    ] {
+        std::env::remove_var(k);
+    }
 
     rsb::hosts::setup_xdg_paths();
     rsb::hosts::setup_rsb_paths();

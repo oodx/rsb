@@ -31,7 +31,10 @@ mod util;
 #[cfg(all(feature = "colors-named", not(feature = "colors-all")))]
 pub use named::*;
 
-#[cfg(all(feature = "colors-simple", not(any(feature = "colors-named", feature = "colors-all"))))]
+#[cfg(all(
+    feature = "colors-simple",
+    not(any(feature = "colors-named", feature = "colors-all"))
+))]
 pub use simple::*;
 
 #[cfg(feature = "colors-all")]
@@ -39,6 +42,6 @@ pub use {named::*, status::*};
 
 // Ergonomic, string-first API surface
 pub use registry::{
-    color, get_color, bg, colorize, colorize_bg,
-    color_enable, color_enable_with, color_mode, colored, get_all_colors,
+    bg, color, color_enable, color_enable_with, color_mode, colored, colorize, colorize_bg,
+    get_all_colors, get_color,
 };

@@ -27,4 +27,3 @@ fn sanity_baseline_param() {
     println!("FOO='{}'", param!("FOO"));
     println!("FOO no .txt => '{}'", param!("FOO", suffix: ".txt"));
 }
-

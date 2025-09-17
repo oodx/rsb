@@ -99,4 +99,3 @@ pub fn export_vars(path: &str) {
     }
     let _ = std::fs::write(&expanded_path, &content);
 }
-

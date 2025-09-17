@@ -1,5 +1,5 @@
 //! General Path Algebra and Manipulation
-//! 
+//!
 //! Pure path manipulation utilities - no environment discovery
 //! Focus on path operations, joining, splitting, canonicalization
 
@@ -7,7 +7,7 @@
 // pub fn path_join(base: &str, component: &str) -> String
 // Safely join path components, handling separators and edge cases
 
-// pub fn path_split(path: &str) -> Vec<String>  
+// pub fn path_split(path: &str) -> Vec<String>
 // Split path into individual components for traversal/analysis
 
 // pub fn path_canonical(path: &str) -> String
@@ -19,7 +19,7 @@
 // pub fn path_normalize(path: &str) -> String
 // Clean up path by removing redundant separators, ., .. references
 
-// TODO: Path validation utilities  
+// TODO: Path validation utilities
 // pub fn path_is_absolute(path: &str) -> bool
 // Check if path starts from filesystem root
 
@@ -39,7 +39,7 @@
 // pub fn path_basename(path: &str) -> String
 // Extract filename/last component from full path
 
-// pub fn path_dirname(path: &str) -> String  
+// pub fn path_dirname(path: &str) -> String
 // Extract directory portion, removing filename
 
 // pub fn path_extension(path: &str) -> String

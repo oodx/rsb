@@ -3,15 +3,15 @@
 //! Terminal-based progress display implementations.
 //! Framework-agnostic and extractable to RSB.
 
+use std::collections::HashMap;
 use std::io::{self, Write};
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::{Duration, Instant};
-use std::collections::HashMap;
 
-use super::core::{ProgressReporter, ProgressEvent, ProgressState};
+use super::core::{ProgressEvent, ProgressReporter, ProgressState};
 #[allow(unused_imports)]
-use super::styles::{ProgressStyle, SpinnerStyle, BarStyle, MessagePosition};
+use super::styles::{BarStyle, MessagePosition, ProgressStyle, SpinnerStyle};
 
 /// Configuration for terminal progress display
 #[derive(Debug, Clone)]
@@ -81,12 +81,10 @@ impl TerminalReporter {
         // Start spinner animation thread
         if use_unicode {
             let spinner_frame = reporter.spinner_frame.clone();
-            thread::spawn(move || {
-                loop {
-                    thread::sleep(Duration::from_millis(80));
-                    let mut frame = spinner_frame.lock().unwrap();
-                    *frame = (*frame + 1) % 10;
-                }
+            thread::spawn(move || loop {
+                thread::sleep(Duration::from_millis(80));
+                let mut frame = spinner_frame.lock().unwrap();
+                *frame = (*frame + 1) % 10;
             });
         }
 
@@ -308,7 +306,12 @@ impl TerminalReporter {
     }
 
     /// Render percentage-style progress
-    fn render_percentage(&self, event: &ProgressEvent, display: &TaskDisplay, total: u64) -> String {
+    fn render_percentage(
+        &self,
+        event: &ProgressEvent,
+        display: &TaskDisplay,
+        total: u64,
+    ) -> String {
         let percentage = if total > 0 {
             (event.current as f64 / total as f64) * 100.0
         } else {
@@ -347,7 +350,12 @@ impl TerminalReporter {
     }
 
     /// Render byte-style progress
-    fn render_bytes(&self, event: &ProgressEvent, display: &TaskDisplay, total_bytes: u64) -> String {
+    fn render_bytes(
+        &self,
+        event: &ProgressEvent,
+        display: &TaskDisplay,
+        total_bytes: u64,
+    ) -> String {
         let current_str = self.format_bytes(event.current);
         let total_str = self.format_bytes(total_bytes);
         let percentage = if total_bytes > 0 {
@@ -363,16 +371,34 @@ impl TerminalReporter {
                 let elapsed = display.start_time.elapsed();
                 let rate = self.calculate_byte_rate(total_bytes, elapsed);
                 if self.config.use_colors {
-                    format!("\x1b[32m✓\x1b[0m {} {} ({}, {})", total_str, message, self.format_duration(elapsed), rate)
+                    format!(
+                        "\x1b[32m✓\x1b[0m {} {} ({}, {})",
+                        total_str,
+                        message,
+                        self.format_duration(elapsed),
+                        rate
+                    )
                 } else {
-                    format!("✓ {} {} ({}, {})", total_str, message, self.format_duration(elapsed), rate)
+                    format!(
+                        "✓ {} {} ({}, {})",
+                        total_str,
+                        message,
+                        self.format_duration(elapsed),
+                        rate
+                    )
                 }
             }
             ProgressState::Failed => {
                 if self.config.use_colors {
-                    format!("\x1b[31m✗ {}/{} ({:.1}%) {}\x1b[0m", current_str, total_str, percentage, message)
+                    format!(
+                        "\x1b[31m✗ {}/{} ({:.1}%) {}\x1b[0m",
+                        current_str, total_str, percentage, message
+                    )
                 } else {
-                    format!("✗ {}/{} ({:.1}%) {}", current_str, total_str, percentage, message)
+                    format!(
+                        "✗ {}/{} ({:.1}%) {}",
+                        current_str, total_str, percentage, message
+                    )
                 }
             }
             ProgressState::Running => {
@@ -385,18 +411,28 @@ impl TerminalReporter {
 
                 let eta = self.calculate_eta(event.current, total_bytes, elapsed);
                 if let Some(eta_str) = eta {
-                    format!("{}/{} ({:.1}%) {} - {} ETA: {}",
-                            current_str, total_str, percentage, message, rate, eta_str)
+                    format!(
+                        "{}/{} ({:.1}%) {} - {} ETA: {}",
+                        current_str, total_str, percentage, message, rate, eta_str
+                    )
                 } else {
-                    format!("{}/{} ({:.1}%) {} - {}",
-                            current_str, total_str, percentage, message, rate)
+                    format!(
+                        "{}/{} ({:.1}%) {} - {}",
+                        current_str, total_str, percentage, message, rate
+                    )
                 }
             }
             ProgressState::Cancelled => {
                 if self.config.use_colors {
-                    format!("\x1b[33m◐ {}/{} ({:.1}%) {}\x1b[0m", current_str, total_str, percentage, message)
+                    format!(
+                        "\x1b[33m◐ {}/{} ({:.1}%) {}\x1b[0m",
+                        current_str, total_str, percentage, message
+                    )
                 } else {
-                    format!("◐ {}/{} ({:.1}%) {}", current_str, total_str, percentage, message)
+                    format!(
+                        "◐ {}/{} ({:.1}%) {}",
+                        current_str, total_str, percentage, message
+                    )
                 }
             }
         }
@@ -503,8 +539,10 @@ impl ProgressReporter for TerminalReporter {
         }
 
         // Handle cursor visibility based on task state
-        let is_finished = matches!(event.state,
-            ProgressState::Complete | ProgressState::Failed | ProgressState::Cancelled);
+        let is_finished = matches!(
+            event.state,
+            ProgressState::Complete | ProgressState::Failed | ProgressState::Cancelled
+        );
 
         if !is_finished {
             // Hide cursor when first running task starts
@@ -614,8 +652,8 @@ impl From<SilentReporter> for TerminalReporter {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use super::super::core::ProgressEvent;
+    use super::*;
 
     #[test]
     fn test_terminal_reporter_creation() {
@@ -687,7 +725,12 @@ mod tests {
             state: ProgressState::Running,
         };
         let style = reporter.infer_style(&event);
-        assert!(matches!(style, ProgressStyle::Bytes { total_bytes: 2000000 }));
+        assert!(matches!(
+            style,
+            ProgressStyle::Bytes {
+                total_bytes: 2000000
+            }
+        ));
 
         // Test spinner inference
         let event = ProgressEvent {

@@ -22,9 +22,7 @@
 
 #[cfg(feature = "prompts")]
 pub use crate::visual::prompts::utils::{
-    confirm_with_timeout,
-    ask_with_timeout,
-    select_with_timeout,
+    ask_with_timeout, confirm_with_timeout, select_with_timeout,
 };
 
 // Future: Other visual utils can be added here

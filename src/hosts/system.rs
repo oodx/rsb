@@ -13,7 +13,8 @@ pub fn get_hostname() -> String {
 pub fn get_username() -> String {
     if let Ok(user) = std::env::var("USER") {
         user
-    } else if let Ok(user) = std::env::var("USERNAME") { // Windows
+    } else if let Ok(user) = std::env::var("USERNAME") {
+        // Windows
         user
     } else {
         // Fallback try whoami
@@ -26,10 +27,14 @@ pub fn get_username() -> String {
 }
 
 /// CPU architecture (x86_64, aarch64, etc.)
-pub fn get_arch() -> String { std::env::consts::ARCH.to_string() }
+pub fn get_arch() -> String {
+    std::env::consts::ARCH.to_string()
+}
 
 /// Operating system (linux, macos, windows)
-pub fn get_os() -> String { std::env::consts::OS.to_string() }
+pub fn get_os() -> String {
+    std::env::consts::OS.to_string()
+}
 
 /// Check if a command exists in PATH
 pub fn is_command(cmd: &str) -> bool {
@@ -41,7 +46,9 @@ pub fn is_command(cmd: &str) -> bool {
         .status()
         .map(|s| s.success())
         .unwrap_or(false)
-    { return true; }
+    {
+        return true;
+    }
 
     // command -v
     if std::process::Command::new("command")
@@ -52,7 +59,9 @@ pub fn is_command(cmd: &str) -> bool {
         .status()
         .map(|s| s.success())
         .unwrap_or(false)
-    { return true; }
+    {
+        return true;
+    }
 
     false
 }

@@ -21,4 +21,3 @@ fn sanity_threads_job_background_wait_list() {
     // Listing jobs should not panic
     let _ = rsb::threads::list_jobs();
 }
-

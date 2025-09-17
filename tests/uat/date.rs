@@ -34,18 +34,36 @@ fn uat_timestamp_utilities_demo() {
     println!("⏰ Current Timestamps:");
     println!("   Unix timestamp (s):  {}", ts);
     println!("   Unix timestamp (ms): {}", ts_ms);
-    println!("   Difference ratio:    {:.1}", ts_ms as f64 / (ts * 1000) as f64);
+    println!(
+        "   Difference ratio:    {:.1}",
+        ts_ms as f64 / (ts * 1000) as f64
+    );
 
     println!("\n🔄 Timestamp Formatting:");
-    println!("   Local time:  {}", rsb::date::format_time(ts, "%Y-%m-%d %H:%M:%S %Z"));
-    println!("   UTC time:    {}", rsb::date::format_time_utc(ts, "%Y-%m-%d %H:%M:%S UTC"));
-    println!("   Custom:      {}", rsb::date::format_time(ts, "%A, %B %d at %I:%M %p"));
+    println!(
+        "   Local time:  {}",
+        rsb::date::format_time(ts, "%Y-%m-%d %H:%M:%S %Z")
+    );
+    println!(
+        "   UTC time:    {}",
+        rsb::date::format_time_utc(ts, "%Y-%m-%d %H:%M:%S UTC")
+    );
+    println!(
+        "   Custom:      {}",
+        rsb::date::format_time(ts, "%A, %B %d at %I:%M %p")
+    );
 
     // Demonstrate historical timestamp
     let historical = 1640995200; // 2022-01-01 00:00:00 UTC
     println!("\n📜 Historical Timestamp Demo ({}):", historical);
-    println!("   Local:       {}", rsb::date::format_time(historical, "%Y-%m-%d %H:%M:%S"));
-    println!("   UTC:         {}", rsb::date::format_time_utc(historical, "%Y-%m-%d %H:%M:%S"));
+    println!(
+        "   Local:       {}",
+        rsb::date::format_time(historical, "%Y-%m-%d %H:%M:%S")
+    );
+    println!(
+        "   UTC:         {}",
+        rsb::date::format_time_utc(historical, "%Y-%m-%d %H:%M:%S")
+    );
 }
 
 #[test]
@@ -57,18 +75,30 @@ fn uat_time_differences_demo() {
         ("1 hour ago", "2024-01-01T10:00:00Z", "2024-01-01T11:00:00Z"),
         ("1 day", "2024-01-01T12:00:00Z", "2024-01-02T12:00:00Z"),
         ("Complex", "2024-01-01T09:15:30Z", "2024-01-03T14:45:45Z"),
-        ("Just seconds", "2024-01-01T12:00:00Z", "2024-01-01T12:00:42Z"),
+        (
+            "Just seconds",
+            "2024-01-01T12:00:00Z",
+            "2024-01-01T12:00:42Z",
+        ),
     ];
 
     println!("⏳ Time Difference Calculations:");
     for (desc, start, end) in samples {
         let diff = rsb::date::time_diff(start, end);
-        println!("   {:<12} {} → {}", desc, diff, end.split('T').next().unwrap());
+        println!(
+            "   {:<12} {} → {}",
+            desc,
+            diff,
+            end.split('T').next().unwrap()
+        );
     }
 
     // Demo with invalid inputs
     println!("\n❌ Error Handling:");
-    println!("   Invalid input: {}", rsb::date::time_diff("invalid", "2024-01-01T12:00:00Z"));
+    println!(
+        "   Invalid input: {}",
+        rsb::date::time_diff("invalid", "2024-01-01T12:00:00Z")
+    );
 }
 
 #[test]
@@ -86,7 +116,12 @@ fn uat_human_readable_dates_demo() {
     println!("👥 Human Date Descriptions:");
     for (desc, date_str) in samples {
         let human = rsb::date::human_date(date_str);
-        println!("   {:<12} {} ({})", desc, human, date_str.split('T').next().unwrap());
+        println!(
+            "   {:<12} {} ({})",
+            desc,
+            human,
+            date_str.split('T').next().unwrap()
+        );
     }
 
     println!("\n⏰ Time Until Dates:");
@@ -119,7 +154,10 @@ fn uat_date_parsing_demo() {
         match rsb::date::parse_time(date_str, format) {
             Ok(timestamp) => {
                 let formatted = rsb::date::format_time_utc(timestamp, "%Y-%m-%d %H:%M:%S UTC");
-                println!("   {:<12} '{}' → {} (ts: {})", desc, date_str, formatted, timestamp);
+                println!(
+                    "   {:<12} '{}' → {} (ts: {})",
+                    desc, date_str, formatted, timestamp
+                );
             }
             Err(e) => {
                 println!("   {:<12} '{}' → ERROR: {}", desc, date_str, e);
@@ -168,7 +206,10 @@ fn uat_date_macro_integration_demo() {
     let current_ts = get_var("TIMESTAMP").parse::<i64>().unwrap_or(0);
     if current_ts > 0 {
         let one_hour_later = current_ts + 3600;
-        println!("   One hour later      = {}", rsb::date::format_time_utc(one_hour_later, "%Y-%m-%d %H:%M:%S UTC"));
+        println!(
+            "   One hour later      = {}",
+            rsb::date::format_time_utc(one_hour_later, "%Y-%m-%d %H:%M:%S UTC")
+        );
     }
 
     println!("\n✅ Date module successfully integrated with RSB context system!");

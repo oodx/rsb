@@ -16,7 +16,7 @@
 //! let _ = sess.wait();
 //! ```
 
-use std::io::{Read, Write, Error as IoError, ErrorKind};
+use std::io::{Error as IoError, ErrorKind, Read, Write};
 use std::sync::mpsc;
 use std::thread;
 use std::time::Duration;
@@ -32,7 +32,11 @@ pub struct PtyOptions {
 
 impl Default for PtyOptions {
     fn default() -> Self {
-        Self { cols: 80, rows: 24, cwd: None }
+        Self {
+            cols: 80,
+            rows: 24,
+            cwd: None,
+        }
     }
 }
 
@@ -63,12 +67,16 @@ impl PtySession {
         thread::spawn(move || {
             let mut buf = [0u8; 4096];
             match reader.read(&mut buf) {
-                Ok(0) => { let _ = tx.send(Ok(String::new())); }
+                Ok(0) => {
+                    let _ = tx.send(Ok(String::new()));
+                }
                 Ok(n) => {
                     let s = String::from_utf8_lossy(&buf[..n]).to_string();
                     let _ = tx.send(Ok(s));
                 }
-                Err(e) => { let _ = tx.send(Err(e)); }
+                Err(e) => {
+                    let _ = tx.send(Err(e));
+                }
             }
         });
 
@@ -81,7 +89,12 @@ impl PtySession {
     /// Resize the PTY.
     pub fn resize(&mut self, cols: u16, rows: u16) -> std::io::Result<()> {
         self.master
-            .resize(PtySize { rows, cols, pixel_width: 0, pixel_height: 0 })
+            .resize(PtySize {
+                rows,
+                cols,
+                pixel_width: 0,
+                pixel_height: 0,
+            })
             .map_err(to_io_err)
     }
 
@@ -101,7 +114,12 @@ impl PtySession {
 pub fn spawn_pty(command: &str, opts: &PtyOptions) -> std::io::Result<PtySession> {
     let pty_system = native_pty_system();
     let pair = pty_system
-        .openpty(PtySize { rows: opts.rows, cols: opts.cols, pixel_width: 0, pixel_height: 0 })
+        .openpty(PtySize {
+            rows: opts.rows,
+            cols: opts.cols,
+            pixel_width: 0,
+            pixel_height: 0,
+        })
         .map_err(to_io_err)?;
 
     let mut cmd = CommandBuilder::new("sh");
@@ -114,7 +132,10 @@ pub fn spawn_pty(command: &str, opts: &PtyOptions) -> std::io::Result<PtySession
     let child = pair.slave.spawn_command(cmd).map_err(to_io_err)?;
     drop(pair.slave); // Close slave in parent
 
-    Ok(PtySession { master: pair.master, child })
+    Ok(PtySession {
+        master: pair.master,
+        child,
+    })
 }
 
 fn to_io_err<E: std::fmt::Display>(e: E) -> IoError {

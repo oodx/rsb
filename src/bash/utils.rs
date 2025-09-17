@@ -30,15 +30,27 @@ pub fn curl_post(url: &str, data: &str) -> CmdResult {
 // Friendly curl-style namespace aliases
 pub mod curl {
     use super::*;
-    pub fn get(url: &str) -> CmdResult { curl_get(url) }
-    pub fn get_opts(url: &str, options: &str) -> CmdResult { curl_get_with_options(url, options) }
-    pub fn post(url: &str, data: &str) -> CmdResult { curl_post(url, data) }
+    pub fn get(url: &str) -> CmdResult {
+        curl_get(url)
+    }
+    pub fn get_opts(url: &str, options: &str) -> CmdResult {
+        curl_get_with_options(url, options)
+    }
+    pub fn post(url: &str, data: &str) -> CmdResult {
+        curl_post(url, data)
+    }
 }
 
 // Back-compat http_* names
-pub fn http_get(url: &str) -> CmdResult { curl_get(url) }
-pub fn http_get_with_options(url: &str, options: &str) -> CmdResult { curl_get_with_options(url, options) }
-pub fn http_post(url: &str, data: &str) -> CmdResult { curl_post(url, data) }
+pub fn http_get(url: &str) -> CmdResult {
+    curl_get(url)
+}
+pub fn http_get_with_options(url: &str, options: &str) -> CmdResult {
+    curl_get_with_options(url, options)
+}
+pub fn http_post(url: &str, data: &str) -> CmdResult {
+    curl_post(url, data)
+}
 
 // --- Archive Operations ---
 

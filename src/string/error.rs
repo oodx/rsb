@@ -5,13 +5,26 @@ use std::fmt::{Display, Formatter, Result as FmtResult};
 #[derive(Debug, Clone)]
 pub enum StringError {
     // General pattern/regex issues
-    InvalidPattern { pattern: String, reason: &'static str },
-    RegexCompile { pattern: String },
-    RegexReplace { pattern: String },
+    InvalidPattern {
+        pattern: String,
+        reason: &'static str,
+    },
+    RegexCompile {
+        pattern: String,
+    },
+    RegexReplace {
+        pattern: String,
+    },
 
     // Guards
-    SizeLimitExceeded { limit: usize, length: usize },
-    IndexOutOfBounds { index: isize, len: usize },
+    SizeLimitExceeded {
+        limit: usize,
+        length: usize,
+    },
+    IndexOutOfBounds {
+        index: isize,
+        len: usize,
+    },
 
     // Misc
     Utf8,

@@ -84,12 +84,14 @@ fn uat_dev_debugging_tools_demo() {
     {
         println!("Testing PTY development tools...");
 
-        use rsb::dev::{PtyOptions, spawn_pty};
+        use rsb::dev::{spawn_pty, PtyOptions};
 
         // Test basic PTY command execution
         println!("Testing basic PTY command execution...");
         let mut session = spawn_pty("echo 'PTY test successful'", &PtyOptions::default()).unwrap();
-        let output = session.read_for(std::time::Duration::from_millis(500)).unwrap();
+        let output = session
+            .read_for(std::time::Duration::from_millis(500))
+            .unwrap();
         println!("✓ PTY command output: {}", output.trim());
         let _ = session.wait();
 
@@ -99,8 +101,14 @@ fn uat_dev_debugging_tools_demo() {
         let temp_file = temp_dir.join(format!("pty_test_{}.txt", std::process::id()));
         let temp_file_str = temp_file.to_string_lossy().to_string();
 
-        let mut session = spawn_pty(&format!("echo 'PTY file test' > {}", temp_file_str), &PtyOptions::default()).unwrap();
-        let _ = session.read_for(std::time::Duration::from_millis(300)).unwrap();
+        let mut session = spawn_pty(
+            &format!("echo 'PTY file test' > {}", temp_file_str),
+            &PtyOptions::default(),
+        )
+        .unwrap();
+        let _ = session
+            .read_for(std::time::Duration::from_millis(300))
+            .unwrap();
         let _ = session.wait();
 
         // Verify file was created
@@ -118,7 +126,10 @@ fn uat_dev_debugging_tools_demo() {
 
         // Demonstrate debug state management using global variables
         set_var("RSB_DEV_MODE", "enabled");
-        println!("✓ Development mode enabled: {}", get_var("RSB_DEV_MODE").unwrap_or_default());
+        println!(
+            "✓ Development mode enabled: {}",
+            get_var("RSB_DEV_MODE").unwrap_or_default()
+        );
 
         // Demonstrate timing utilities
         let start = std::time::Instant::now();

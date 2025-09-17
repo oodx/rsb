@@ -3,7 +3,7 @@
 use rsb::prelude::*;
 
 #[cfg(feature = "prompts")]
-use rsb::visual::utils::*;  // Explicit utils namespace
+use rsb::visual::utils::*; // Explicit utils namespace
 
 fn main() {
     println!("=== RSB visual::utils Namespace Demo ===\n");
@@ -23,30 +23,44 @@ fn main() {
         println!("=== Explicit Utils Access (Advanced Usage) ===");
 
         // Direct function calls with explicit control
-        println!("1. confirm_with_timeout(\"Deploy?\", None, false) → {}",
-                confirm_with_timeout("Deploy?", None, false));
+        println!(
+            "1. confirm_with_timeout(\"Deploy?\", None, false) → {}",
+            confirm_with_timeout("Deploy?", None, false)
+        );
 
-        println!("2. confirm_with_timeout(\"Risky op?\", Some(1), true) → {}",
-                confirm_with_timeout("Risky op?", Some(1), true));
+        println!(
+            "2. confirm_with_timeout(\"Risky op?\", Some(1), true) → {}",
+            confirm_with_timeout("Risky op?", Some(1), true)
+        );
 
-        println!("3. ask_with_timeout(\"API Key\", Some(\"test\"), Some(2)) → {}",
-                ask_with_timeout("API Key", Some("test"), Some(2)));
+        println!(
+            "3. ask_with_timeout(\"API Key\", Some(\"test\"), Some(2)) → {}",
+            ask_with_timeout("API Key", Some("test"), Some(2))
+        );
 
-        println!("4. select_with_timeout(\"Env\", &[\"dev\", \"prod\"], Some(1), None) → {}",
-                select_with_timeout("Env", &["dev", "prod"], Some(1), None));
+        println!(
+            "4. select_with_timeout(\"Env\", &[\"dev\", \"prod\"], Some(1), None) → {}",
+            select_with_timeout("Env", &["dev", "prod"], Some(1), None)
+        );
 
         println!("\n=== Comparison: Utils vs Macros ===");
 
         println!("Utils approach (explicit):");
         let utils_result = confirm_with_timeout("Continue?", Some(5), false);
-        println!("  confirm_with_timeout(\"Continue?\", Some(5), false) → {}", utils_result);
+        println!(
+            "  confirm_with_timeout(\"Continue?\", Some(5), false) → {}",
+            utils_result
+        );
 
         println!("\nMacros approach (ergonomic):");
         use rsb::confirm_timeout;
         let macro_result = confirm_timeout!("Continue?", 5);
         println!("  confirm_timeout!(\"Continue?\", 5) → {}", macro_result);
 
-        println!("  → Both produce same result: {}", utils_result == macro_result);
+        println!(
+            "  → Both produce same result: {}",
+            utils_result == macro_result
+        );
 
         println!("\n=== When to Use Each Approach ===");
         println!("✅ **Macros** (recommended for most users):");
@@ -81,7 +95,10 @@ fn main() {
         #[cfg(feature = "colors-simple")]
         {
             use rsb::visual::colors::colored;
-            println!("\n{}", colored("{green}🎯 MODULE_SPEC Compliant Architecture Complete!{reset}"));
+            println!(
+                "\n{}",
+                colored("{green}🎯 MODULE_SPEC Compliant Architecture Complete!{reset}")
+            );
         }
 
         #[cfg(not(feature = "colors-simple"))]

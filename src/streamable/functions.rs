@@ -9,10 +9,10 @@ macro_rules! streamable {
     // Simple case: fn_name(stdin, arg1, arg2) => { body }
     ($fn_name:ident($stdin:ident, $($arg:ident: $arg_type:ty),*) => $body:block) => {
         pub struct $fn_name;
-        
+
         impl Streamable for $fn_name {
             type Args = ($($arg_type,)*);
-            
+
             fn stream_apply(stdin: &str, args: Self::Args) -> String {
                 let $stdin = stdin;
                 #[allow(unused_variables)]
@@ -46,11 +46,9 @@ streamable!(Trim(stdin,) => {
     stdin.trim().to_string()
 });
 
-
 streamable!(Length(stdin,) => {
     stdin.len().to_string()
 });
-
 
 // === ENCODING FUNCTIONS ===
 
@@ -127,9 +125,6 @@ pub fn url_decode_fn(input: &str, _args: ()) -> String {
 
 // === UNIX-STYLE STREAMABLES ===
 
-
-
-
 streamable!(Head(stdin, n: usize) => {
     stdin.lines().take(n).collect::<Vec<_>>().join("\n")
 });
@@ -163,7 +158,7 @@ streamable!(Unique(stdin,) => {
 
 streamable!(WordCount(stdin,) => {
     let lines = stdin.lines().count();
-    let words = stdin.split_whitespace().count(); 
+    let words = stdin.split_whitespace().count();
     let chars = stdin.chars().count();
     format!("{} {} {}", lines, words, chars)
 });
@@ -187,9 +182,6 @@ streamable!(SedLines(stdin, start: usize, end: usize) => {
         .to_string()
 });
 
-
-
-
 // Advanced streamables
 streamable!(Pipeline(stdin, commands: Vec<String>) => {
     let mut result = stdin.to_string();
@@ -200,9 +192,6 @@ streamable!(Pipeline(stdin, commands: Vec<String>) => {
     }
     result
 });
-
-
-
 
 #[cfg(test)]
 mod tests {
@@ -221,7 +210,7 @@ mod tests {
     fn test_function_style() {
         let result = replace_fn("hello world", ("world".to_string(), "rust".to_string()));
         assert_eq!(result, "hello rust");
-        
+
         let result = uppercase_fn(&result, ());
         assert_eq!(result, "HELLO RUST");
     }

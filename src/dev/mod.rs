@@ -11,4 +11,3 @@ pub mod pty;
 
 #[cfg(feature = "dev-pty")]
 pub use pty::*;
-

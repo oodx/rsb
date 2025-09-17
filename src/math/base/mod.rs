@@ -26,14 +26,12 @@ pub fn from_hex(hex_str: &str) -> Result<i64, String> {
 
 pub fn from_binary(bin_str: &str) -> Result<i64, String> {
     let cleaned = bin_str.trim_start_matches("0b").trim_start_matches("0B");
-    i64::from_str_radix(cleaned, 2)
-        .map_err(|_| format!("Could not parse '{}' as binary", bin_str))
+    i64::from_str_radix(cleaned, 2).map_err(|_| format!("Could not parse '{}' as binary", bin_str))
 }
 
 pub fn from_octal(oct_str: &str) -> Result<i64, String> {
     let cleaned = oct_str.trim_start_matches("0o").trim_start_matches("0O");
-    i64::from_str_radix(cleaned, 8)
-        .map_err(|_| format!("Could not parse '{}' as octal", oct_str))
+    i64::from_str_radix(cleaned, 8).map_err(|_| format!("Could not parse '{}' as octal", oct_str))
 }
 
 pub fn to_base(n: i64, base: u32) -> Result<String, String> {

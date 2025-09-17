@@ -19,7 +19,10 @@ fn uat_math_basic_arithmetic_demo() {
     }
 
     println!("   2^3           = {}", rsb::math::power(2.0, 3.0));
-    println!("   √16           = {}", rsb::math::sqrt(16.0).unwrap_or(-1.0));
+    println!(
+        "   √16           = {}",
+        rsb::math::sqrt(16.0).unwrap_or(-1.0)
+    );
     println!("   |−5|          = {}", rsb::math::abs(-5.0));
     println!("   min(5, 3)     = {}", rsb::math::min(5.0, 3.0));
     println!("   max(5, 3)     = {}", rsb::math::max(5.0, 3.0));
@@ -72,8 +75,14 @@ fn uat_math_integer_operations_demo() {
         Err(e) => println!("   25! → ERROR: {}", e),
     }
 
-    println!("   int_add(5, 3) = {}", rsb::math::int_add(5, 3).unwrap_or(-1));
-    println!("   int_mult(7,8) = {}", rsb::math::int_multiply(7, 8).unwrap_or(-1));
+    println!(
+        "   int_add(5, 3) = {}",
+        rsb::math::int_add(5, 3).unwrap_or(-1)
+    );
+    println!(
+        "   int_mult(7,8) = {}",
+        rsb::math::int_multiply(7, 8).unwrap_or(-1)
+    );
 }
 
 #[test]
@@ -93,14 +102,29 @@ fn uat_math_base_conversions_demo() {
     }
 
     println!("\n🔄 Parsing from different bases:");
-    println!("   from_hex('FF')     = {}", rsb::math::from_hex("FF").unwrap_or(0));
-    println!("   from_binary('1000') = {}", rsb::math::from_binary("1000").unwrap_or(0));
-    println!("   from_octal('100')   = {}", rsb::math::from_octal("100").unwrap_or(0));
-    println!("   from_base('2s', 36) = {}", rsb::math::from_base("2s", 36).unwrap_or(0));
+    println!(
+        "   from_hex('FF')     = {}",
+        rsb::math::from_hex("FF").unwrap_or(0)
+    );
+    println!(
+        "   from_binary('1000') = {}",
+        rsb::math::from_binary("1000").unwrap_or(0)
+    );
+    println!(
+        "   from_octal('100')   = {}",
+        rsb::math::from_octal("100").unwrap_or(0)
+    );
+    println!(
+        "   from_base('2s', 36) = {}",
+        rsb::math::from_base("2s", 36).unwrap_or(0)
+    );
 
     println!("\n🚀 Direct Base Conversion:");
     let binary_to_hex = rsb::math::base_convert("11111111", 2, 16);
-    println!("   Binary '11111111' → Hex '{}'", binary_to_hex.unwrap_or("ERROR".to_string()));
+    println!(
+        "   Binary '11111111' → Hex '{}'",
+        binary_to_hex.unwrap_or("ERROR".to_string())
+    );
 
     println!("\n💻 Programming Examples:");
     let rgb = 192; // RGB value
@@ -142,9 +166,18 @@ fn uat_math_percentage_operations_demo() {
     }
 
     println!("\n🔄 Percentage Conversions:");
-    println!("   50% to decimal       = {}", rsb::math::percentage_to_decimal(50.0));
-    println!("   0.25 to percentage   = {}%", rsb::math::decimal_to_percentage(0.25));
-    println!("   0.125 to percentage  = {}%", rsb::math::decimal_to_percentage(0.125));
+    println!(
+        "   50% to decimal       = {}",
+        rsb::math::percentage_to_decimal(50.0)
+    );
+    println!(
+        "   0.25 to percentage   = {}%",
+        rsb::math::decimal_to_percentage(0.25)
+    );
+    println!(
+        "   0.125 to percentage  = {}%",
+        rsb::math::decimal_to_percentage(0.125)
+    );
 
     println!("\n🛒 Shopping Examples:");
     let price = 120.0;
@@ -163,32 +196,50 @@ fn uat_math_predicates_demo() {
     println!("🔢 Number Properties:");
     let numbers = [8, 7, 0, -5, 42];
     for num in numbers {
-        println!("   {} → even: {}, odd: {}, sign: {}",
-                 num,
-                 rsb::math::is_even(num),
-                 rsb::math::is_odd(num),
-                 rsb::math::sign(num as f64) as i32);
+        println!(
+            "   {} → even: {}, odd: {}, sign: {}",
+            num,
+            rsb::math::is_even(num),
+            rsb::math::is_odd(num),
+            rsb::math::sign(num as f64) as i32
+        );
     }
 
     println!("\n🧮 Modulo Operations:");
-    println!("   10 mod 3          = {}", rsb::math::modulo(10, 3).unwrap_or(0));
-    println!("   15 mod 4          = {}", rsb::math::modulo(15, 4).unwrap_or(0));
-    println!("   7 mod 2           = {}", rsb::math::modulo(7, 2).unwrap_or(0));
+    println!(
+        "   10 mod 3          = {}",
+        rsb::math::modulo(10, 3).unwrap_or(0)
+    );
+    println!(
+        "   15 mod 4          = {}",
+        rsb::math::modulo(15, 4).unwrap_or(0)
+    );
+    println!(
+        "   7 mod 2           = {}",
+        rsb::math::modulo(7, 2).unwrap_or(0)
+    );
 
     println!("\n➕➖ Sign Comparisons:");
     let pairs = [(5.0, 3.0), (-5.0, 3.0), (-2.0, -8.0), (0.0, 0.0)];
     for (a, b) in pairs {
-        println!("   same_sign({}, {}) = {}", a, b, rsb::math::same_sign(a, b));
+        println!(
+            "   same_sign({}, {}) = {}",
+            a,
+            b,
+            rsb::math::same_sign(a, b)
+        );
     }
 
     println!("\n🎯 Sign Tests:");
     let test_vals = [5.0, -3.0, 0.0, 42.7, -0.0];
     for val in test_vals {
-        println!("   {} → positive: {}, negative: {}, zero: {}",
-                 val,
-                 rsb::math::is_positive(val),
-                 rsb::math::is_negative(val),
-                 rsb::math::is_zero(val));
+        println!(
+            "   {} → positive: {}, negative: {}, zero: {}",
+            val,
+            rsb::math::is_positive(val),
+            rsb::math::is_negative(val),
+            rsb::math::is_zero(val)
+        );
     }
 }
 
@@ -202,22 +253,48 @@ fn uat_math_aggregation_demo() {
     println!("   Test scores: {:?}", test_scores);
     println!("   Count:       {}", test_scores.len());
     println!("   Sum:         {:.1}", rsb::math::sum_list(&test_scores));
-    println!("   Average:     {:.2}", rsb::math::avg(&test_scores).unwrap_or(0.0));
-    println!("   Mean:        {:.2}", rsb::math::mean(&test_scores).unwrap_or(0.0));
-    println!("   Median:      {:.2}", rsb::math::median(&test_scores).unwrap_or(0.0));
-    println!("   Minimum:     {:.1}", rsb::math::min_list(&test_scores).unwrap_or(0.0));
-    println!("   Maximum:     {:.1}", rsb::math::max_list(&test_scores).unwrap_or(0.0));
-    println!("   Range:       {:.1}",
-             rsb::math::max_list(&test_scores).unwrap_or(0.0) -
-             rsb::math::min_list(&test_scores).unwrap_or(0.0));
+    println!(
+        "   Average:     {:.2}",
+        rsb::math::avg(&test_scores).unwrap_or(0.0)
+    );
+    println!(
+        "   Mean:        {:.2}",
+        rsb::math::mean(&test_scores).unwrap_or(0.0)
+    );
+    println!(
+        "   Median:      {:.2}",
+        rsb::math::median(&test_scores).unwrap_or(0.0)
+    );
+    println!(
+        "   Minimum:     {:.1}",
+        rsb::math::min_list(&test_scores).unwrap_or(0.0)
+    );
+    println!(
+        "   Maximum:     {:.1}",
+        rsb::math::max_list(&test_scores).unwrap_or(0.0)
+    );
+    println!(
+        "   Range:       {:.1}",
+        rsb::math::max_list(&test_scores).unwrap_or(0.0)
+            - rsb::math::min_list(&test_scores).unwrap_or(0.0)
+    );
 
     println!("\n💰 Financial Data Example:");
     let daily_sales = vec![1250.0, 980.0, 1450.0, 1100.0, 1320.0, 1875.0, 1650.0];
     println!("   Daily sales: {:?}", daily_sales);
     println!("   Weekly total: ${:.2}", rsb::math::sum_list(&daily_sales));
-    println!("   Daily average: ${:.2}", rsb::math::avg(&daily_sales).unwrap_or(0.0));
-    println!("   Best day: ${:.2}", rsb::math::max_list(&daily_sales).unwrap_or(0.0));
-    println!("   Worst day: ${:.2}", rsb::math::min_list(&daily_sales).unwrap_or(0.0));
+    println!(
+        "   Daily average: ${:.2}",
+        rsb::math::avg(&daily_sales).unwrap_or(0.0)
+    );
+    println!(
+        "   Best day: ${:.2}",
+        rsb::math::max_list(&daily_sales).unwrap_or(0.0)
+    );
+    println!(
+        "   Worst day: ${:.2}",
+        rsb::math::min_list(&daily_sales).unwrap_or(0.0)
+    );
 
     println!("\n❌ Empty List Handling:");
     let empty: Vec<f64> = vec![];
@@ -235,7 +312,10 @@ fn uat_math_random_operations_demo() {
     for i in 1..=5 {
         let random_float = rsb::math::random_range(1.0, 10.0);
         let random_int = rsb::math::random_int_range(1, 100);
-        println!("   Sample {}: float={:.3}, int={}", i, random_float, random_int);
+        println!(
+            "   Sample {}: float={:.3}, int={}",
+            i, random_float, random_int
+        );
     }
 
     println!("\n📊 Random List Generation:");
@@ -269,7 +349,14 @@ fn uat_math_random_operations_demo() {
 
     println!("\n🎮 Gaming/Simulation Applications:");
     println!("   Dice roll (1-6): {}", rsb::math::random_int_range(1, 6));
-    println!("   Coin flip:       {}", if rsb::math::random_range(0.0, 1.0) > 0.5 { "Heads" } else { "Tails" });
+    println!(
+        "   Coin flip:       {}",
+        if rsb::math::random_range(0.0, 1.0) > 0.5 {
+            "Heads"
+        } else {
+            "Tails"
+        }
+    );
 
     let damage_roll = rsb::math::random_list_string("int", 3, Some("1:6"));
     match damage_roll {
@@ -283,22 +370,58 @@ fn uat_math_string_based_calculations_demo() {
     println!("\n=== UAT: String-Based Calculations (RSB Style) ===\n");
 
     println!("🧮 Basic Calculator Functions:");
-    println!("   calc('add', '5', '3')      = '{}'", rsb::math::calc("add", "5", "3"));
-    println!("   calc('subtract', '10', '3') = '{}'", rsb::math::calc("subtract", "10", "3"));
-    println!("   calc('multiply', '4', '5')  = '{}'", rsb::math::calc("multiply", "4", "5"));
-    println!("   calc('divide', '10', '2')   = '{}'", rsb::math::calc("divide", "10", "2"));
-    println!("   calc('power', '2', '8')     = '{}'", rsb::math::calc("power", "2", "8"));
+    println!(
+        "   calc('add', '5', '3')      = '{}'",
+        rsb::math::calc("add", "5", "3")
+    );
+    println!(
+        "   calc('subtract', '10', '3') = '{}'",
+        rsb::math::calc("subtract", "10", "3")
+    );
+    println!(
+        "   calc('multiply', '4', '5')  = '{}'",
+        rsb::math::calc("multiply", "4", "5")
+    );
+    println!(
+        "   calc('divide', '10', '2')   = '{}'",
+        rsb::math::calc("divide", "10", "2")
+    );
+    println!(
+        "   calc('power', '2', '8')     = '{}'",
+        rsb::math::calc("power", "2", "8")
+    );
 
     println!("\n🔢 Integer Calculator:");
-    println!("   int_calc('add', '42', '58')    = '{}'", rsb::math::int_calc("add", "42", "58"));
-    println!("   int_calc('gcd', '48', '18')    = '{}'", rsb::math::int_calc("gcd", "48", "18"));
-    println!("   int_calc('multiply', '7', '8') = '{}'", rsb::math::int_calc("multiply", "7", "8"));
-    println!("   int_calc('factorial', '5', '') = '{}'", rsb::math::int_calc("factorial", "5", ""));
+    println!(
+        "   int_calc('add', '42', '58')    = '{}'",
+        rsb::math::int_calc("add", "42", "58")
+    );
+    println!(
+        "   int_calc('gcd', '48', '18')    = '{}'",
+        rsb::math::int_calc("gcd", "48", "18")
+    );
+    println!(
+        "   int_calc('multiply', '7', '8') = '{}'",
+        rsb::math::int_calc("multiply", "7", "8")
+    );
+    println!(
+        "   int_calc('factorial', '5', '') = '{}'",
+        rsb::math::int_calc("factorial", "5", "")
+    );
 
     println!("\n❌ Error Handling:");
-    println!("   calc('invalid', '5', '3')   = '{}'", rsb::math::calc("invalid", "5", "3"));
-    println!("   calc('divide', '5', '0')    = '{}'", rsb::math::calc("divide", "5", "0"));
-    println!("   int_calc('parse', 'abc', '') = '{}'", rsb::math::int_calc("parse", "abc", ""));
+    println!(
+        "   calc('invalid', '5', '3')   = '{}'",
+        rsb::math::calc("invalid", "5", "3")
+    );
+    println!(
+        "   calc('divide', '5', '0')    = '{}'",
+        rsb::math::calc("divide", "5", "0")
+    );
+    println!(
+        "   int_calc('parse', 'abc', '') = '{}'",
+        rsb::math::int_calc("parse", "abc", "")
+    );
 
     println!("\n🔧 Number Parsing:");
     match rsb::math::parse_number("42.5") {
@@ -331,13 +454,7 @@ fn uat_math_expression_evaluation_demo() {
     println!("     y = {}", get_var("y"));
 
     println!("\n🎯 Expression Examples:");
-    let expressions = vec![
-        "x + y",
-        "x * y",
-        "pi * radius",
-        "x + y * 2",
-        "(x + y) * 2",
-    ];
+    let expressions = vec!["x + y", "x * y", "pi * radius", "x + y * 2", "(x + y) * 2"];
 
     for expr in expressions {
         let result = rsb::math::evaluate_expression(expr);

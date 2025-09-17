@@ -32,7 +32,7 @@ pub fn get_home_dir() -> String {
 // pub fn is_home_subpath(path: &str) -> bool
 // Check if given path is within user's home directory
 
-// pub fn is_temp_subpath(path: &str) -> bool  
+// pub fn is_temp_subpath(path: &str) -> bool
 // Check if given path is within temporary directory
 
 // pub fn expand_tilde(path: &str) -> String

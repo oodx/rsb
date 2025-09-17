@@ -9,9 +9,8 @@ use super::types::{Namespace, TokenError};
 pub(crate) fn strip_quotes_internal(s: &str) -> String {
     let s = s.trim();
     if s.len() >= 2 {
-        if (s.starts_with('"') && s.ends_with('"')) ||
-           (s.starts_with('\'') && s.ends_with('\'')) {
-            s[1..s.len()-1].to_string()
+        if (s.starts_with('"') && s.ends_with('"')) || (s.starts_with('\'') && s.ends_with('\'')) {
+            s[1..s.len() - 1].to_string()
         } else {
             s.to_string()
         }
@@ -21,7 +20,11 @@ pub(crate) fn strip_quotes_internal(s: &str) -> String {
 }
 
 /// Internal helper for token format validation.
-pub(crate) fn validate_token_format(token_str: &str, key_part: &str, value_part: &str) -> Result<(), TokenError> {
+pub(crate) fn validate_token_format(
+    token_str: &str,
+    key_part: &str,
+    value_part: &str,
+) -> Result<(), TokenError> {
     // Check for spaces around '=' - key should not have trailing spaces, value should not have leading spaces
     if key_part != key_part.trim_end() {
         return Err(TokenError::MalformedToken {
@@ -40,7 +43,10 @@ pub(crate) fn validate_token_format(token_str: &str, key_part: &str, value_part:
 }
 
 /// Internal helper for namespace and key validation.
-pub(crate) fn validate_key_parts(token_str: &str, key_part: &str) -> Result<(Option<Namespace>, String), TokenError> {
+pub(crate) fn validate_key_parts(
+    token_str: &str,
+    key_part: &str,
+) -> Result<(Option<Namespace>, String), TokenError> {
     // Check for empty key
     if key_part.is_empty() {
         return Err(TokenError::MalformedToken {
@@ -69,7 +75,7 @@ pub(crate) fn validate_key_parts(token_str: &str, key_part: &str) -> Result<(Opt
             // Parse namespace with its internal delimiter
             let namespace = Namespace::from_string(ns);
             Ok((Some(namespace), k.to_string()))
-        },
+        }
         None => {
             // Even non-prefixed keys shouldn't have spaces
             if key_part.contains(' ') {
@@ -79,7 +85,7 @@ pub(crate) fn validate_key_parts(token_str: &str, key_part: &str) -> Result<(Opt
                 });
             }
             Ok((None, key_part.to_string()))
-        },
+        }
     }
 }
 

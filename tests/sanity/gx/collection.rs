@@ -39,11 +39,7 @@ mod tests {
 
     #[test]
     fn test_get_rand_from_slice_distribution() {
-        let words = vec![
-            "alpha".to_string(),
-            "beta".to_string(),
-            "gamma".to_string(),
-        ];
+        let words = vec!["alpha".to_string(), "beta".to_string(), "gamma".to_string()];
 
         // Run many selections and verify we get different results
         // (basic randomness check)
@@ -56,7 +52,11 @@ mod tests {
 
         // Should see multiple different results over 50 tries
         // (would be extremely unlikely to only get one value)
-        assert!(results.len() > 1, "Expected variety in random selection, got: {:?}", results);
+        assert!(
+            results.len() > 1,
+            "Expected variety in random selection, got: {:?}",
+            results
+        );
 
         // All results should be valid words from our list
         for result in &results {
@@ -66,9 +66,7 @@ mod tests {
 
     #[test]
     fn test_get_rand_from_slice_large_collection() {
-        let large_words: Vec<String> = (0..1000)
-            .map(|i| format!("word_{}", i))
-            .collect();
+        let large_words: Vec<String> = (0..1000).map(|i| format!("word_{}", i)).collect();
 
         for _ in 0..20 {
             let result = get_rand_from_slice(&large_words);
@@ -82,9 +80,7 @@ mod tests {
 
     #[test]
     fn test_get_rand_from_slice_clone_behavior() {
-        let words = vec![
-            "original".to_string(),
-        ];
+        let words = vec!["original".to_string()];
 
         let result = get_rand_from_slice(&words);
         assert!(result.is_some());

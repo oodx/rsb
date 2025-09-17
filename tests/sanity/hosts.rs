@@ -103,7 +103,7 @@ fn test_hosts_execution_context() {
         "/path/to/script.sh".to_string(),
         "arg1".to_string(),
         "--flag".to_string(),
-        "arg2".to_string()
+        "arg2".to_string(),
     ];
 
     // Setup execution context
@@ -141,10 +141,7 @@ fn test_hosts_env_bootstrap() {
 fn test_hosts_full_bootstrap() {
     // Test complete bootstrap functionality
 
-    let test_args = vec![
-        "test_program".to_string(),
-        "test_arg".to_string()
-    ];
+    let test_args = vec!["test_program".to_string(), "test_arg".to_string()];
 
     // Run full bootstrap
     rsb::hosts::bootstrap(&test_args);
@@ -275,7 +272,7 @@ fn test_edge_cases() {
     // Test with very long path
     let long_args = vec![
         format!("/very/long/path/{}/script.sh", "sub/".repeat(50)),
-        "arg".to_string()
+        "arg".to_string(),
     ];
     rsb::hosts::setup_execution_context(&long_args);
     assert!(!get_var("SCRIPT_NAME").is_empty());

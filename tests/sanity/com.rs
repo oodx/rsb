@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests {
-    use rsb::prelude::*;
     use rsb::com::*;
+    use rsb::prelude::*;
 
     #[test]
     fn test_boolean_constants() {
@@ -58,8 +58,12 @@ mod tests {
         let test_values = ["true", "false", "yes", "no", "1", "0", "abc", ""];
 
         for val in test_values {
-            assert_eq!(is_false_val(val), !is_true_val(val),
-                      "Symmetry failed for value: {}", val);
+            assert_eq!(
+                is_false_val(val),
+                !is_true_val(val),
+                "Symmetry failed for value: {}",
+                val
+            );
         }
     }
 
@@ -211,8 +215,12 @@ mod tests {
     #[test]
     fn test_case_insensitive() {
         // Test case insensitive parsing
-        let true_variants = ["true", "TRUE", "True", "TrUe", "yes", "YES", "Yes", "on", "ON", "On"];
-        let false_variants = ["false", "FALSE", "False", "FaLsE", "no", "NO", "No", "off", "OFF", "Off"];
+        let true_variants = [
+            "true", "TRUE", "True", "TrUe", "yes", "YES", "Yes", "on", "ON", "On",
+        ];
+        let false_variants = [
+            "false", "FALSE", "False", "FaLsE", "no", "NO", "No", "off", "OFF", "Off",
+        ];
 
         for variant in true_variants {
             assert!(is_true_val(variant), "Failed for: {}", variant);

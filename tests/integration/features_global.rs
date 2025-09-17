@@ -17,7 +17,10 @@ fn global_integration_store_and_expansion() {
     // Test compound expansions
     set_var("FULL_PATH", &expanded);
     let final_path = expand_vars("Config: ${FULL_PATH}/config.toml");
-    assert_eq!(final_path, "Config: /tmp/rsb-test/global-test/data/config.toml");
+    assert_eq!(
+        final_path,
+        "Config: /tmp/rsb-test/global-test/data/config.toml"
+    );
 }
 
 #[test]
@@ -50,4 +53,3 @@ fn global_integration_boolean_logic() {
     let should_log = is_true("DEBUG_MODE") && !is_true("QUIET_MODE");
     assert!(should_log);
 }
-

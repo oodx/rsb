@@ -3,8 +3,8 @@
 
 #[cfg(test)]
 mod tests {
-    use rsb::prelude::*;
     use rsb::com::*;
+    use rsb::prelude::*;
     use std::process::ExitCode as StdExitCode;
 
     #[test]
@@ -86,8 +86,14 @@ mod tests {
         println!("is_false!(\"no\"): {}", is_false!("no"));
 
         // Variable access
-        println!("is_true!(var: \"macro_demo\"): {}", is_true!(var: "macro_demo"));
-        println!("is_false!(var: \"macro_demo\"): {}", is_false!(var: "macro_demo"));
+        println!(
+            "is_true!(var: \"macro_demo\"): {}",
+            is_true!(var: "macro_demo")
+        );
+        println!(
+            "is_false!(var: \"macro_demo\"): {}",
+            is_false!(var: "macro_demo")
+        );
     }
 
     #[test]
@@ -109,9 +115,18 @@ mod tests {
         println!("is_true_any(&0): {}", is_true_any(&0));
         println!("is_true_any(&-5): {}", is_true_any(&-5));
         println!("is_true_any(&\"yes\"): {}", is_true_any(&"yes"));
-        println!("is_true_any(&\"no\".to_string()): {}", is_true_any(&"no".to_string()));
-        println!("is_true_any(&ExitKind::Success): {}", is_true_any(&ExitKind::Success));
-        println!("is_true_any(&ExitKind::Failure): {}", is_true_any(&ExitKind::Failure));
+        println!(
+            "is_true_any(&\"no\".to_string()): {}",
+            is_true_any(&"no".to_string())
+        );
+        println!(
+            "is_true_any(&ExitKind::Success): {}",
+            is_true_any(&ExitKind::Success)
+        );
+        println!(
+            "is_true_any(&ExitKind::Failure): {}",
+            is_true_any(&ExitKind::Failure)
+        );
     }
 
     #[test]
@@ -121,15 +136,28 @@ mod tests {
         println!("ExitKind enum variants:");
         println!("ExitKind::Success.code(): {}", ExitKind::Success.code());
         println!("ExitKind::Failure.code(): {}", ExitKind::Failure.code());
-        println!("ExitKind::SystemFailure.code(): {}", ExitKind::SystemFailure.code());
-        println!("ExitKind::LogicFailure.code(): {}", ExitKind::LogicFailure.code());
-        println!("ExitKind::UserFailure.code(): {}", ExitKind::UserFailure.code());
+        println!(
+            "ExitKind::SystemFailure.code(): {}",
+            ExitKind::SystemFailure.code()
+        );
+        println!(
+            "ExitKind::LogicFailure.code(): {}",
+            ExitKind::LogicFailure.code()
+        );
+        println!(
+            "ExitKind::UserFailure.code(): {}",
+            ExitKind::UserFailure.code()
+        );
 
         println!("\nExit code classification:");
         let codes = [0, 1, 2, 127, -1];
         for code in codes {
-            println!("Code {}: is_success={}, is_fail={}",
-                    code, is_success(code), is_fail(code));
+            println!(
+                "Code {}: is_success={}, is_fail={}",
+                code,
+                is_success(code),
+                is_fail(code)
+            );
         }
     }
 
@@ -168,18 +196,34 @@ mod tests {
         println!("Simulating CLI flag processing:");
 
         // Positive flags
-        set_var("opt_debug", TRUE_STR);    // --debug
-        set_var("opt_verbose", TRUE_STR);  // --verbose or -v
+        set_var("opt_debug", TRUE_STR); // --debug
+        set_var("opt_verbose", TRUE_STR); // --verbose or -v
 
         // Negative flags
-        set_var("opt_quiet", FALSE_STR);   // --not-quiet
+        set_var("opt_quiet", FALSE_STR); // --not-quiet
         set_var("opt_minimal", FALSE_STR); // --not-minimal
 
         println!("Flag states after CLI processing:");
-        println!("--debug -> opt_debug = {:?} ({})", get_var("opt_debug"), is_true("opt_debug"));
-        println!("--verbose -> opt_verbose = {:?} ({})", get_var("opt_verbose"), is_true("opt_verbose"));
-        println!("--not-quiet -> opt_quiet = {:?} ({})", get_var("opt_quiet"), is_true("opt_quiet"));
-        println!("--not-minimal -> opt_minimal = {:?} ({})", get_var("opt_minimal"), is_true("opt_minimal"));
+        println!(
+            "--debug -> opt_debug = {:?} ({})",
+            get_var("opt_debug"),
+            is_true("opt_debug")
+        );
+        println!(
+            "--verbose -> opt_verbose = {:?} ({})",
+            get_var("opt_verbose"),
+            is_true("opt_verbose")
+        );
+        println!(
+            "--not-quiet -> opt_quiet = {:?} ({})",
+            get_var("opt_quiet"),
+            is_true("opt_quiet")
+        );
+        println!(
+            "--not-minimal -> opt_minimal = {:?} ({})",
+            get_var("opt_minimal"),
+            is_true("opt_minimal")
+        );
 
         // Demonstrate conditional logic
         if is_true("opt_debug") && !is_true("opt_quiet") {
@@ -194,16 +238,32 @@ mod tests {
         // Simulate environment variable detection
         println!("Simulating environment variable detection:");
 
-        set_var("DEBUG_MODE", TRUE_STR);    // DEBUG env var present
-        set_var("DEV_MODE", TRUE_STR);      // DEV env var present
-        set_var("QUIET_MODE", FALSE_STR);   // QUIET env var absent
-        set_var("TRACE_MODE", FALSE_STR);   // TRACE env var absent
+        set_var("DEBUG_MODE", TRUE_STR); // DEBUG env var present
+        set_var("DEV_MODE", TRUE_STR); // DEV env var present
+        set_var("QUIET_MODE", FALSE_STR); // QUIET env var absent
+        set_var("TRACE_MODE", FALSE_STR); // TRACE env var absent
 
         println!("Environment mode states:");
-        println!("DEBUG_MODE: {} ({})", get_var("DEBUG_MODE"), is_true("DEBUG_MODE"));
-        println!("DEV_MODE: {} ({})", get_var("DEV_MODE"), is_true("DEV_MODE"));
-        println!("QUIET_MODE: {} ({})", get_var("QUIET_MODE"), is_true("QUIET_MODE"));
-        println!("TRACE_MODE: {} ({})", get_var("TRACE_MODE"), is_true("TRACE_MODE"));
+        println!(
+            "DEBUG_MODE: {} ({})",
+            get_var("DEBUG_MODE"),
+            is_true("DEBUG_MODE")
+        );
+        println!(
+            "DEV_MODE: {} ({})",
+            get_var("DEV_MODE"),
+            is_true("DEV_MODE")
+        );
+        println!(
+            "QUIET_MODE: {} ({})",
+            get_var("QUIET_MODE"),
+            is_true("QUIET_MODE")
+        );
+        println!(
+            "TRACE_MODE: {} ({})",
+            get_var("TRACE_MODE"),
+            is_true("TRACE_MODE")
+        );
 
         // Application logic based on modes
         if is_true("DEBUG_MODE") {

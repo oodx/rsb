@@ -16,7 +16,10 @@ fn test_date_macro_basic_formats() {
     // Basic format validation
     assert!(!default_date.is_empty());
     assert!(iso_date.contains("T")); // ISO format has T separator
-    assert!(iso_date.contains("T") && (iso_date.contains("+") || iso_date.contains("-") || iso_date.contains("Z"))); // ISO format has timezone
+    assert!(
+        iso_date.contains("T")
+            && (iso_date.contains("+") || iso_date.contains("-") || iso_date.contains("Z"))
+    ); // ISO format has timezone
     assert!(epoch_str.parse::<i64>().is_ok()); // Epoch should be parseable as number
     assert!(epoch_ms_str.parse::<i64>().is_ok()); // Epoch ms should be parseable
     assert!(utc_iso_date.contains("T")); // UTC ISO format has T separator

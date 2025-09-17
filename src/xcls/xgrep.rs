@@ -13,52 +13,56 @@ impl XGrep {
             content: content.into(),
         }
     }
-    
+
     /// Filter lines with a closure predicate
-    pub fn filter_lines<F>(self, predicate: F) -> Self 
+    pub fn filter_lines<F>(self, predicate: F) -> Self
     where
-        F: Fn(&str) -> bool
+        F: Fn(&str) -> bool,
     {
-        let filtered = self.content
+        let filtered = self
+            .content
             .lines()
             .filter(|line| predicate(line))
             .collect::<Vec<_>>()
             .join("\n");
         XGrep::new(filtered)
     }
-    
+
     /// Map lines with a transformation closure
     pub fn map_lines<F>(self, transform: F) -> Self
     where
-        F: Fn(&str) -> String
+        F: Fn(&str) -> String,
     {
-        let mapped = self.content
+        let mapped = self
+            .content
             .lines()
             .map(|line| transform(line))
             .collect::<Vec<_>>()
             .join("\n");
         XGrep::new(mapped)
     }
-    
+
     /// Filter and map in one operation
     pub fn filter_map<F>(self, func: F) -> Self
     where
-        F: Fn(&str) -> Option<String>
+        F: Fn(&str) -> Option<String>,
     {
-        let result = self.content
+        let result = self
+            .content
             .lines()
             .filter_map(|line| func(line))
             .collect::<Vec<_>>()
             .join("\n");
         XGrep::new(result)
     }
-    
+
     /// Find lines matching pattern and transform them
     pub fn grep_transform<F>(self, pattern: &str, transform: F) -> Self
     where
-        F: Fn(&str) -> String
+        F: Fn(&str) -> String,
     {
-        let result = self.content
+        let result = self
+            .content
             .lines()
             .map(|line| {
                 if line.contains(pattern) {
@@ -71,13 +75,14 @@ impl XGrep {
             .join("\n");
         XGrep::new(result)
     }
-    
+
     /// Extract matches with a closure
     pub fn extract_matches<F>(self, pattern: &str, extractor: F) -> Self
     where
-        F: Fn(&str) -> String
+        F: Fn(&str) -> String,
     {
-        let result = self.content
+        let result = self
+            .content
             .lines()
             .filter(|line| line.contains(pattern))
             .map(|line| extractor(line))
@@ -85,18 +90,15 @@ impl XGrep {
             .join("\n");
         XGrep::new(result)
     }
-    
+
     /// Count lines matching a closure predicate
     pub fn count_matching<F>(self, predicate: F) -> usize
     where
-        F: Fn(&str) -> bool
+        F: Fn(&str) -> bool,
     {
-        self.content
-            .lines()
-            .filter(|line| predicate(line))
-            .count()
+        self.content.lines().filter(|line| predicate(line)).count()
     }
-    
+
     /// Get the resulting string
     pub fn to_string(self) -> String {
         self.content
@@ -120,7 +122,7 @@ mod tests {
             .to_string();
         assert_eq!(result, "hello world\nhello rust");
     }
-    
+
     #[test]
     fn test_map_lines() {
         let input = "line1\nline2";
@@ -129,7 +131,7 @@ mod tests {
             .to_string();
         assert_eq!(result, "[line1]\n[line2]");
     }
-    
+
     #[test]
     fn test_grep_transform() {
         let input = "foo: 123\nbar: 456\nfoo: 789";
@@ -138,7 +140,7 @@ mod tests {
             .to_string();
         assert_eq!(result, "FOO: 123\nbar: 456\nFOO: 789");
     }
-    
+
     #[test]
     fn test_extract_matches() {
         let input = "name: alice\nage: 30\nname: bob";

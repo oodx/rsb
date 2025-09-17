@@ -20,7 +20,7 @@ pub enum SimpleColor {
     Cyan,
     White,
     Black,
-    
+
     // Bright variants (16-color support)
     BrightRed,
     BrightGreen,
@@ -29,22 +29,22 @@ pub enum SimpleColor {
     BrightMagenta,
     BrightCyan,
     BrightWhite,
-    
+
     // Grey scale for UI elements
-    Grey,         // Same as bright_black
-    BrightBlack,  // Alias for grey
-    
+    Grey,        // Same as bright_black
+    BrightBlack, // Alias for grey
+
     // Control codes
     Reset,
     Bold,
     Dim,
     Underline,
-    
+
     // Semantic aliases using simple colors
-    Error,    // bright_red
-    Success,  // bright_green
-    Warning,  // bright_yellow
-    Info,     // bright_blue
+    Error,   // bright_red
+    Success, // bright_green
+    Warning, // bright_yellow
+    Info,    // bright_blue
 }
 
 impl SimpleColor {
@@ -60,7 +60,7 @@ impl SimpleColor {
             SimpleColor::Cyan => "\x1B[36m",
             SimpleColor::White => "\x1B[37m",
             SimpleColor::Black => "\x1B[30m",
-            
+
             // Bright colors
             SimpleColor::BrightRed => "\x1B[91m",
             SimpleColor::BrightGreen => "\x1B[92m",
@@ -69,24 +69,24 @@ impl SimpleColor {
             SimpleColor::BrightMagenta => "\x1B[95m",
             SimpleColor::BrightCyan => "\x1B[96m",
             SimpleColor::BrightWhite => "\x1B[97m",
-            
+
             // Grey
             SimpleColor::Grey | SimpleColor::BrightBlack => "\x1B[90m",
-            
+
             // Control
             SimpleColor::Reset => "\x1B[0m",
             SimpleColor::Bold => "\x1B[1m",
             SimpleColor::Dim => "\x1B[2m",
             SimpleColor::Underline => "\x1B[4m",
-            
+
             // Semantic aliases
-            SimpleColor::Error => "\x1B[91m",    // bright_red
-            SimpleColor::Success => "\x1B[92m",  // bright_green
-            SimpleColor::Warning => "\x1B[93m",  // bright_yellow
-            SimpleColor::Info => "\x1B[94m",     // bright_blue
+            SimpleColor::Error => "\x1B[91m",   // bright_red
+            SimpleColor::Success => "\x1B[92m", // bright_green
+            SimpleColor::Warning => "\x1B[93m", // bright_yellow
+            SimpleColor::Info => "\x1B[94m",    // bright_blue
         }
     }
-    
+
     /// Get the string name of this simple color
     pub const fn name(self) -> &'static str {
         match self {
@@ -99,8 +99,8 @@ impl SimpleColor {
             SimpleColor::Cyan => "cyan",
             SimpleColor::White => "white",
             SimpleColor::Black => "black",
-            
-            // Bright colors  
+
+            // Bright colors
             SimpleColor::BrightRed => "bright_red",
             SimpleColor::BrightGreen => "bright_green",
             SimpleColor::BrightYellow => "bright_yellow",
@@ -108,25 +108,25 @@ impl SimpleColor {
             SimpleColor::BrightMagenta => "bright_magenta",
             SimpleColor::BrightCyan => "bright_cyan",
             SimpleColor::BrightWhite => "bright_white",
-            
+
             // Grey
             SimpleColor::Grey => "grey",
             SimpleColor::BrightBlack => "bright_black",
-            
+
             // Control
             SimpleColor::Reset => "reset",
             SimpleColor::Bold => "bold",
             SimpleColor::Dim => "dim",
             SimpleColor::Underline => "underline",
-            
+
             // Semantic aliases
             SimpleColor::Error => "error",
-            SimpleColor::Success => "success", 
+            SimpleColor::Success => "success",
             SimpleColor::Warning => "warning",
             SimpleColor::Info => "info",
         }
     }
-    
+
     /// Parse a simple color from string name
     pub fn from_name(name: &str) -> Option<Self> {
         match name {
@@ -139,7 +139,7 @@ impl SimpleColor {
             "cyan" => Some(SimpleColor::Cyan),
             "white" => Some(SimpleColor::White),
             "black" => Some(SimpleColor::Black),
-            
+
             // Bright colors
             "bright_red" => Some(SimpleColor::BrightRed),
             "bright_green" => Some(SimpleColor::BrightGreen),
@@ -148,43 +148,61 @@ impl SimpleColor {
             "bright_magenta" => Some(SimpleColor::BrightMagenta),
             "bright_cyan" => Some(SimpleColor::BrightCyan),
             "bright_white" => Some(SimpleColor::BrightWhite),
-            
+
             // Grey (both names map to same enum)
             "grey" => Some(SimpleColor::Grey),
             "bright_black" => Some(SimpleColor::BrightBlack),
-            
+
             // Control
             "reset" => Some(SimpleColor::Reset),
             "bold" => Some(SimpleColor::Bold),
             "dim" => Some(SimpleColor::Dim),
             "underline" => Some(SimpleColor::Underline),
-            
+
             // Semantic aliases
             "error" => Some(SimpleColor::Error),
             "success" => Some(SimpleColor::Success),
             "warning" => Some(SimpleColor::Warning),
             "info" => Some(SimpleColor::Info),
-            
+
             // Unknown
             _ => None,
         }
     }
-    
+
     /// Get all simple colors as a vector
     pub fn all() -> Vec<Self> {
         vec![
             // Basic colors
-            SimpleColor::Red, SimpleColor::Green, SimpleColor::Yellow, SimpleColor::Blue,
-            SimpleColor::Magenta, SimpleColor::Cyan, SimpleColor::White, SimpleColor::Black,
+            SimpleColor::Red,
+            SimpleColor::Green,
+            SimpleColor::Yellow,
+            SimpleColor::Blue,
+            SimpleColor::Magenta,
+            SimpleColor::Cyan,
+            SimpleColor::White,
+            SimpleColor::Black,
             // Bright colors
-            SimpleColor::BrightRed, SimpleColor::BrightGreen, SimpleColor::BrightYellow, SimpleColor::BrightBlue,
-            SimpleColor::BrightMagenta, SimpleColor::BrightCyan, SimpleColor::BrightWhite,
+            SimpleColor::BrightRed,
+            SimpleColor::BrightGreen,
+            SimpleColor::BrightYellow,
+            SimpleColor::BrightBlue,
+            SimpleColor::BrightMagenta,
+            SimpleColor::BrightCyan,
+            SimpleColor::BrightWhite,
             // Grey scale
-            SimpleColor::Grey, SimpleColor::BrightBlack,
+            SimpleColor::Grey,
+            SimpleColor::BrightBlack,
             // Control
-            SimpleColor::Reset, SimpleColor::Bold, SimpleColor::Dim, SimpleColor::Underline,
+            SimpleColor::Reset,
+            SimpleColor::Bold,
+            SimpleColor::Dim,
+            SimpleColor::Underline,
             // Semantic
-            SimpleColor::Error, SimpleColor::Success, SimpleColor::Warning, SimpleColor::Info,
+            SimpleColor::Error,
+            SimpleColor::Success,
+            SimpleColor::Warning,
+            SimpleColor::Info,
         ]
     }
 }
@@ -222,14 +240,14 @@ pub fn is_simple_color(color: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_basic_colors() {
         assert_eq!(get_simple_color("red"), "\x1B[31m");
         assert_eq!(get_simple_color("green"), "\x1B[32m");
         assert_eq!(get_simple_color("blue"), "\x1B[34m");
     }
-    
+
     #[test]
     fn test_semantic_colors() {
         assert_eq!(get_simple_color("error"), "\x1B[91m");
@@ -237,20 +255,20 @@ mod tests {
         assert_eq!(get_simple_color("warning"), "\x1B[93m");
         assert_eq!(get_simple_color("info"), "\x1B[94m");
     }
-    
+
     #[test]
     fn test_colorize_simple() {
         let result = colorize_simple("Hello", "red");
         assert_eq!(result, "\x1B[31mHello\x1B[0m");
-        
+
         let unknown = colorize_simple("Hello", "unknown");
         assert_eq!(unknown, "Hello");
     }
-    
+
     #[test]
     fn test_is_simple_color() {
         assert!(is_simple_color("red"));
-        assert!(is_simple_color("success")); 
+        assert!(is_simple_color("success"));
         assert!(!is_simple_color("crimson"));
         assert!(!is_simple_color("unknown"));
     }

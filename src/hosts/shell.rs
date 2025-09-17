@@ -7,7 +7,9 @@
 pub fn setup_execution_context(args: &[String]) {
     if args.is_empty() {
         // Still record current directory as PWD for completeness
-        let pwd = std::env::current_dir().map(|p| p.to_string_lossy().to_string()).unwrap_or_else(|_| ".".to_string());
+        let pwd = std::env::current_dir()
+            .map(|p| p.to_string_lossy().to_string())
+            .unwrap_or_else(|_| ".".to_string());
         crate::global::set_var("PWD", &pwd);
         return;
     }
@@ -23,7 +25,9 @@ pub fn setup_execution_context(args: &[String]) {
     crate::global::set_var("SCRIPT_NAME", script_name);
     crate::global::set_var("SCRIPT_PATH", script_path);
     crate::global::set_var("SCRIPT_DIR", script_dir);
-    let pwd = std::env::current_dir().map(|p| p.to_string_lossy().to_string()).unwrap_or_else(|_| ".".to_string());
+    let pwd = std::env::current_dir()
+        .map(|p| p.to_string_lossy().to_string())
+        .unwrap_or_else(|_| ".".to_string());
     crate::global::set_var("PWD", &pwd);
 }
 

@@ -5,7 +5,7 @@
 /// The unix pipe pattern generalized for any function
 pub trait Streamable {
     type Args;
-    
+
     /// Apply this streamable function to stdin with given args
     fn stream_apply(stdin: &str, args: Self::Args) -> String;
 }

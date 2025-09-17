@@ -17,6 +17,8 @@ pub fn guard_size(s: &str, limit: usize) -> Result<(), StringError> {
 pub fn guard_index(len: usize, idx: isize) -> Result<usize, StringError> {
     let n = len as isize;
     let i = if idx < 0 { n + idx } else { idx };
-    if i < 0 || i > n { return Err(StringError::IndexOutOfBounds { index: idx, len }); }
+    if i < 0 || i > n {
+        return Err(StringError::IndexOutOfBounds { index: idx, len });
+    }
     Ok(i as usize)
 }

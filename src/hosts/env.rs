@@ -20,14 +20,24 @@ pub fn import_environment() {
 /// Apply standard mode flags from environment into global (Rust-native booleans).
 /// Sets: DEBUG_MODE, DEV_MODE, QUIET_MODE, TRACE_MODE to "true" when present.
 pub fn setup_standard_modes() {
-    if std::env::var("DEBUG").is_ok() { crate::global::set_var("DEBUG_MODE", crate::com::TRUE_STR); }
-    if std::env::var("DEV").is_ok() { crate::global::set_var("DEV_MODE", crate::com::TRUE_STR); }
-    if std::env::var("QUIET").is_ok() { crate::global::set_var("QUIET_MODE", crate::com::TRUE_STR); }
-    if std::env::var("TRACE").is_ok() { crate::global::set_var("TRACE_MODE", crate::com::TRUE_STR); }
+    if std::env::var("DEBUG").is_ok() {
+        crate::global::set_var("DEBUG_MODE", crate::com::TRUE_STR);
+    }
+    if std::env::var("DEV").is_ok() {
+        crate::global::set_var("DEV_MODE", crate::com::TRUE_STR);
+    }
+    if std::env::var("QUIET").is_ok() {
+        crate::global::set_var("QUIET_MODE", crate::com::TRUE_STR);
+    }
+    if std::env::var("TRACE").is_ok() {
+        crate::global::set_var("TRACE_MODE", crate::com::TRUE_STR);
+    }
 }
 
 /// Get an environment variable directly (bypasses global).
-pub fn get_env_var(key: &str) -> Option<String> { std::env::var(key).ok() }
+pub fn get_env_var(key: &str) -> Option<String> {
+    std::env::var(key).ok()
+}
 
 /// Set an environment variable and mirror it in the global store.
 pub fn set_env_var(key: &str, value: &str) {
@@ -36,10 +46,14 @@ pub fn set_env_var(key: &str, value: &str) {
 }
 
 /// Check if an environment variable exists.
-pub fn has_env_var(key: &str) -> bool { std::env::var(key).is_ok() }
+pub fn has_env_var(key: &str) -> bool {
+    std::env::var(key).is_ok()
+}
 
 /// Sync all environment variables into the global store (alias to import_environment).
-pub fn env_to_global() { import_environment(); }
+pub fn env_to_global() {
+    import_environment();
+}
 
 /// Sync all global variables back into environment variables.
 pub fn global_to_env() {

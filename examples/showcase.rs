@@ -4,9 +4,9 @@
 use rsb::prelude::*;
 // Visual/log macros: import explicitly; gate colored under feature
 #[cfg(feature = "visual")]
-use rsb::{info, okay, warn, error, fatal, debug, trace, colored};
+use rsb::{colored, debug, error, fatal, info, okay, trace, warn};
 #[cfg(not(feature = "visual"))]
-use rsb::{info, okay, warn, error, fatal, debug, trace};
+use rsb::{debug, error, fatal, info, okay, trace, warn};
 
 fn main() {
     // The bootstrap! macro handles collecting args, loading the environment,
@@ -60,8 +60,7 @@ fn install_deps(mut args: Args) -> i32 {
     if force {
         warn!("Force installation enabled.");
     }
-    cmd!("echo 'Simulating package installation...'")
-        .each(|line| okay!("{}", line));
+    cmd!("echo 'Simulating package installation...'").each(|line| okay!("{}", line));
     0
 }
 
@@ -76,12 +75,22 @@ fn init_project(args: Args) -> i32 {
         return 1;
     }
 
-    validate!(!is_entity(&project_path_str), "Project directory already exists: {}", project_path_str);
+    validate!(
+        !is_entity(&project_path_str),
+        "Project directory already exists: {}",
+        project_path_str
+    );
 
     info!("Initializing project: {}", project_path_str);
     mkdir_p(&project_path_str);
-    let readme_content = format!("# {}\n\nInitialized with RSB.", project_path.file_name().unwrap().to_str().unwrap());
-    write_file(&project_path.join("README.md").to_str().unwrap(), &readme_content);
+    let readme_content = format!(
+        "# {}\n\nInitialized with RSB.",
+        project_path.file_name().unwrap().to_str().unwrap()
+    );
+    write_file(
+        &project_path.join("README.md").to_str().unwrap(),
+        &readme_content,
+    );
 
     okay!("Project initialized successfully!");
     0
@@ -102,7 +111,9 @@ fn build_project(mut args: Args) -> i32 {
     require_var!("HOME");
     set_var("PROJECT", "my-app");
 
-    let version = args.has_val("--version").unwrap_or_else(|| "1.0.0".to_string());
+    let version = args
+        .has_val("--version")
+        .unwrap_or_else(|| "1.0.0".to_string());
     let target = args.get_or(1, "debug");
     let clean = args.has_pop("--clean");
     if let Some(output_dir) = args.get_kv("output") {
@@ -172,7 +183,9 @@ fn deploy(mut args: Args) -> i32 {
 }
 
 fn logs(mut args: Args) -> i32 {
-    let log_file = args.has_val("--file").unwrap_or_else(|| "app.log".to_string());
+    let log_file = args
+        .has_val("--file")
+        .unwrap_or_else(|| "app.log".to_string());
     let errors_only = args.has_pop("--errors");
 
     pipe!(
@@ -188,8 +201,7 @@ fn logs(mut args: Args) -> i32 {
             .grep("ERROR")
             .each(|line| error!("{}", line));
     } else {
-        cat!(&log_file)
-            .each(|line| echo!("{}", line));
+        cat!(&log_file).each(|line| echo!("{}", line));
     }
     0
 }
@@ -206,12 +218,12 @@ fn config(args: Args) -> i32 {
             set_var(&key, &value);
             save_config_file("./myapp.conf", &[&key]);
             okay!("Configuration saved to ./myapp.conf");
-        },
+        }
         "get" => {
             let key = args.get_or(2, "");
             validate!(!key.is_empty(), "Usage: config get <key>");
             echo!("{} = {}", key, get_var(&key));
-        },
+        }
         _ => {
             error!("Unknown config action: {}", action);
             return 1;
@@ -224,7 +236,10 @@ fn process_data(_args: Args) -> i32 {
     let input_file = "data.csv";
     let output_file = "processed.txt";
 
-    write_file(input_file, "user,active,id\nalice,true,101\nbob,false,102\ncharlie,true,103\nalice,true,104");
+    write_file(
+        input_file,
+        "user,active,id\nalice,true,101\nbob,false,102\ncharlie,true,103\nalice,true,104",
+    );
 
     info!("Processing {} -> {}", input_file, output_file);
 
@@ -273,7 +288,6 @@ fn system_test(_args: Args) -> i32 {
     validate!(num >= 1 && num <= 100, "Random number out of range");
     0
 }
-
 
 fn date_test(_args: Args) -> i32 {
     info!("Testing date macros...");
@@ -361,7 +375,10 @@ fn random_test(_args: Args) -> i32 {
 fn dict_test(_args: Args) -> i32 {
     write_file("test.dict", "apple banana orange");
     let my_dict = dict!("test.dict");
-    set_array("MY_DICT", &my_dict.iter().map(|s| s.as_str()).collect::<Vec<&str>>());
+    set_array(
+        "MY_DICT",
+        &my_dict.iter().map(|s| s.as_str()).collect::<Vec<&str>>(),
+    );
     echo!("Random word: {}", rand_dict!("MY_DICT"));
 
     gen_dict!(alnum, 5, into: "RANDOM_WORDS");
@@ -372,33 +389,33 @@ fn dict_test(_args: Args) -> i32 {
 fn sed_test(_args: Args) -> i32 {
     // Test data
     let sample_text = "Line 1\nLine 2\nIMPORTANT: Main content\nLine 4\nLine 5\nLine 6\n{{PLACEHOLDER}}\nLine 8\nLine 9\nLine 10";
-    
+
     info!("Testing sed_lines (lines 2-4):");
     let lines_result = sed_lines!(sample_text, 2, 4);
     echo!("{}", lines_result);
-    
+
     info!("Testing sed_around (2 lines around 'IMPORTANT'):");
     let around_result = sed_around!(sample_text, "IMPORTANT", 2);
     echo!("{}", around_result);
-    
+
     info!("Testing sed_insert (replace {{PLACEHOLDER}}):");
     let insert_content = "INSERTED LINE 1\nINSERTED LINE 2\nINSERTED LINE 3";
     let insert_result = sed_insert!(insert_content, "{{PLACEHOLDER}}", sample_text);
     echo!("{}", insert_result);
-    
+
     info!("Testing sed_template (replace all instances):");
-    let template_text = "Hello {{NAME}}, welcome to {{PLACE}}! {{NAME}}, enjoy your stay at {{PLACE}}.";
+    let template_text =
+        "Hello {{NAME}}, welcome to {{PLACE}}! {{NAME}}, enjoy your stay at {{PLACE}}.";
     let template_result1 = sed_template!("Alice", "{{NAME}}", &template_text);
     let template_result2 = sed_template!("Wonderland", "{{PLACE}}", &template_result1);
     echo!("{}", template_result2);
-    
+
     info!("Testing sed_replace (simple replacement):");
     let replace_result = sed_replace!("Hello world, world!", "world", "RSB");
     echo!("{}", replace_result);
-    
+
     0
 }
-
 
 fn sed_block_test(_args: Args) -> i32 {
     let content = "
@@ -440,43 +457,43 @@ fn color_test(_args: Args) -> i32 {
 
 fn archive_test(_args: Args) -> i32 {
     info!("Testing archive operations...");
-    
+
     // Create test files
     write_file("test1.txt", "Hello from file 1");
     write_file("test2.txt", "Hello from file 2");
     mkdir_p("testdir");
     write_file("testdir/test3.txt", "Hello from file 3");
-    
+
     info!("Testing pack! macro (auto-detect format):");
     pack!("test.tar.gz", "test1.txt", "test2.txt", "testdir");
-    
+
     info!("Testing tar! macro operations:");
     tar!(create: "test.tar", "test1.txt", "test2.txt");
-    
+
     info!("Listing tar contents:");
     let tar_contents = tar!(list: "test.tar");
     echo!("{}", tar_contents);
-    
+
     if is_command("zip") {
         info!("Testing zip! macro operations:");
         zip!(create: "test.zip", "test1.txt", "test2.txt");
-        
+
         info!("Listing zip contents:");
         let zip_contents = zip!(list: "test.zip");
         echo!("{}", zip_contents);
     } else {
         warn!("zip command not available, skipping zip tests");
     }
-    
+
     info!("Testing unpack! macro:");
     mkdir_p("extract_test");
     unpack!("test.tar", to: "extract_test");
-    
+
     info!("Files extracted to extract_test:");
     file_in!(file in "extract_test" => {
         echo!("Found: $file");
     });
-    
+
     // Cleanup
     rm_rf("test1.txt");
     rm_rf("test2.txt");
@@ -485,39 +502,39 @@ fn archive_test(_args: Args) -> i32 {
     rm_rf("test.tar.gz");
     rm_rf("test.zip");
     rm_rf("extract_test");
-    
+
     0
 }
 
 fn utils_test(_args: Args) -> i32 {
     info!("Testing system utilities...");
-    
+
     // System information
     echo!("Hostname: {}", hostname!());
     echo!("User: {}", user!());
     echo!("Home: {}", home_dir!());
     echo!("Current dir: {}", current_dir!());
-    
+
     // Process management (demo only, using sleep)
     info!("Testing process management...");
     let job_id = job!(background: "sleep 1");
     echo!("Started sleep job: {}", job_id);
-    
+
     let sleep_pid = pid_of!("sleep");
     if !sleep_pid.is_empty() {
         echo!("Found sleep process with PID: {}", sleep_pid);
         echo!("Process exists: {}", process_exists!("sleep"));
     }
-    
+
     job!(wait: job_id);
-    
+
     // Locking demonstration
     info!("Testing locking mechanism...");
     with_lock!("/tmp/rsb-test.lock" => {
         echo!("Inside locked section!");
         sleep!(ms: 100);
     });
-    
+
     // Network (if curl is available)
     if is_command("curl") {
         info!("Testing HTTP utilities...");
@@ -525,7 +542,7 @@ fn utils_test(_args: Args) -> i32 {
         let response = get!("https://httpbin.org/get?test=rsb", options: "-s --connect-timeout 5");
         if !response.is_empty() {
             echo!("HTTP GET response received ({} bytes)", response.len());
-            
+
             // JSON parsing if jq is available
             if is_command("jq") {
                 let test_param = json_get!(&response, ".args.test");
@@ -541,6 +558,6 @@ fn utils_test(_args: Args) -> i32 {
     } else {
         warn!("curl not available, skipping HTTP tests");
     }
-    
+
     0
 }

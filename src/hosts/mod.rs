@@ -19,12 +19,12 @@ pub mod macros;
 
 // Implementation modules (kept private)
 mod env;
-mod paths;
-mod xdg_path;
-mod rsb_path;
 mod host_path;
-mod virt_path;
+mod paths;
+mod rsb_path;
 mod shell;
 mod system;
+mod virt_path;
+mod xdg_path;
 pub use system::*;
 mod bootstrap;

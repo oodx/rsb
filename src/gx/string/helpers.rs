@@ -2,8 +2,8 @@
 //!
 //! Core string generation functions migrated from src/random.rs
 
-use rand::{Rng, distr::Alphanumeric};
 use super::constants::*;
+use rand::{distr::Alphanumeric, Rng};
 
 /// Generates a random alphanumeric string of a given length.
 pub fn get_rand_alnum(n: usize) -> String {
@@ -19,7 +19,10 @@ pub fn get_rand_alpha(n: usize) -> String {
     let mut rng = rand::rng();
     (0..n)
         .map(|_| {
-            ALPHA_CHARS.chars().nth(rng.random_range(0..ALPHA_CHARS.len())).unwrap()
+            ALPHA_CHARS
+                .chars()
+                .nth(rng.random_range(0..ALPHA_CHARS.len()))
+                .unwrap()
         })
         .collect()
 }
@@ -29,7 +32,10 @@ pub fn get_rand_hex(n: usize) -> String {
     let mut rng = rand::rng();
     (0..n)
         .map(|_| {
-            HEX_CHARS.chars().nth(rng.random_range(0..HEX_CHARS.len())).unwrap()
+            HEX_CHARS
+                .chars()
+                .nth(rng.random_range(0..HEX_CHARS.len()))
+                .unwrap()
         })
         .collect()
 }
@@ -39,7 +45,10 @@ pub fn get_rand_string(n: usize) -> String {
     let mut rng = rand::rng();
     (0..n)
         .map(|_| {
-            PRINTABLE_CHARS.chars().nth(rng.random_range(0..PRINTABLE_CHARS.len())).unwrap()
+            PRINTABLE_CHARS
+                .chars()
+                .nth(rng.random_range(0..PRINTABLE_CHARS.len()))
+                .unwrap()
         })
         .collect()
 }

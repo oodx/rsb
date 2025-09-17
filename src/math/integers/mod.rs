@@ -116,17 +116,20 @@ pub fn sum_range(start: i64, end: i64) -> i64 {
 // Integer arithmetic with overflow detection
 /// Integer addition with overflow detection
 pub fn int_add(a: i64, b: i64) -> Result<i64, String> {
-    a.checked_add(b).ok_or_else(|| format!("Integer overflow: {} + {}", a, b))
+    a.checked_add(b)
+        .ok_or_else(|| format!("Integer overflow: {} + {}", a, b))
 }
 
 /// Integer subtraction with overflow detection
 pub fn int_subtract(a: i64, b: i64) -> Result<i64, String> {
-    a.checked_sub(b).ok_or_else(|| format!("Integer overflow: {} - {}", a, b))
+    a.checked_sub(b)
+        .ok_or_else(|| format!("Integer overflow: {} - {}", a, b))
 }
 
 /// Integer multiplication with overflow detection
 pub fn int_multiply(a: i64, b: i64) -> Result<i64, String> {
-    a.checked_mul(b).ok_or_else(|| format!("Integer overflow: {} * {}", a, b))
+    a.checked_mul(b)
+        .ok_or_else(|| format!("Integer overflow: {} * {}", a, b))
 }
 
 /// Integer division with zero-check
@@ -134,18 +137,21 @@ pub fn int_divide(a: i64, b: i64) -> Result<i64, String> {
     if b == 0 {
         return Err("Division by zero".to_string());
     }
-    a.checked_div(b).ok_or_else(|| format!("Integer overflow: {} / {}", a, b))
+    a.checked_div(b)
+        .ok_or_else(|| format!("Integer overflow: {} / {}", a, b))
 }
 
 /// Integer exponentiation with overflow protection
 pub fn int_power(base: i64, exp: u32) -> Result<i64, String> {
-    base.checked_pow(exp).ok_or_else(|| format!("Integer overflow: {} ^ {}", base, exp))
+    base.checked_pow(exp)
+        .ok_or_else(|| format!("Integer overflow: {} ^ {}", base, exp))
 }
 
 // String-first RSB interfaces
 /// Parse string to integer with error reporting
 pub fn int_parse(text: &str) -> Result<i64, String> {
-    text.trim().parse::<i64>()
+    text.trim()
+        .parse::<i64>()
         .map_err(|_| format!("Could not parse '{}' as integer", text))
 }
 
@@ -176,4 +182,3 @@ pub fn int_calc(operation: &str, a: &str, b: &str) -> String {
         Err(e) => format!("Error: {}", e),
     }
 }
-

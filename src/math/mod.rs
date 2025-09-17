@@ -37,44 +37,50 @@
 //! ```
 
 // MODULE_SPEC: Implementation packages
-pub mod basic;
-pub mod integers;
-pub mod expressions;
+pub mod aggregators;
 pub mod base;
+pub mod basic;
+pub mod expressions;
+pub mod integers;
+pub mod macros;
 pub mod percentage;
 pub mod predicates;
-pub mod aggregators;
-pub mod random;
-pub mod macros;  // Module-owned macros
+pub mod random; // Module-owned macros
 
 // MODULE_SPEC: Curated public surface - re-export key functions
 
 // Basic operations
-pub use basic::{add, subtract, multiply, divide, power, sqrt, abs, min, max};
-pub use basic::{round, roundup, rounddown, floor, ceil, parse_number, calc, eval_var};
+pub use basic::{abs, add, divide, max, min, multiply, power, sqrt, subtract};
+pub use basic::{calc, ceil, eval_var, floor, parse_number, round, rounddown, roundup};
 
 // Integer operations
-pub use integers::{gcd, lcm, is_prime, factorial, fibonacci, factors, sum_range};
-pub use integers::{int_add, int_subtract, int_multiply, int_divide, int_power, int_parse, int_calc};
+pub use integers::{factorial, factors, fibonacci, gcd, is_prime, lcm, sum_range};
+pub use integers::{
+    int_add, int_calc, int_divide, int_multiply, int_parse, int_power, int_subtract,
+};
 
 // Expression evaluation
 pub use expressions::evaluate_expression;
 
 // Base conversion operations
-pub use base::{to_hex, to_hex_upper, to_binary, to_octal};
-pub use base::{from_hex, from_binary, from_octal, to_base, from_base, base_convert};
+pub use base::{base_convert, from_base, from_binary, from_hex, from_octal, to_base};
+pub use base::{to_binary, to_hex, to_hex_upper, to_octal};
 
 // Percentage operations
-pub use percentage::{percent_of, percent_change, ratio, percentage_to_decimal, decimal_to_percentage};
+pub use percentage::{
+    decimal_to_percentage, percent_change, percent_of, percentage_to_decimal, ratio,
+};
 
 // Predicate operations
-pub use predicates::{is_even, is_odd, modulo, sign, same_sign, is_positive, is_negative, is_zero};
+pub use predicates::{is_even, is_negative, is_odd, is_positive, is_zero, modulo, same_sign, sign};
 
 // Aggregator operations
-pub use aggregators::{min_list, max_list, sum_list, avg, mean, median};
+pub use aggregators::{avg, max_list, mean, median, min_list, sum_list};
 
 // Random operations
-pub use random::{random_range, random_int_range, random_list_float, random_list_int, random_list_bool, random_list_string};
+pub use random::{
+    random_int_range, random_list_bool, random_list_float, random_list_int, random_list_string,
+    random_range,
+};
 
 // Note: Macros are exported at crate root via src/macros/mod.rs
-

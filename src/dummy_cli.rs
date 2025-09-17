@@ -21,9 +21,6 @@ fn main() {
     });
 }
 
-
-
-
 // --- Pre-dispatch commands ---
 fn do_install(_args: Args) -> i32 {
     echo!("Installing dummy dependencies...");

@@ -1,5 +1,5 @@
 //! RSB Visual Package - Optional visual enhancements
-//! 
+//!
 //! This module provides optional color systems, glyphs, and interactive prompts
 //! through Cargo feature flags. Components are organized into focused packages
 //! to allow selective inclusion based on application needs.

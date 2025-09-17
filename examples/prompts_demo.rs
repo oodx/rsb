@@ -2,7 +2,7 @@
 use rsb::prelude::*;
 
 #[cfg(feature = "prompts")]
-use rsb::{confirm, ask, select};
+use rsb::{ask, confirm, select};
 
 fn main() {
     println!("=== RSB-004 Prompts MVP Demo ===\n");
@@ -18,7 +18,7 @@ fn main() {
         // Set up colors for better UX
         #[cfg(feature = "colors-simple")]
         {
-            use rsb::visual::colors::{color_mode, color_enable_with};
+            use rsb::visual::colors::{color_enable_with, color_mode};
             color_mode("always");
             color_enable_with("simple");
         }
@@ -29,14 +29,23 @@ fn main() {
 
         println!("1. confirm!(\"Proceed?\") → {}", confirm!("Proceed?"));
         println!("2. ask!(\"Name\", \"Alice\") → {}", ask!("Name", "Alice"));
-        println!("3. select!(\"Color\", &[\"red\", \"blue\"]) → {}", select!("Color", &["red", "blue"]));
-        println!("4. select!(\"Option\", &[\"a\", \"b\", \"c\"], 1) → {}", select!("Option", &["a", "b", "c"], 1));
+        println!(
+            "3. select!(\"Color\", &[\"red\", \"blue\"]) → {}",
+            select!("Color", &["red", "blue"])
+        );
+        println!(
+            "4. select!(\"Option\", &[\"a\", \"b\", \"c\"], 1) → {}",
+            select!("Option", &["a", "b", "c"], 1)
+        );
 
         // Demo with opt_yes
         unset_var("opt_quiet");
         set_var("opt_yes", "1");
         println!("\n=== Testing with opt_yes (auto-confirm) ===");
-        println!("5. confirm!(\"Delete files?\") → {}", confirm!("Delete files?"));
+        println!(
+            "5. confirm!(\"Delete files?\") → {}",
+            confirm!("Delete files?")
+        );
 
         unset_var("opt_yes");
 
@@ -50,7 +59,10 @@ fn main() {
         #[cfg(feature = "colors-simple")]
         {
             use rsb::visual::colors::colored;
-            println!("\n{}", colored("{green}🎉 RSB-004 Prompts MVP Complete!{reset}"));
+            println!(
+                "\n{}",
+                colored("{green}🎉 RSB-004 Prompts MVP Complete!{reset}")
+            );
         }
 
         #[cfg(not(feature = "colors-simple"))]

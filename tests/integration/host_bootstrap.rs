@@ -14,7 +14,10 @@ fn host_bootstrap_sets_expected_keys() {
     rsb::hosts::bootstrap(&args);
 
     // XDG and RSB
-    assert!(rsb::global::get_var("XDG_HOME").ends_with(".local") || rsb::global::get_var("XDG_HOME").ends_with(home.path().to_string_lossy().as_ref()));
+    assert!(
+        rsb::global::get_var("XDG_HOME").ends_with(".local")
+            || rsb::global::get_var("XDG_HOME").ends_with(home.path().to_string_lossy().as_ref())
+    );
     assert!(!rsb::global::get_var("RSB_LIB_HOME").is_empty());
 
     // Script + args
@@ -22,4 +25,3 @@ fn host_bootstrap_sets_expected_keys() {
     assert_eq!(rsb::global::get_var("ARGC"), "3");
     assert_eq!(rsb::global::get_var("ARGV_1"), "a");
 }
-

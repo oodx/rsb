@@ -11,8 +11,8 @@ use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::{Duration, Instant};
 
+use super::interactive::{ask, confirm, confirm_default, select};
 use crate::global::get_var;
-use super::interactive::{confirm, confirm_default, ask, select};
 
 /// Parse timeout from global context
 /// Priority: opt_prompt_timeout (CLI flag) > PROMPT_TIMEOUT (env var) > None
@@ -71,7 +71,11 @@ where
 
 /// Confirm with timeout support
 /// Returns `default_value` on timeout
-pub fn confirm_with_timeout(message: &str, timeout_override: Option<u64>, default_value: bool) -> bool {
+pub fn confirm_with_timeout(
+    message: &str,
+    timeout_override: Option<u64>,
+    default_value: bool,
+) -> bool {
     let timeout_secs = timeout_override
         .or_else(parse_timeout_from_context)
         .unwrap_or(30); // 30 second default
@@ -80,12 +84,16 @@ pub fn confirm_with_timeout(message: &str, timeout_override: Option<u64>, defaul
     let message_owned = message.to_string();
 
     // Use timeout wrapper
-    with_timeout(timeout_duration, move || confirm(&message_owned))
-        .unwrap_or(default_value) // Return default on timeout
+    with_timeout(timeout_duration, move || confirm(&message_owned)).unwrap_or(default_value)
+    // Return default on timeout
 }
 
 /// Confirm with default and timeout support
-pub fn confirm_default_with_timeout(message: &str, default: bool, timeout_override: Option<u64>) -> bool {
+pub fn confirm_default_with_timeout(
+    message: &str,
+    default: bool,
+    timeout_override: Option<u64>,
+) -> bool {
     let timeout_secs = timeout_override
         .or_else(parse_timeout_from_context)
         .unwrap_or(30);
@@ -93,13 +101,19 @@ pub fn confirm_default_with_timeout(message: &str, default: bool, timeout_overri
     let timeout_duration = Duration::from_secs(timeout_secs);
     let message_owned = message.to_string();
 
-    with_timeout(timeout_duration, move || confirm_default(&message_owned, default))
-        .unwrap_or(default) // Return provided default on timeout
+    with_timeout(timeout_duration, move || {
+        confirm_default(&message_owned, default)
+    })
+    .unwrap_or(default) // Return provided default on timeout
 }
 
 /// Ask with timeout support
 /// Returns `default_value` on timeout
-pub fn ask_with_timeout(message: &str, default: Option<&str>, timeout_override: Option<u64>) -> String {
+pub fn ask_with_timeout(
+    message: &str,
+    default: Option<&str>,
+    timeout_override: Option<u64>,
+) -> String {
     let timeout_secs = timeout_override
         .or_else(parse_timeout_from_context)
         .unwrap_or(30);
@@ -116,7 +130,12 @@ pub fn ask_with_timeout(message: &str, default: Option<&str>, timeout_override: 
 
 /// Select with timeout support
 /// Returns option at `default_index` on timeout
-pub fn select_with_timeout(message: &str, options: &[&str], default_index: Option<usize>, timeout_override: Option<u64>) -> String {
+pub fn select_with_timeout(
+    message: &str,
+    options: &[&str],
+    default_index: Option<usize>,
+    timeout_override: Option<u64>,
+) -> String {
     if options.is_empty() {
         return String::new();
     }
@@ -126,7 +145,9 @@ pub fn select_with_timeout(message: &str, options: &[&str], default_index: Optio
         .unwrap_or(30);
 
     let timeout_duration = Duration::from_secs(timeout_secs);
-    let default_idx = default_index.unwrap_or(0).min(options.len().saturating_sub(1));
+    let default_idx = default_index
+        .unwrap_or(0)
+        .min(options.len().saturating_sub(1));
     let message_owned = message.to_string();
     let options_owned: Vec<String> = options.iter().map(|s| s.to_string()).collect();
 

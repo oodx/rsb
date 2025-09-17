@@ -34,16 +34,10 @@
 
 // MODULE_SPEC: Implementation modules
 pub mod interactive;
-pub mod utils;  // Curated functions - exposed via visual::utils
+pub mod utils; // Curated functions - exposed via visual::utils
 
 // MODULE_SPEC: Curated public surface - re-export core functions
-pub use interactive::{
-    confirm,
-    confirm_default,
-    ask,
-    select,
-    default_from,
-};
+pub use interactive::{ask, confirm, confirm_default, default_from, select};
 
 // Note: Timeout-enhanced functions are available via:
 // 1. Ergonomic macros: confirm_timeout!, ask_timeout!, etc. (recommended)

@@ -1,5 +1,5 @@
 //! Virtualized Test/Home Environments
-//! 
+//!
 //! Create isolated, virtualized environments for testing and development
 //! Mock home directories, temp spaces, config isolation
 
@@ -20,7 +20,7 @@
 // pub fn virt_home() -> String
 // Get virtual home directory path (when in virt mode)
 
-// pub fn virt_config() -> String  
+// pub fn virt_config() -> String
 // Get virtual config directory path
 
 // pub fn virt_data() -> String

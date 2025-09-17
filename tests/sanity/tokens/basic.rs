@@ -1,6 +1,6 @@
 //! Token module sanity tests - core functionality validation
 
-use rsb::token::{tokenize_string, is_token_streamable, TokenStreamable, Token, Namespace};
+use rsb::token::{is_token_streamable, tokenize_string, Namespace, Token, TokenStreamable};
 
 #[test]
 fn test_basic_token_parsing() {
@@ -16,7 +16,8 @@ fn test_basic_token_parsing() {
 #[test]
 fn test_namespace_support() {
     // Test namespace:key=value format
-    let tokens = tokenize_string(r#"db:user="admin"; db:pass="secret"; auth:token="xyz";"#).unwrap();
+    let tokens =
+        tokenize_string(r#"db:user="admin"; db:pass="secret"; auth:token="xyz";"#).unwrap();
     assert_eq!(tokens.len(), 3);
 
     // Check db namespace tokens
@@ -33,21 +34,29 @@ fn test_namespace_support() {
 #[test]
 fn test_quote_stripping() {
     // Test that quotes are properly stripped from values
-    let tokens = tokenize_string(r#"key1="double quoted"; key2='single quoted'; key3=unquoted;"#).unwrap();
+    let tokens =
+        tokenize_string(r#"key1="double quoted"; key2='single quoted'; key3=unquoted;"#).unwrap();
     assert_eq!(tokens.len(), 3);
-    assert_eq!(tokens[0].value, "double quoted");  // Double quotes stripped
-    assert_eq!(tokens[1].value, "single quoted");  // Single quotes stripped
-    assert_eq!(tokens[2].value, "unquoted");       // No quotes to strip
+    assert_eq!(tokens[0].value, "double quoted"); // Double quotes stripped
+    assert_eq!(tokens[1].value, "single quoted"); // Single quotes stripped
+    assert_eq!(tokens[2].value, "unquoted"); // No quotes to strip
 }
 
 #[test]
 fn test_hierarchical_namespaces() {
     // Test dot-separated hierarchical namespaces
-    let tokens = tokenize_string(r#"config.db:host="localhost"; config.auth:enabled="true";"#).unwrap();
+    let tokens =
+        tokenize_string(r#"config.db:host="localhost"; config.auth:enabled="true";"#).unwrap();
     assert_eq!(tokens.len(), 2);
 
-    assert_eq!(tokens[0].namespace.as_ref().unwrap().to_string(), "config.db");
-    assert_eq!(tokens[1].namespace.as_ref().unwrap().to_string(), "config.auth");
+    assert_eq!(
+        tokens[0].namespace.as_ref().unwrap().to_string(),
+        "config.db"
+    );
+    assert_eq!(
+        tokens[1].namespace.as_ref().unwrap().to_string(),
+        "config.auth"
+    );
 }
 
 #[test]
@@ -59,8 +68,8 @@ fn test_validation_functions() {
 
     // Test invalid formats
     assert!(!is_token_streamable("missing_equals"));
-    assert!(!is_token_streamable("key = value"));  // spaces around =
-    assert!(!is_token_streamable("key=value "));   // trailing space
+    assert!(!is_token_streamable("key = value")); // spaces around =
+    assert!(!is_token_streamable("key=value ")); // trailing space
 }
 
 #[test]
@@ -86,7 +95,7 @@ fn test_error_handling() {
     let result = tokenize_string("bad_token");
     assert!(matches!(result, Err(TokenError::MalformedToken { .. })));
 
-    let result = tokenize_string("key = value");  // space before =
+    let result = tokenize_string("key = value"); // space before =
     assert!(matches!(result, Err(TokenError::MalformedToken { .. })));
 }
 

@@ -48,14 +48,14 @@ mod tests {
 
     #[test]
     fn test_same_sign() {
-        assert!(same_sign(5.0, 3.0));    // both positive
-        assert!(same_sign(-5.0, -3.0));  // both negative
-        assert!(same_sign(0.0, 0.0));    // both zero
+        assert!(same_sign(5.0, 3.0)); // both positive
+        assert!(same_sign(-5.0, -3.0)); // both negative
+        assert!(same_sign(0.0, 0.0)); // both zero
 
-        assert!(!same_sign(5.0, -3.0));  // different signs
-        assert!(!same_sign(-5.0, 3.0));  // different signs
-        assert!(!same_sign(0.0, 5.0));   // zero vs positive
-        assert!(!same_sign(0.0, -5.0));  // zero vs negative
+        assert!(!same_sign(5.0, -3.0)); // different signs
+        assert!(!same_sign(-5.0, 3.0)); // different signs
+        assert!(!same_sign(0.0, 5.0)); // zero vs positive
+        assert!(!same_sign(0.0, -5.0)); // zero vs negative
     }
 
     #[test]

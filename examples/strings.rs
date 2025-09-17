@@ -8,4 +8,3 @@ fn main() {
     echo!("replace once: {}", str_replace("a/b/c", "/", "_", false)); // a_b/c
     echo!("upper first: {}", str_upper("hello", false)); // Hello
 }
-

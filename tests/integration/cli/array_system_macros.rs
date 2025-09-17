@@ -61,8 +61,7 @@ fn test_system_macro_operations() {
     assert!(content.contains("Line 2"));
 
     // Test line-based operations using RSB streams
-    let lines = pipe!(content)
-        .to_string();
+    let lines = pipe!(content).to_string();
 
     assert!(lines.contains("Line 2"));
 

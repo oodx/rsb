@@ -4,9 +4,12 @@
 //! Framework-agnostic and extractable to RSB.
 
 use std::collections::HashMap;
-use std::sync::{Arc, Mutex, atomic::{AtomicU64, Ordering}};
+use std::sync::{
+    atomic::{AtomicU64, Ordering},
+    Arc, Mutex,
+};
 
-use super::core::{ProgressReporter, ProgressTask, TaskId, TaskBuilder};
+use super::core::{ProgressReporter, ProgressTask, TaskBuilder, TaskId};
 use super::styles::ProgressStyle;
 
 /// Central manager for progress tasks
@@ -78,13 +81,20 @@ impl ProgressManager {
         let task = Arc::new(builder.build(task_id, reporters));
 
         // Add to active tasks
-        self.active_tasks.lock().unwrap().insert(task_id, task.clone());
+        self.active_tasks
+            .lock()
+            .unwrap()
+            .insert(task_id, task.clone());
 
         task
     }
 
     /// Start a task with custom builder
-    pub fn start_task_with_builder(&self, builder: TaskBuilder, style: ProgressStyle) -> Arc<ProgressTask> {
+    pub fn start_task_with_builder(
+        &self,
+        builder: TaskBuilder,
+        style: ProgressStyle,
+    ) -> Arc<ProgressTask> {
         if !self.enabled {
             return Arc::new(self.create_noop_task("disabled".to_string()));
         }
@@ -99,7 +109,10 @@ impl ProgressManager {
 
         let task = Arc::new(builder.build(task_id, reporters));
 
-        self.active_tasks.lock().unwrap().insert(task_id, task.clone());
+        self.active_tasks
+            .lock()
+            .unwrap()
+            .insert(task_id, task.clone());
         task
     }
 
@@ -110,8 +123,7 @@ impl ProgressManager {
 
     /// Get all active (non-finished) tasks
     pub fn active_tasks(&self) -> Vec<Arc<ProgressTask>> {
-        self
-            .active_tasks
+        self.active_tasks
             .lock()
             .unwrap()
             .values()
@@ -225,7 +237,10 @@ impl ProgressStats {
 
     /// Check if all tasks are completed
     pub fn all_complete(&self) -> bool {
-        self.total_tasks > 0 && self.running_tasks == 0 && self.failed_tasks == 0 && self.cancelled_tasks == 0
+        self.total_tasks > 0
+            && self.running_tasks == 0
+            && self.failed_tasks == 0
+            && self.cancelled_tasks == 0
     }
 
     /// Check if any tasks failed
@@ -275,12 +290,10 @@ impl ManagerBuilder {
                 let active_tasks = manager.active_tasks.clone();
                 let interval = std::time::Duration::from_millis(self.cleanup_interval_ms);
 
-                std::thread::spawn(move || {
-                    loop {
-                        std::thread::sleep(interval);
-                        let mut tasks = active_tasks.lock().unwrap();
-                        tasks.retain(|_, task| !task.is_finished());
-                    }
+                std::thread::spawn(move || loop {
+                    std::thread::sleep(interval);
+                    let mut tasks = active_tasks.lock().unwrap();
+                    tasks.retain(|_, task| !task.is_finished());
                 });
             }
 
@@ -361,7 +374,10 @@ impl MultiStepProgress {
         }
 
         let overall_percentage = (total_progress * 100.0) as u64;
-        self.main_task.update(overall_percentage, &format!("Step {}/{}", self.current_step, self.steps.len()));
+        self.main_task.update(
+            overall_percentage,
+            &format!("Step {}/{}", self.current_step, self.steps.len()),
+        );
     }
 
     /// Complete the multi-step operation
@@ -482,9 +498,7 @@ mod tests {
 
         assert!(manager.is_enabled());
 
-        let disabled_manager = ManagerBuilder::new()
-            .enabled(false)
-            .build();
+        let disabled_manager = ManagerBuilder::new().enabled(false).build();
 
         assert!(!disabled_manager.is_enabled());
     }

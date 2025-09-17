@@ -10,7 +10,10 @@ fn uat_threads_basic_demo() {
 
     // Benchmark demo
     let d = rsb::threads::bench("uat:sum", || {
-        let mut s = 0u64; for i in 0..50_000 { s += i; }
+        let mut s = 0u64;
+        for i in 0..50_000 {
+            s += i;
+        }
         let _ = s;
     });
     println!("bench: uat:sum -> {:?}", d);
@@ -23,7 +26,10 @@ fn uat_threads_basic_demo() {
 
     // List jobs (may be empty if completed)
     let jobs = rsb::threads::list_jobs();
-    if jobs.is_empty() { println!("jobs: <none>"); }
-    for (id, cmd) in jobs { println!("jobs: [{}] {}", id, cmd); }
+    if jobs.is_empty() {
+        println!("jobs: <none>");
+    }
+    for (id, cmd) in jobs {
+        println!("jobs: [{}] {}", id, cmd);
+    }
 }
-

@@ -232,7 +232,7 @@ fn test_expression_evaluation() {
     // and produces some result
     match result {
         Ok(val) => assert!(val >= 0.0), // Basic sanity check
-        Err(_) => {}, // Expression evaluation might fail, that's OK for this test
+        Err(_) => {}                    // Expression evaluation might fail, that's OK for this test
     }
 }
 
@@ -278,7 +278,10 @@ fn test_math_consistency() {
     assert_eq!(rsb::math::multiply(a, b), rsb::math::multiply(a, b));
 
     // Test mathematical relationships
-    assert_eq!(rsb::math::power(2.0, 3.0), rsb::math::multiply(rsb::math::multiply(2.0, 2.0), 2.0));
+    assert_eq!(
+        rsb::math::power(2.0, 3.0),
+        rsb::math::multiply(rsb::math::multiply(2.0, 2.0), 2.0)
+    );
     assert_eq!(rsb::math::sqrt(16.0).unwrap(), 4.0);
     assert_eq!(rsb::math::power(4.0, 2.0), 16.0);
 }

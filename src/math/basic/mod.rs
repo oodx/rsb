@@ -72,7 +72,8 @@ pub fn ceil(n: f64) -> f64 {
 }
 
 pub fn parse_number(text: &str) -> Result<f64, String> {
-    text.trim().parse::<f64>()
+    text.trim()
+        .parse::<f64>()
         .map_err(|_| format!("Could not parse '{}' as number", text))
 }
 
@@ -109,4 +110,3 @@ pub fn eval_var(var_name: &str) -> Result<f64, String> {
     parse_number(&val_str)
         .map_err(|_| format!("Variable '{}' is not a valid number: {}", var_name, val_str))
 }
-

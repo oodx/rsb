@@ -19,7 +19,7 @@ pub fn cli_bootstrap_from_env() {
 // - Extract script information from command line args
 // - Set SCRIPT_NAME, SCRIPT_PATH, SCRIPT_DIR, PWD variables
 
-// rsb_bootstrap(args: &[String]) -> ()  
+// rsb_bootstrap(args: &[String]) -> ()
 // - SPLIT: CLI parts here, environment parts in global::bootstrap
 // - This function becomes: cli_bootstrap() + global::env_bootstrap()
 
@@ -34,7 +34,7 @@ pub fn cli_bootstrap_from_env() {
 // - Extract and set script-related variables:
 //   - SCRIPT_NAME: filename only (e.g., "backup.sh")
 //   - SCRIPT_PATH: full path (e.g., "/usr/local/bin/backup.sh")
-//   - SCRIPT_DIR: containing directory (e.g., "/usr/local/bin")  
+//   - SCRIPT_DIR: containing directory (e.g., "/usr/local/bin")
 //   - PWD: current working directory
 
 // SCRIPT INFORMATION:
@@ -43,7 +43,7 @@ pub fn cli_bootstrap_from_env() {
 // - Get current script name from global context
 // - Example: get_script_name() -> "backup"
 
-// get_script_path() -> String  
+// get_script_path() -> String
 // - Get full script path from global context
 // - Example: get_script_path() -> "/usr/local/bin/backup"
 
