@@ -72,14 +72,14 @@ fn test_sed_template_macro() {
     set_var("USER_NAME", "TestUser");
     set_var("APP_VERSION", "1.0.0");
 
-    let template_content = "Welcome {{USER_NAME}} to version {{APP_VERSION}}";
+    let template_content = "Welcome $USER_NAME to version $APP_VERSION";
 
-    let result = rsb::parse::template_replace_str(template_content);
+    let result = expand_vars(template_content);
     assert_eq!(result, "Welcome TestUser to version 1.0.0");
 
     // Test with missing variables
-    let template_missing = "Hello {{MISSING_VAR}}";
-    let result_missing = rsb::parse::template_replace_str(template_missing);
+    let template_missing = "Hello $MISSING_VAR";
+    let result_missing = expand_vars(template_missing);
     assert_eq!(result_missing, "Hello "); // Should replace with empty string
 
     unset_var("USER_NAME");
@@ -169,13 +169,13 @@ fn test_parse_complex_templates() {
 
     let docker_template = r#"
 FROM alpine:latest
-EXPOSE {{PORT}}
-ENV SERVICE={{SERVICE_NAME}}
-ENV ENVIRONMENT={{ENV}}
-CMD ["./{{SERVICE_NAME}}", "--workers", "{{WORKERS}}"]
+EXPOSE $PORT
+ENV SERVICE=$SERVICE_NAME
+ENV ENVIRONMENT=$ENV
+CMD ["./$SERVICE_NAME", "--workers", "$WORKERS"]
 "#;
 
-    let result = rsb::parse::template_replace_str(docker_template);
+    let result = expand_vars(docker_template);
     assert!(result.contains("EXPOSE 8080"));
     assert!(result.contains("ENV SERVICE=web-server"));
     assert!(result.contains("ENV ENVIRONMENT=production"));
@@ -271,14 +271,14 @@ fn test_parse_integration_scenarios() {
 
     let config_template = r#"
 [database]
-host={{DB_HOST}}
-port={{DB_PORT}}
+host=$DB_HOST
+port=$DB_PORT
 
 [application]
-environment={{APP_ENV}}
+environment=$APP_ENV
 "#;
 
-    let final_config = rsb::parse::template_replace_str(config_template);
+    let final_config = expand_vars(config_template);
     assert!(final_config.contains("host=prod-db.example.com"));
     assert!(final_config.contains("port=5432"));
     assert!(final_config.contains("environment=production"));
