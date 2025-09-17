@@ -52,21 +52,29 @@ fn uat_dev_test_environment_demo() {
     println!("✓ Test environment variable set");
 
     // Test debug mode detection
-    if rsb::dev::is_debug_mode() {
-        println!("✓ Debug mode is active");
-    } else {
-        println!("ℹ Debug mode is inactive");
+    #[cfg(feature = "dev-pty")]
+    {
+        if rsb::dev::is_debug_mode() {
+            println!("✓ Debug mode is active");
+        } else {
+            println!("ℹ Debug mode is inactive");
+        }
+
+        // Test development assertions
+        rsb::dev::dev_assert(true, "Basic dev assertion test");
+        println!("✓ Development assertion passed");
+
+        // Test timing utilities for performance testing
+        let start = rsb::dev::start_timer();
+        std::thread::sleep(std::time::Duration::from_millis(1));
+        let elapsed = rsb::dev::elapsed_time(start);
+        println!("✓ Timing measurement: {:?}", elapsed);
     }
 
-    // Test development assertions
-    rsb::dev::dev_assert(true, "Basic dev assertion test");
-    println!("✓ Development assertion passed");
-
-    // Test timing utilities for performance testing
-    let start = rsb::dev::start_timer();
-    std::thread::sleep(std::time::Duration::from_millis(1));
-    let elapsed = rsb::dev::elapsed_time(start);
-    println!("✓ Timing measurement: {:?}", elapsed);
+    #[cfg(not(feature = "dev-pty"))]
+    {
+        println!("⚠ dev-pty feature disabled; skipping debug utility checks");
+    }
 
     // Test cleanup
     unset_var("DEV_TEST_MODE");
@@ -126,10 +134,7 @@ fn uat_dev_debugging_tools_demo() {
 
         // Demonstrate debug state management using global variables
         set_var("RSB_DEV_MODE", "enabled");
-        println!(
-            "✓ Development mode enabled: {}",
-            get_var("RSB_DEV_MODE").unwrap_or_default()
-        );
+        println!("✓ Development mode enabled: {}", get_var("RSB_DEV_MODE"));
 
         // Demonstrate timing utilities
         let start = std::time::Instant::now();

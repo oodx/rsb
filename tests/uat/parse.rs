@@ -61,18 +61,16 @@ fn uat_parse_file_operations_demo() {
     println!("{}", around_target);
 
     // Test file insertion
-    let insert_result = sed_insert_file!(&temp_file_str, "New inserted line", "Target Line");
+    let insert_result =
+        rsb::parse::sed_insert_file(&temp_file_str, "New inserted line", "Target Line");
     match insert_result {
         Ok(_) => println!("✓ Content inserted into file successfully"),
         Err(e) => println!("⚠ File insertion failed: {}", e),
     }
 
     // Test file template replacement
-    let template_result = sed_template_file!(&temp_file_str, "Replacement content", "Target Line");
-    match template_result {
-        Ok(_) => println!("✓ Template replacement in file successful"),
-        Err(e) => println!("⚠ File template replacement failed: {}", e),
-    }
+    rsb::parse::sed_template_file(&temp_file_str, "Replacement content", "Target Line");
+    println!("✓ Template replacement in file successful");
 
     println!("File operations demo completed!");
 }
