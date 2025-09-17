@@ -54,10 +54,16 @@ fn sanity_parse_template_operations() {
 fn sanity_parse_file_operations() {
     // Create temporary test file
     let content = "File line 1\nFile line 2\nFile line 3";
-    let temp_file = rsb::dev::create_temp_file(content);
+
+    let temp_dir = std::env::temp_dir();
+    let temp_file = temp_dir.join(format!("rsb_parse_test_{}.txt", std::process::id()));
+    let temp_file_str = temp_file.to_string_lossy().to_string();
+
+    // Write content to temp file
+    rsb::fs::write_file(&temp_file_str, content);
 
     // Test file line extraction
-    let lines = sed_lines_file!(&temp_file, 1, 2);
+    let lines = sed_lines_file!(&temp_file_str, 1, 2);
     assert!(lines.contains("File line 1"));
     assert!(lines.contains("File line 2"));
     assert!(!lines.contains("File line 3"));

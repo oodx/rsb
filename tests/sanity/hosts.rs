@@ -3,7 +3,8 @@ use rsb::prelude::*;
 #[test]
 fn sanity_hosts_environment_discovery() {
     // Test environment discovery functionality
-    rsb::hosts::discover_environment();
+    rsb::hosts::env_bootstrap();
+    rsb::hosts::import_environment();
 
     // Should populate basic environment variables
     assert!(!get_var("HOME").is_empty());

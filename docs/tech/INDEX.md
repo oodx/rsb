@@ -21,7 +21,8 @@ This index links to feature guides, developer docs, and reference material.
 | Parse | String/stream sed-like transforms + file adapter | [FEATURES_PARSE.md](features/FEATURES_PARSE.md) |
 | Truth | Boolean semantics (REBEL: 0=true, 1=false) | [FEATURES_TRUTH.md](features/FEATURES_TRUTH.md) |
 | Generators | String/ID/selection generators (GX) | [FEATURES_GENERATORS.md](features/FEATURES_GENERATORS.md) |
-| Colors | Visual color system and runtime registry | [FEATURES_COLORS.md](features/FEATURES_COLORS.md) |
+| Visuals | Complete visual system: colors, glyphs, prompts, progress | [FEATURES_VISUALS.md](features/FEATURES_VISUALS.md) |
+| Colors | Visual color system and runtime registry (legacy) | [FEATURES_COLORS.md](features/FEATURES_COLORS.md) |
 | Prompts | Interactive prompts with timeouts | [FEATURES_PROMPTS.md](features/FEATURES_PROMPTS.md) |
 | Progress | Modular progress indicators | [FEATURES_PROGRESS.md](features/FEATURES_PROGRESS.md) |
 | Dev Utils | Development/test utilities (PTY wrapper) | [FEATURES_DEV.md](features/FEATURES_DEV.md) |

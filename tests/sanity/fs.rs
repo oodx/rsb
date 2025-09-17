@@ -5,21 +5,28 @@ use std::path::Path;
 fn sanity_fs_file_operations() {
     // Test basic file read/write operations
     let test_content = "Hello, RSB file system test!";
-    let temp_file = rsb::dev::create_temp_file(test_content);
+
+    // Create temporary file using standard approach
+    let temp_dir = std::env::temp_dir();
+    let temp_file = temp_dir.join(format!("rsb_test_{}.txt", std::process::id()));
+    let temp_file_str = temp_file.to_string_lossy().to_string();
+
+    // Write initial content
+    rsb::fs::write_file(&temp_file_str, test_content);
 
     // Test file reading
-    let read_content = rsb::fs::read_file(&temp_file);
+    let read_content = rsb::fs::read_file(&temp_file_str);
     assert_eq!(read_content, test_content);
 
     // Test file writing
     let new_content = "Updated content for testing";
-    rsb::fs::write_file(&temp_file, new_content);
-    let updated_content = rsb::fs::read_file(&temp_file);
+    rsb::fs::write_file(&temp_file_str, new_content);
+    let updated_content = rsb::fs::read_file(&temp_file_str);
     assert_eq!(updated_content, new_content);
 
     // Test file appending
-    rsb::fs::append_file(&temp_file, "\nAppended line");
-    let final_content = rsb::fs::read_file(&temp_file);
+    rsb::fs::append_file(&temp_file_str, "\nAppended line");
+    let final_content = rsb::fs::read_file(&temp_file_str);
     assert!(final_content.contains("Updated content"));
     assert!(final_content.contains("Appended line"));
 }
@@ -61,13 +68,18 @@ fn sanity_fs_directory_operations() {
 #[test]
 fn sanity_fs_predicates() {
     // Test file system predicates
-    let temp_file = rsb::dev::create_temp_file("predicate test");
+    let temp_dir = std::env::temp_dir();
+    let temp_file = temp_dir.join(format!("rsb_predicate_test_{}.txt", std::process::id()));
+    let temp_file_str = temp_file.to_string_lossy().to_string();
 
-    assert!(rsb::fs::is_file(&temp_file));
-    assert!(!rsb::fs::is_dir(&temp_file));
-    assert!(rsb::fs::is_entity(&temp_file));
-    assert!(rsb::fs::is_readable(&temp_file));
-    assert!(rsb::fs::is_writable(&temp_file));
+    // Create the temp file
+    rsb::fs::write_file(&temp_file_str, "predicate test");
+
+    assert!(rsb::fs::is_file(&temp_file_str));
+    assert!(!rsb::fs::is_dir(&temp_file_str));
+    assert!(rsb::fs::is_entity(&temp_file_str));
+    assert!(rsb::fs::is_readable(&temp_file_str));
+    assert!(rsb::fs::is_writable(&temp_file_str));
 
     // Test non-existent file
     let fake_path = "/nonexistent/fake/path.txt";
@@ -113,19 +125,24 @@ fn sanity_fs_temp_operations() {
 #[test]
 fn sanity_fs_metadata_operations() {
     // Test metadata and backup operations
-    let temp_file = rsb::dev::create_temp_file("metadata test content");
+    let temp_dir = std::env::temp_dir();
+    let temp_file = temp_dir.join(format!("rsb_metadata_test_{}.txt", std::process::id()));
+    let temp_file_str = temp_file.to_string_lossy().to_string();
+
+    // Create the temp file
+    rsb::fs::write_file(&temp_file_str, "metadata test content");
 
     // Test chmod (basic test)
-    rsb::fs::chmod(&temp_file, "644");
+    rsb::fs::chmod(&temp_file_str, "644");
     // Cannot easily test permissions cross-platform, but should not panic
 
     // Test backup creation
-    let backup_path = rsb::fs::backup_file(&temp_file);
+    let backup_path = rsb::fs::backup_file(&temp_file_str, ".backup");
     assert!(rsb::fs::is_file(&backup_path));
-    assert!(backup_path.contains(&temp_file));
+    assert!(backup_path.unwrap().contains(&temp_file_str));
 
     // Test metadata extraction (if any exists)
-    let metadata = rsb::fs::extract_meta_from_file(&temp_file);
+    let metadata = rsb::fs::extract_meta_from_file(&temp_file_str);
     // Metadata might be empty, but function should not panic
     assert!(metadata.is_ok() || metadata.is_err()); // Either result is acceptable
 }

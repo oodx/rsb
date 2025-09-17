@@ -68,6 +68,8 @@ boxy_display() {
             warning) border_symbol="⚠️" ;;
             success) border_symbol="✅" ;;
             info) border_symbol="ℹ️" ;;
+            magic) border_symbol="🎭" ;;
+            silly) border_symbol="🤪" ;;
             *) border_symbol="•" ;;
         esac
 
@@ -444,14 +446,6 @@ Use --violations flag to see complete organized list."
         # 🎉 ZERO VIOLATIONS ACHIEVED! 🎉
         local celebration_text="🎉 ZERO TEST VIOLATIONS ACHIEVED! 🎉
 
-All RSB test organization requirements are satisfied:
-✅ All modules have required sanity tests
-✅ All modules have required UAT tests
-✅ All test files follow proper naming conventions
-✅ All test categories are properly organized
-✅ No unauthorized or invalid test files
-
-Total violations eliminated: 15 → 0
 Test framework status: FULLY COMPLIANT
 
 The RSB test ecosystem is now perfectly organized and ready for
@@ -459,7 +453,7 @@ comprehensive validation across all modules and categories.
 
 🏆 Outstanding work achieving complete test compliance! 🏆"
 
-        boxy_display "$celebration_text" "success" "🎯 RSB TEST ORGANIZATION: PERFECT COMPLIANCE"
+        boxy_display "$celebration_text" "magic" "🎯 RSB TEST ORGANIZATION: PERFECT COMPLIANCE"
     fi
 
     return 0

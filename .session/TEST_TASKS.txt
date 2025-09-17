@@ -519,3 +519,338 @@ The systematic TASKS approach has proven capable of:
 - Strategic optimization (83% effort reduction while accelerating delivery)
 
 ================================================================================
+EPIC 7: API MODERNIZATION & COMPILATION FIXES (Priority: P0 - Critical)
+================================================================================
+Source: Comprehensive analysis + China/Tina validation (session continuation + red eggs)
+Organization: Module-based tickets for focused context and execution
+Updated: 2025-09-16 (CRITICAL REVISIONS after foundational doc review + validation)
+
+🚨 **CRITICAL DISCOVERY:** Existing test files use outdated/non-existent APIs
+**Impact:** Tests don't compile, blocking development and CI/CD
+**Root Cause:** Tests written against old API design, never updated to modern RSB APIs
+**Validation:** China + Tina analysis confirms multiple API mismatches and blocking issues
+
+**MODULE-BASED APPROACH:** Group API fixes by RSB module for focused context
+- Each ticket targets one module's test modernization
+- Enables focused feature documentation review per module
+- Allows incremental validation and completion
+- Uses `./bin/test.sh docs <module>` for authoritative API reference
+
+**EXECUTION ORDER (Priority-Based):**
+1. Visual (unblock ecosystem) → Math (fix compilation) → CLI (simple fix) → Dev (rewrite) → Infrastructure
+
+================================================================================
+
+🔥 **IMMEDIATE PRIORITY: Complete Epic 4 First!**
+--------------------------------------------------
+**BLOCKING:** Must fix `features_global` reference in `tests/integration.rs` (30 seconds)
+**ACTION:** Complete TICKET-013 to achieve Epic 4 milestone before starting Epic 7
+**Validation:** China confirmed Epic 4 at 98% - literally 2 minutes from completion!
+
+================================================================================
+
+TICKET-018A: Visual Module Critical Fix (P0 - BLOCKING ALL VISUAL TESTS)
+-------------------------------------------------------------------------
+**Module:** `rsb::visual` | **Files:** All visual-dependent tests
+**Type:** Feature Flag Fix | **Priority:** P0 | **Story Points:** 1
+**Status:** Ready for Execution | **Assignee:** Unassigned
+
+**Description:**
+Fix critical visual feature flag issue blocking entire visual testing ecosystem
+
+**Current Issues (Tina Red Egg Analysis):**
+- Visual features NOT enabled by default in Cargo.toml
+- ALL visual module imports fail with "could not find visual in rsb"
+- Entire UAT test infrastructure down due to missing feature flags
+- Blocking all visual API modernization work
+
+**Root Cause:**
+- Missing `visual` and `colors-simple` in default feature set
+- OR improper feature-gated testing patterns in tests
+
+**Modern API Reference:**
+- Documentation: `./bin/test.sh docs visual`, `./bin/test.sh docs colors`
+- Feature flags: `visual`, `colors-simple`, `colors-named`, `colors-status`
+- Namespace: `rsb::visual::colors::*` (not direct `rsb::visual::*`)
+
+**Acceptance Criteria:**
+- [ ] Read feature docs: `./bin/test.sh docs visual` + `./bin/test.sh docs colors`
+- [ ] Choose approach: Enable visual in default features OR create proper feature gates
+- [ ] If default: Add `visual = ["colors-simple"]` to Cargo.toml default features
+- [ ] If gated: Add `#[cfg(feature = "visual")]` to all visual tests
+- [ ] Verify visual imports work: `cargo check --test sanity`
+- [ ] Verify feature combinations: `cargo check --test sanity --features visual,colors-simple`
+- [ ] Document approach for EPIC 5 test creation
+
+**Impact:** Unblocks entire visual testing ecosystem + enables visual API modernization
+**Effort:** 15 minutes (Cargo.toml update + validation)
+
+================================================================================
+
+TICKET-018B: Math Module API Alignment (P0 - COMPILATION BLOCKING)
+-------------------------------------------------------------------
+**Module:** `rsb::math` | **File:** `tests/sanity/math.rs` + `tests/uat/math.rs`
+**Type:** API Signature Fix | **Priority:** P0 | **Story Points:** 1
+**Status:** Ready for Execution | **Assignee:** Unassigned
+
+**Description:**
+Fix math module API mismatches preventing compilation
+
+**Current Issues (Tina Red Egg Analysis):**
+- Math tests expect different API signatures than implementation
+- "COMPREHENSIVE but BROKEN - API mismatches prevent compilation"
+- Tests written against wrong API patterns
+- Claims of working implementation are invalid due to compilation failures
+
+**Root Cause:**
+- Test expectations don't match actual `rsb::math` module API signatures
+- Function signatures, return types, or parameter patterns misaligned
+
+**Modern API Reference:**
+- Documentation: `./bin/test.sh docs math`
+- Implementation: Review `src/math/` for actual API signatures
+- Pattern: RSB string-biased philosophy and helper patterns
+
+**Acceptance Criteria:**
+- [ ] Read feature docs: `./bin/test.sh docs math`
+- [ ] Identify actual vs expected API signatures in math tests
+- [ ] Update function calls to match current `rsb::math` API
+- [ ] Fix return type expectations and parameter patterns
+- [ ] Verify compilation: `cargo check --test sanity` + `cargo check --test uat`
+- [ ] Verify tests pass: `cargo test sanity_math` + `cargo test uat_math`
+- [ ] Document corrected patterns for future math test creation
+
+**Impact:** Enables math module test compilation + validates comprehensive math coverage
+**Effort:** 20 minutes (signature alignment + validation)
+
+================================================================================
+
+TICKET-019: CLI Module Type Signature Fix (P1 - SIMPLE API UPDATE)
+-------------------------------------------------------------------
+**Module:** `rsb::cli` | **File:** `tests/sanity/cli.rs`
+**Type:** API Modernization | **Priority:** P1 | **Story Points:** 1
+**Status:** Ready for Execution | **Assignee:** Unassigned
+
+**Description:**
+Modernize CLI module test to use current `rsb::cli::Args` API signatures
+
+**Current Issues:**
+- Line 8-10: Tests expect `args.get(n)` to return `Option<String>`
+- Line 84: Bootstrap expects `args.get(0)` to return `Option<String>`
+- Actual API returns `String` (empty string for missing args)
+
+**Modern API Reference:**
+- Documentation: `./bin/test.sh docs cli`
+- Implementation: `src/cli/args.rs:17: pub fn get(&self, n: usize) -> String`
+- Pattern: Bash-like behavior (empty string vs None for missing args)
+
+**Module Context:**
+- CLI module provides bash-style argument parsing
+- Args API designed for shell-like usage patterns
+- Bootstrap integration with host environment detection
+
+**Acceptance Criteria:**
+- [ ] Read feature docs: `./bin/test.sh docs cli`
+- [ ] Update `assert_eq!(args.get(1), Some("arg1".to_string()))` → `assert_eq!(args.get(1), "arg1")`
+- [ ] Update `assert_eq!(args.get(3), None)` → `assert_eq!(args.get(3), "")`
+- [ ] Update `assert_eq!(args.get(0), Some("test_bin".to_string()))` → `assert_eq!(args.get(0), "test_bin")`
+- [ ] Verify compilation: `cargo check --test sanity`
+- [ ] Verify tests pass: `cargo test sanity_cli`
+
+**Impact:** Enables CLI module test compilation and execution
+**Effort:** 10 minutes (simple type signature fixes with feature doc context)
+
+================================================================================
+
+TICKET-020: Dev Module PTY-Focused Rewrite (P1 - COMPLETE API REPLACEMENT)
+---------------------------------------------------------------------------
+**Module:** `rsb::dev` | **File:** `tests/sanity/dev.rs`
+**Type:** API Modernization | **Priority:** P1 | **Story Points:** 2
+**Status:** Ready for Execution | **Assignee:** Unassigned
+
+**Description:**
+Replace dev module tests with modern `rsb::dev` PTY-focused API
+
+**Current Issues (Tina Red Egg Analysis):**
+- Tests expect debug utilities: `is_debug_mode()`, `debug_print()`, `dev_assert()`, `start_timer()`
+- Modern API only provides PTY functionality: `spawn_pty()`, `PtyOptions`, `PtySession`
+- All expected functions are non-existent in current implementation
+- Module is feature-gated under `dev-pty`
+
+**Modern API Reference:**
+- Documentation: `./bin/test.sh docs dev`
+- Implementation: PTY wrapper only under `dev-pty` feature flag
+- API: `rsb::dev::{PtyOptions, PtySession, spawn_pty}`
+- Purpose: Test-focused utilities for TTY interaction testing
+
+**Module Context:**
+- Dev module is narrowly focused on PTY testing capabilities
+- Feature-gated and optional (not in prelude)
+- Designed for testing interactive/TTY code paths
+- Debug utilities moved to other modules or not implemented
+
+**Acceptance Criteria:**
+- [ ] Read feature docs: `./bin/test.sh docs dev`
+- [ ] Replace debug utility tests with PTY functionality tests
+- [ ] Add feature gate: `#[cfg(feature = "dev-pty")]` for PTY tests
+- [ ] Create non-PTY tests using `rsb::global` for debug state simulation
+- [ ] Test PTY spawn: `spawn_pty("printf test", &PtyOptions::default())`
+- [ ] Test PTY read: `session.read_for(Duration::from_millis(200))`
+- [ ] Test PTY cleanup: `session.wait()`
+- [ ] Verify compilation: `cargo check --test sanity --features dev-pty`
+- [ ] Verify tests pass: `cargo test sanity_dev --features dev-pty`
+
+**Impact:** Enables dev module test compilation with modern PTY-focused API
+**Effort:** 30 minutes (complete test rewrite + feature gate setup + PTY patterns)
+
+================================================================================
+
+TICKET-021: Features Directory Infrastructure (P2 - MISSING STRUCTURE)
+-----------------------------------------------------------------------
+**Module:** Cross-module | **Scope:** Integration test infrastructure
+**Type:** Infrastructure | **Priority:** P2 | **Story Points:** 1
+**Status:** Ready for Execution | **Assignee:** Unassigned
+
+**Description:**
+Create missing integration test infrastructure for features testing
+
+**Current Issues (Tina Red Egg Analysis):**
+- Missing `tests/integration/features/global/` directory structure
+- `features_global` reference expects proper integration test layout
+- "REAL PROBLEM: Missing directory structure, not the reference itself"
+- Affects proper integration testing patterns
+
+**Root Cause:**
+- Integration tests expect modular feature-based organization
+- Directory structure missing for feature-specific integration tests
+- `features_global` is valid but needs supporting infrastructure
+
+**Modern Integration Pattern:**
+- Documentation: `./bin/test.sh docs howto` (integration testing patterns)
+- Structure: `tests/integration/features/<feature>/` per feature module
+- Purpose: Feature-specific integration testing with proper isolation
+
+**Acceptance Criteria:**
+- [ ] Read testing docs: `./bin/test.sh docs howto`
+- [ ] Create `tests/integration/features/` directory
+- [ ] Create `tests/integration/features/global/` subdirectory
+- [ ] Create proper `mod.rs` files for module structure
+- [ ] Move or create appropriate feature integration tests
+- [ ] Update `tests/integration.rs` to include features module
+- [ ] Verify compilation: `cargo check --test integration`
+- [ ] Verify integration tests run: `cargo test --test integration`
+
+**Impact:** Enables proper integration testing patterns + fixes features_global reference
+**Effort:** 15 minutes (directory structure + module setup + validation)
+
+================================================================================
+
+TICKET-020: Dev Module API Modernization (CRITICAL)
+----------------------------------------------------
+**Module:** `rsb::dev` | **File:** `tests/sanity/dev.rs`
+**Type:** API Modernization | **Priority:** P0 | **Story Points:** 2
+**Status:** Ready for Execution | **Assignee:** Unassigned
+
+**Description:**
+Replace dev module tests with modern `rsb::dev` PTY-focused API
+
+**Current Issues:**
+- Tests expect debug utilities: `is_debug_mode()`, `debug_print()`, `dev_assert()`, `start_timer()`
+- Modern API only provides PTY functionality: `spawn_pty()`, `PtyOptions`, `PtySession`
+- All expected functions are non-existent in current implementation
+- Module is feature-gated under `dev-pty`
+
+**Modern API Reference:**
+- Documentation: `./bin/test.sh docs dev`
+- Implementation: PTY wrapper only under `dev-pty` feature flag
+- API: `rsb::dev::{PtyOptions, PtySession, spawn_pty}`
+- Purpose: Test-focused utilities for TTY interaction testing
+
+**Module Context:**
+- Dev module is narrowly focused on PTY testing capabilities
+- Feature-gated and optional (not in prelude)
+- Designed for testing interactive/TTY code paths
+- Debug utilities moved to other modules or not implemented
+
+**Acceptance Criteria:**
+- [ ] Read feature docs: `./bin/test.sh docs dev`
+- [ ] Replace debug utility tests with PTY functionality tests
+- [ ] Add feature gate: `#[cfg(feature = "dev-pty")]` for PTY tests
+- [ ] Create non-PTY tests using `rsb::global` for debug state simulation
+- [ ] Test PTY spawn: `spawn_pty("printf test", &PtyOptions::default())`
+- [ ] Test PTY read: `session.read_for(Duration::from_millis(200))`
+- [ ] Test PTY cleanup: `session.wait()`
+- [ ] Verify compilation: `cargo check --test sanity --features dev-pty`
+- [ ] Verify tests pass: `cargo test sanity_dev --features dev-pty`
+
+**Impact:** Enables dev module test compilation with modern PTY-focused API
+**Effort:** 30 minutes (complete test rewrite + feature gate setup + PTY patterns)
+
+================================================================================
+
+TICKET-021: API Modernization Validation (Quality Assurance)
+-------------------------------------------------------------
+**Module:** Cross-module | **Scope:** All modernized test files
+**Type:** Validation | **Priority:** P1 | **Story Points:** 1
+**Status:** Blocked by TICKET-018,019,020 | **Assignee:** Unassigned
+
+**Description:**
+Comprehensive validation that all module API modernization work compiles and executes
+
+**Module Integration Testing:**
+- CLI module: Verify Args API works with all test patterns
+- Visual module: Verify color API works with all feature flag combinations
+- Dev module: Verify PTY API works with dev-pty feature flag
+
+**Cross-Module Dependencies:**
+- Ensure no API changes break other modules
+- Validate feature flag interactions
+- Confirm prelude re-exports still work
+
+**Acceptance Criteria:**
+- [ ] Full sanity test compilation: `cargo check --test sanity --all-features`
+- [ ] Individual module compilation: `cargo check --test sanity --features visual,colors-simple`
+- [ ] Full sanity test execution: `cargo test --test sanity --all-features`
+- [ ] Individual module testing: `cargo test sanity_cli sanity_visual sanity_dev`
+- [ ] Verify no regression in other test categories
+- [ ] Document modern API patterns for EPIC 5 ticket work
+- [ ] Create feature flag cheat sheet for future development
+
+**Dependencies:** TICKET-018, TICKET-019, TICKET-020 must be completed first
+
+**Impact:** Confirms module API modernization success and enables EPIC 5 completion
+**Effort:** 15 minutes (validation + documentation of modern patterns)
+
+================================================================================
+
+🎯 EPIC 7 MODULE-BASED SUMMARY
+================================================================================
+
+**MODULE-FOCUSED APPROACH:**
+- **CLI Module:** Simple type signature fixes (String vs Option<String>)
+- **Visual Module:** Namespace migration + feature flag setup + initialization
+- **Dev Module:** Complete API replacement (debug utils → PTY testing)
+- **Cross-Module:** Integration validation + pattern documentation
+
+**EXECUTION STRATEGY:**
+1. **TICKET-018:** CLI module (15 min) → Quick compilation win
+2. **TICKET-019:** Visual module (30 min) → Feature-gated modernization
+3. **TICKET-020:** Dev module (30 min) → PTY-focused rewrite
+4. **TICKET-021:** Cross-module validation (15 min) → Integration confirmation
+
+**MODULE CONTEXT BENEFITS:**
+- Focused feature documentation per module (`./bin/test.sh docs <module>`)
+- Clear API boundary understanding
+- Incremental validation per module
+- Modern patterns established for EPIC 5 work
+
+**TOTAL EFFORT:** ~1.5 hours
+**PRIORITY:** P0 (Critical) - Must complete before EPIC 5 tickets
+**OUTCOME:** All existing tests compile with modern module APIs
+
+**INTEGRATION WITH EPIC 5:**
+- Establishes modern API patterns by module
+- Prevents creating broken tests in TICKET-014B and TICKET-015
+- Provides feature flag guidance for remaining test creation
+
+================================================================================

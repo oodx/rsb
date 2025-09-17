@@ -77,31 +77,64 @@ fn uat_dev_test_environment_demo() {
 
 #[test]
 fn uat_dev_debugging_tools_demo() {
-    println!("\n=== UAT: Dev Debugging Tools Demo ===");
+    println!("\n=== UAT: Dev PTY Testing Demo ===");
 
-    // Test debugging and development utilities
-    println!("Testing debugging tools...");
+    // Test PTY development utilities (when available)
+    #[cfg(feature = "dev-pty")]
+    {
+        println!("Testing PTY development tools...");
 
-    // Test debug output utilities
-    rsb::dev::debug_print("Testing debug output functionality");
-    println!("✓ Debug print utility tested");
+        use rsb::dev::{PtyOptions, spawn_pty};
 
-    // Test test helpers and utilities
-    rsb::dev::setup_test_env();
-    println!("✓ Test environment setup completed");
+        // Test basic PTY command execution
+        println!("Testing basic PTY command execution...");
+        let mut session = spawn_pty("echo 'PTY test successful'", &PtyOptions::default()).unwrap();
+        let output = session.read_for(std::time::Duration::from_millis(500)).unwrap();
+        println!("✓ PTY command output: {}", output.trim());
+        let _ = session.wait();
 
-    // Test temporary file creation for testing
-    let temp_file = rsb::dev::create_temp_file("dev_test_content");
-    println!("✓ Temporary test file created: {}", temp_file);
+        // Test PTY with file operations
+        println!("Testing PTY with file operations...");
+        let temp_dir = std::env::temp_dir();
+        let temp_file = temp_dir.join(format!("pty_test_{}.txt", std::process::id()));
+        let temp_file_str = temp_file.to_string_lossy().to_string();
 
-    // Verify temp file exists
-    if std::path::Path::new(&temp_file).exists() {
-        println!("✓ Temporary file verified to exist");
+        let mut session = spawn_pty(&format!("echo 'PTY file test' > {}", temp_file_str), &PtyOptions::default()).unwrap();
+        let _ = session.read_for(std::time::Duration::from_millis(300)).unwrap();
+        let _ = session.wait();
+
+        // Verify file was created
+        if std::path::Path::new(&temp_file_str).exists() {
+            println!("✓ PTY file creation verified");
+        }
+
+        println!("PTY development tools demo completed!");
     }
 
-    // Test environment cleanup
-    rsb::dev::cleanup_test_env();
-    println!("✓ Test environment cleanup completed");
+    #[cfg(not(feature = "dev-pty"))]
+    {
+        println!("PTY development tools not available (dev-pty feature disabled)");
+        println!("Demonstrating alternative development utilities...");
 
-    println!("Debugging tools demo completed!");
+        // Demonstrate debug state management using global variables
+        set_var("RSB_DEV_MODE", "enabled");
+        println!("✓ Development mode enabled: {}", get_var("RSB_DEV_MODE").unwrap_or_default());
+
+        // Demonstrate timing utilities
+        let start = std::time::Instant::now();
+        std::thread::sleep(std::time::Duration::from_millis(10));
+        let elapsed = start.elapsed();
+        println!("✓ Timing measurement: {:?}", elapsed);
+
+        // Demonstrate temp file creation using standard approach
+        let temp_dir = std::env::temp_dir();
+        let temp_file = temp_dir.join(format!("dev_test_{}.txt", std::process::id()));
+        let temp_file_str = temp_file.to_string_lossy().to_string();
+        rsb::fs::write_file(&temp_file_str, "dev test content");
+        println!("✓ Temporary file created: {}", temp_file_str);
+
+        // Cleanup
+        unset_var("RSB_DEV_MODE");
+        println!("Alternative development tools demo completed!");
+    }
 }

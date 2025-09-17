@@ -43,28 +43,32 @@ fn uat_parse_file_operations_demo() {
 
     // Create a temporary test file
     let test_content = "File Line 1\nFile Line 2\nFile Line 3\nTarget Line\nFile Line 5";
-    let temp_file = rsb::dev::create_temp_file(test_content);
-    println!("✓ Test file created: {}", temp_file);
+
+    let temp_dir = std::env::temp_dir();
+    let temp_file = temp_dir.join(format!("rsb_uat_parse_test_{}.txt", std::process::id()));
+    let temp_file_str = temp_file.to_string_lossy().to_string();
+    rsb::fs::write_file(&temp_file_str, test_content);
+    println!("✓ Test file created: {}", temp_file_str);
 
     // Test file line extraction
-    let file_lines = sed_lines_file!(&temp_file, 2, 4);
+    let file_lines = sed_lines_file!(&temp_file_str, 2, 4);
     println!("✓ Lines 2-4 from file:");
     println!("{}", file_lines);
 
     // Test file pattern extraction
-    let around_target = sed_around_file!(&temp_file, "Target", 1);
+    let around_target = sed_around_file!(&temp_file_str, "Target", 1);
     println!("✓ Context around 'Target' from file:");
     println!("{}", around_target);
 
     // Test file insertion
-    let insert_result = sed_insert_file!(&temp_file, "New inserted line", "Target Line");
+    let insert_result = sed_insert_file!(&temp_file_str, "New inserted line", "Target Line");
     match insert_result {
         Ok(_) => println!("✓ Content inserted into file successfully"),
         Err(e) => println!("⚠ File insertion failed: {}", e),
     }
 
     // Test file template replacement
-    let template_result = sed_template_file!(&temp_file, "Replacement content", "Target Line");
+    let template_result = sed_template_file!(&temp_file_str, "Replacement content", "Target Line");
     match template_result {
         Ok(_) => println!("✓ Template replacement in file successful"),
         Err(e) => println!("⚠ File template replacement failed: {}", e),
