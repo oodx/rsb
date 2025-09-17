@@ -88,6 +88,26 @@ mod string;
 #[path = "sanity/gx.rs"]
 mod gx;
 
+// CLI module sanity tests (MODERN - comprehensive Args and bootstrap functionality)
+#[path = "sanity/cli.rs"]
+mod cli;
+
+// Param module sanity tests (MODERN - parameter expansion and context operations)
+#[path = "sanity/param.rs"]
+mod param;
+
+// Parse module sanity tests (MODERN - sed-like transformations and templates)
+#[path = "sanity/parse.rs"]
+mod parse;
+
+// Dev module sanity tests (MODERN - PTY functionality with feature gating)
+#[path = "sanity/dev.rs"]
+mod dev;
+
+// FS module sanity tests (MODERN - file system operations and utilities)
+#[path = "sanity/fs.rs"]
+mod fs;
+
 // The following modules are archived in tests/sanity/_archive/ pending fresh rewrites:
-// - dev, parse, cli, fs, hosts, param, token, visual
+// - hosts, token, visual
 // They will be added back as modern sanity tests are written
