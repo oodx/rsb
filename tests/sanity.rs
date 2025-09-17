@@ -108,6 +108,10 @@ mod dev;
 #[path = "sanity/fs.rs"]
 mod fs;
 
+// Visual module sanity tests (MODERN - colors, glyphs, prompts with feature gating)
+#[path = "sanity/visual.rs"]
+mod visual;
+
 // The following modules are archived in tests/sanity/_archive/ pending fresh rewrites:
-// - hosts, token, visual
+// - hosts, token
 // They will be added back as modern sanity tests are written
