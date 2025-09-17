@@ -483,6 +483,79 @@ Then the ceremony runner handles the visual formatting:
 cargo test --test uat_colors -- --nocapture | boxy --theme info --style rounded --width max
 ```
 
+## Cross-Module Integration Testing
+
+### Progressive Enhancement Pattern
+
+RSB uses a **progressive enhancement** approach for cross-module testing that isolates pure module functionality from cross-module dependencies:
+
+1. **Pure Module Tests** (sanity): Test modules in isolation without dependencies
+2. **Cross-Module Adapters** (UAT): Test integration between modules with feature gating
+3. **Dependency Chain Validation**: Cross-module tests depend on stable core modules
+
+### Cross-Module Adapter Pattern
+
+Create adapter tests for cross-module functionality using feature gating:
+
+```rust
+// tests/uat/string_gx_adapter.rs - String + Generators integration
+use rsb::prelude::*;
+
+#[test]
+fn uat_string_gx_random_case_transforms() {
+    // Generate random strings and test case transformations
+    let random_alnum = rsb::gx::string::get_rand_alnum(10);
+
+    // Test case transformations on generated content
+    let snake = rsb::string::to_snake_case(&random_alnum);
+    let kebab = rsb::string::to_kebab_case(&random_alnum);
+
+    assert!(!snake.is_empty());
+    assert!(!kebab.is_empty());
+}
+
+// tests/uat/string_dev_adapter.rs - String + Dev integration
+#[cfg(feature = "dev-pty")]
+use rsb::dev::{PtyOptions, spawn_pty};
+
+#[test]
+#[cfg(feature = "dev-pty")]
+fn uat_string_dev_pty_output_processing() {
+    // Test string processing of PTY command output
+    let mut sess = spawn_pty("echo 'Hello World'", &PtyOptions::default())
+        .expect("PTY spawn should work");
+
+    let output = sess.read_for(std::time::Duration::from_millis(500))
+        .expect("PTY read should work");
+
+    // Process PTY output with string utilities
+    let snake = rsb::string::to_snake_case(&output.trim());
+    assert_eq!(snake, "hello_world");
+}
+
+#[test]
+#[cfg(not(feature = "dev-pty"))]
+fn uat_string_dev_fallback_test() {
+    // Graceful fallback when feature not available
+    assert_eq!(rsb::string::to_snake_case("Hello World"), "hello_world");
+}
+```
+
+### Benefits of Progressive Enhancement
+
+- **Dependency Isolation**: Pure tests work regardless of cross-module issues
+- **API Drift Detection**: Adapter tests reveal when modules evolve incompatibly
+- **Feature Gating**: Cross-module functionality only tested when features available
+- **Development Order**: Fix core modules first, then cross-module integrations
+
+### Cross-Module Testing Strategy
+
+1. **Write pure sanity tests first** for each module
+2. **Establish stable core APIs** before cross-module work
+3. **Create adapter tests** for cross-module functionality
+4. **Use feature gates** to handle optional dependencies
+5. **Provide fallbacks** when features unavailable
+
 ## Adding New Tests
 
 ### 1. Create Test Files
