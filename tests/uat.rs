@@ -4,6 +4,12 @@
 #[path = "uat/bash.rs"]
 mod bash;
 
+#[path = "uat/cli.rs"]
+mod cli;
+
+#[path = "uat/fs.rs"]
+mod fs;
+
 #[path = "uat/colors.rs"]
 mod colors;
 
@@ -19,14 +25,11 @@ mod global;
 #[path = "uat/glyphs.rs"]
 mod glyphs;
 
-#[path = "uat/host_env.rs"]
-mod host_env;
+#[path = "uat/hosts.rs"]
+mod hosts;
 
-#[path = "uat/host_paths.rs"]
-mod host_paths;
-
-#[path = "uat/param_uat.rs"]
-mod param_uat;
+#[path = "uat/param.rs"]
+mod param;
 
 #[path = "uat/prompts.rs"]
 mod prompts;
@@ -37,8 +40,8 @@ mod string;
 #[path = "uat/threads.rs"]
 mod threads;
 
-#[path = "uat/tokens.rs"]
-mod tokens;
+#[path = "uat/token.rs"]
+mod token;
 
 #[path = "uat/visual.rs"]
 mod visual;
@@ -50,3 +53,19 @@ mod date;
 // Math module UAT tests
 #[path = "uat/math.rs"]
 mod math;
+
+// Progress module UAT tests
+#[path = "uat/progress.rs"]
+mod progress;
+
+// Dev module UAT tests
+#[path = "uat/dev.rs"]
+mod dev;
+
+// GX (Generators) module UAT tests
+#[path = "uat/gx.rs"]
+mod gx;
+
+// Parse module UAT tests
+#[path = "uat/parse.rs"]
+mod parse;

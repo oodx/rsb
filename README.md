@@ -161,6 +161,50 @@ Examples
 - Use a specific dep through RSB: `cargo test --features deps-chrono` then `use rsb::deps::chrono;`
 - Enable all deps: `cargo test --features deps` then `use rsb::deps::*;`
 
+## Testing
+
+RSB uses a sophisticated BASHFX-aligned testing framework with module-based organization:
+
+### Running Tests
+
+```bash
+# Run all tests
+./bin/test.sh run all
+
+# Run specific test category
+./bin/test.sh run uat
+./bin/test.sh run sanity
+
+# NEW: Run module-specific tests
+./bin/test.sh run uat math        # Run only math UAT tests
+./bin/test.sh run sanity tokens   # Run only tokens sanity tests
+
+# List available tests
+./bin/test.sh list
+
+# Check test organization compliance
+./bin/test.sh lint
+```
+
+### Test Organization
+
+Tests are organized by category and module with strict naming conventions:
+
+- **UAT functions**: `uat_<module>_<description>()` (e.g., `uat_math_basic_demo`)
+- **SANITY functions**: `sanity_<module>_<description>()` (e.g., `sanity_math_basic`)
+
+This enables precise module filtering: `./bin/test.sh run uat math` runs all functions matching `uat_math_*`.
+
+### Test Categories
+
+- **sanity**: Core functionality validation (REQUIRED for all modules)
+- **uat**: User Acceptance Tests with visual ceremony
+- **unit**: Fast, isolated module tests
+- **integration**: Cross-module interaction tests
+- **smoke**: Minimal CI tests (<10s total)
+
+See [`HOWTO_TEST.md`](docs/tech/development/HOWTO_TEST.md) for complete testing guide.
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide.

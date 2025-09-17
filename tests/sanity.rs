@@ -71,3 +71,51 @@ mod date;
 // Math module sanity tests
 #[path = "sanity/math.rs"]
 mod math;
+
+// Dev module sanity tests
+#[path = "sanity/dev.rs"]
+mod dev;
+
+// GX (Generators) module sanity tests
+#[path = "sanity/gx.rs"]
+mod gx;
+
+// Parse module sanity tests
+#[path = "sanity/parse.rs"]
+mod parse;
+
+// CLI module sanity tests
+#[path = "sanity/cli.rs"]
+mod cli;
+
+// FS module sanity tests
+#[path = "sanity/fs.rs"]
+mod fs;
+
+// Global module sanity tests
+#[path = "sanity/global.rs"]
+mod global;
+
+// Hosts module sanity tests
+#[path = "sanity/hosts.rs"]
+mod hosts;
+
+// Param module sanity tests
+#[path = "sanity/param.rs"]
+mod param;
+
+// Progress module sanity tests
+#[path = "sanity/progress.rs"]
+mod progress;
+
+// String module sanity tests
+#[path = "sanity/string.rs"]
+mod string;
+
+// Token module sanity tests
+#[path = "sanity/token.rs"]
+mod token;
+
+// Visual module sanity tests
+#[path = "sanity/visual.rs"]
+mod visual;
