@@ -22,29 +22,23 @@
 /// Basic token validation macro (placeholder).
 #[macro_export]
 macro_rules! token_validate {
-    ($value:expr, min_length: $min:expr) => {
-        {
-            use $crate::token::{TokenRules, validate_token_format};
-            let rules = TokenRules::new().min_length($min);
-            validate_token_format($value, &rules)
-        }
-    };
-    ($value:expr, pattern: $pattern:expr) => {
-        {
-            use $crate::token::{TokenRules, validate_token_format};
-            let rules = TokenRules::new().pattern($pattern.to_string());
-            validate_token_format($value, &rules)
-        }
-    };
+    ($value:expr, min_length: $min:expr) => {{
+        use $crate::token::{validate_token_format, TokenRules};
+        let rules = TokenRules::new().min_length($min);
+        validate_token_format($value, &rules)
+    }};
+    ($value:expr, pattern: $pattern:expr) => {{
+        use $crate::token::{validate_token_format, TokenRules};
+        let rules = TokenRules::new().pattern($pattern.to_string());
+        validate_token_format($value, &rules)
+    }};
 }
 
 /// Simple tokenization macro (placeholder).
 #[macro_export]
 macro_rules! tokenize {
-    ($text:expr, delim: $delim:expr) => {
-        {
-            use $crate::token::tokenize;
-            tokenize($text, &[$delim])
-        }
-    };
+    ($text:expr, delim: $delim:expr) => {{
+        use $crate::token::tokenize;
+        tokenize($text, &[$delim])
+    }};
 }

@@ -137,7 +137,13 @@ pub fn has_option(name: &str) -> bool {
 /// ```
 pub fn get_option_value(name: &str) -> Option<String> {
     let value = global::get_var(&format!("opt_{}", name));
-    if value.is_empty() { return None; }
+    if value.is_empty() {
+        return None;
+    }
     let v_lower = value.to_ascii_lowercase();
-    if v_lower == "true" || v_lower == "false" { None } else { Some(value) }
+    if v_lower == "true" || v_lower == "false" {
+        None
+    } else {
+        Some(value)
+    }
 }

@@ -7,13 +7,17 @@
 pub fn sed_lines_file(path: &str, start_line: usize, end_line: usize) -> String {
     use crate::streams::Stream;
     let content = crate::fs::read_file(path);
-    Stream::from_string(&content).sed_lines(start_line, end_line).to_string()
+    Stream::from_string(&content)
+        .sed_lines(start_line, end_line)
+        .to_string()
 }
 
 pub fn sed_around_file(path: &str, pattern: &str, context: usize) -> String {
     use crate::streams::Stream;
     let content = crate::fs::read_file(path);
-    Stream::from_string(&content).sed_around(pattern, context).to_string()
+    Stream::from_string(&content)
+        .sed_around(pattern, context)
+        .to_string()
 }
 
 pub fn sed_insert_file(path: &str, content: &str, sentinel: &str) -> Result<(), String> {
@@ -27,7 +31,9 @@ pub fn sed_insert_file(path: &str, content: &str, sentinel: &str) -> Result<(), 
 pub fn sed_template_file(path: &str, content: &str, sentinel: &str) {
     use crate::streams::Stream;
     let file_content = crate::fs::read_file(path);
-    let result = Stream::from_string(&file_content).sed_template(content, sentinel).to_string();
+    let result = Stream::from_string(&file_content)
+        .sed_template(content, sentinel)
+        .to_string();
     crate::fs::write_file(path, &result);
 }
 
@@ -39,11 +45,15 @@ pub fn sed_read(path: &str, start: Option<usize>, end: Option<usize>) -> String 
     let content = crate::fs::read_file(path);
     let lines: Vec<&str> = content.lines().collect();
     let total = lines.len();
-    if total == 0 { return String::new(); }
+    if total == 0 {
+        return String::new();
+    }
 
     let s = start.unwrap_or(1).max(1);
     let e = end.unwrap_or(total).min(total);
-    if s > e || s > total { return String::new(); }
+    if s > e || s > total {
+        return String::new();
+    }
     let from = s - 1;
     let to = e; // end is inclusive for slicing upper bound
     lines[from..to].join("\n")

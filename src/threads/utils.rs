@@ -7,7 +7,9 @@
 use std::time::{Duration, Instant};
 
 /// Sleep for the specified number of milliseconds.
-pub fn sleep_ms(ms: u64) { std::thread::sleep(Duration::from_millis(ms)); }
+pub fn sleep_ms(ms: u64) {
+    std::thread::sleep(Duration::from_millis(ms));
+}
 
 /// Benchmark a closure and return the elapsed time.
 pub fn bench<F: FnOnce()>(label: &str, f: F) -> Duration {
@@ -40,7 +42,10 @@ pub fn start_background(command: &str) -> u32 {
         handle: Some(handle),
         rx,
     };
-    crate::os::JOBS.lock().unwrap().insert(job_id, Arc::new(Mutex::new(job_handle)));
+    crate::os::JOBS
+        .lock()
+        .unwrap()
+        .insert(job_id, Arc::new(Mutex::new(job_handle)));
     crate::utils::stderrx("info", &format!("[{}] Started background job", job_id));
     job_id
 }

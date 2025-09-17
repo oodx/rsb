@@ -8,19 +8,35 @@ macro_rules! job {
     (wait: $job_id:expr) => {{
         match $crate::threads::wait($job_id, None) {
             Ok(status) => status,
-            Err(e) => { $crate::utils::stderrx("error", &format!("Failed to wait for job {}: {}", $job_id, e)); -1 }
+            Err(e) => {
+                $crate::utils::stderrx(
+                    "error",
+                    &format!("Failed to wait for job {}: {}", $job_id, e),
+                );
+                -1
+            }
         }
     }};
     (timeout: $timeout:expr, wait: $job_id:expr) => {{
         match $crate::threads::wait($job_id, Some($timeout)) {
             Ok(status) => status,
-            Err(e) => { $crate::utils::stderrx("error", &format!("Failed to wait for job {}: {}", $job_id, e)); -1 }
+            Err(e) => {
+                $crate::utils::stderrx(
+                    "error",
+                    &format!("Failed to wait for job {}: {}", $job_id, e),
+                );
+                -1
+            }
         }
     }};
     (list) => {{
         let jobs = $crate::threads::list_jobs();
-        if jobs.is_empty() { $crate::utils::stderrx("info", "No running jobs."); }
-        for (id, cmd) in jobs { $crate::echo!("[{}] {}", id, cmd); }
+        if jobs.is_empty() {
+            $crate::utils::stderrx("info", "No running jobs.");
+        }
+        for (id, cmd) in jobs {
+            $crate::echo!("[{}] {}", id, cmd);
+        }
     }};
 }
 
@@ -49,9 +65,11 @@ macro_rules! trap {
         match sig_name.as_str() {
             "SIGINT" | "SIGTERM" | "EXIT" | "COMMAND_ERROR" => {
                 $crate::os::install_signal_handlers();
-                $crate::event!(register &sig_name, $handler);
+                $crate::event!(register & sig_name, $handler);
             }
-            _ => { $crate::event!(register &sig_name, $handler); }
+            _ => {
+                $crate::event!(register & sig_name, $handler);
+            }
         }
     }};
 }

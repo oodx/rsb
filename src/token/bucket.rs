@@ -3,9 +3,9 @@
 //! Provides TokenBucket for organizing tokens into namespace-aware collections
 //! with different organizational modes (Flat, Tree, Hybrid).
 
-use std::collections::HashMap;
-use super::types::{Token, Namespace, TokenStreamable};
 use super::error::{TokenBucketError, TokenBucketResult};
+use super::types::{Namespace, Token, TokenStreamable};
+use std::collections::HashMap;
 
 /// Bucket organization modes for different use cases.
 #[derive(Debug, Clone)]
@@ -44,7 +44,7 @@ impl TokenBucket {
             tree: match mode {
                 BucketMode::Flat => None,
                 _ => Some(HashMap::new()),
-            }
+            },
         }
     }
 
@@ -79,11 +79,14 @@ impl TokenBucket {
             return Err(TokenBucketError::EmptyInput);
         }
 
-        let tokens = input.tokenize()
+        let tokens = input
+            .tokenize()
             .map_err(|e| TokenBucketError::ParseError(e))?;
 
         if tokens.is_empty() {
-            return Err(TokenBucketError::ParseError("No valid tokens found in input".to_string()));
+            return Err(TokenBucketError::ParseError(
+                "No valid tokens found in input".to_string(),
+            ));
         }
 
         Ok(Self::from_tokens(&tokens, mode))
@@ -96,13 +99,14 @@ impl TokenBucket {
         let ns_key = namespace.to_string();
 
         // Always store flat data
-        self.data.entry(ns_key.clone())
+        self.data
+            .entry(ns_key.clone())
             .or_insert_with(HashMap::new)
             .insert(key, value);
 
         // Build tree if needed
         match self.mode {
-            BucketMode::Flat => {},
+            BucketMode::Flat => {}
             BucketMode::Tree | BucketMode::Hybrid => {
                 self.build_tree_index(namespace);
             }
@@ -159,7 +163,8 @@ impl TokenBucket {
     ///
     /// Works in all modes by filtering the flat data keys.
     pub fn get_all_under(&self, prefix: &str) -> Vec<String> {
-        self.data.keys()
+        self.data
+            .keys()
             .filter(|ns| ns.starts_with(prefix) && ns.as_str() != prefix)
             .cloned()
             .collect()
@@ -266,7 +271,11 @@ mod tests {
     fn test_from_tokens() {
         let tokens = vec![
             Token::simple("host", "localhost"),
-            Token::with_namespace(Namespace::from_string("db"), "user".to_string(), "admin".to_string()),
+            Token::with_namespace(
+                Namespace::from_string("db"),
+                "user".to_string(),
+                "admin".to_string(),
+            ),
         ];
 
         let bucket = TokenBucket::from_tokens(&tokens, BucketMode::Flat);
@@ -277,7 +286,9 @@ mod tests {
 
     #[test]
     fn test_from_str() {
-        let bucket = TokenBucket::from_str(r#"host="localhost"; db:user="admin";"#, BucketMode::Flat).unwrap();
+        let bucket =
+            TokenBucket::from_str(r#"host="localhost"; db:user="admin";"#, BucketMode::Flat)
+                .unwrap();
         assert_eq!(bucket.data.len(), 2);
         assert_eq!(bucket.data["global"]["host"], "localhost");
         assert_eq!(bucket.data["db"]["user"], "admin");

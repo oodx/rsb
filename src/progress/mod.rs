@@ -25,24 +25,20 @@
 //! ```
 
 pub mod core;
-pub mod styles;
 pub mod manager;
+pub mod styles;
 pub mod terminal;
 
 // Re-exports for convenience
-pub use core::{ProgressReporter, ProgressTask, ProgressEvent, ProgressState};
-pub use styles::{ProgressStyle, SpinnerStyle, BarStyle};
+pub use core::{ProgressEvent, ProgressReporter, ProgressState, ProgressTask};
 pub use manager::ProgressManager;
-pub use terminal::{TerminalReporter, TerminalConfig};
+pub use styles::{BarStyle, ProgressStyle, SpinnerStyle};
+pub use terminal::{TerminalConfig, TerminalReporter};
 
 /// Quick-start progress creation functions
 pub mod prelude {
     pub use super::{
-        ProgressManager,
-        ProgressStyle,
-        ProgressReporter,
-        ProgressTask,
-        TerminalReporter,
+        ProgressManager, ProgressReporter, ProgressStyle, ProgressTask, TerminalReporter,
     };
 }
 

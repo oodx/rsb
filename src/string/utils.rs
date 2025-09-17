@@ -7,9 +7,9 @@
 //! Note: Prefer using `rsb::string` for general usage. Use `string::utils`
 //! when you want to target low-level helpers explicitly.
 
-pub use super::helpers::*;
 pub use super::case::*;
 pub use super::error::*;
+pub use super::helpers::*;
 
 /// Optional static registry for debugging which helpers are ASCII-SAFE vs UNICODE-SAFE.
 /// This is hand-maintained and informational only.

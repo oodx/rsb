@@ -30,15 +30,15 @@ where
         "help" | "--help" | "-h" => {
             global::show_help();
             std::process::exit(0);
-        },
+        }
         "inspect" => {
             global::show_functions();
             std::process::exit(0);
-        },
+        }
         "stack" => {
             global::show_call_stack();
             std::process::exit(0);
-        },
+        }
         _ => {
             // Try to find user command handler
             if let Some(handler) = handler_lookup(&command) {
@@ -62,8 +62,10 @@ where
     F: Fn(&str) -> Option<CommandHandler>,
 {
     let command = args.get_or(1, "");
-    let is_test = std::env::var("CARGO_TEST").is_ok() ||
-        std::thread::current().name().map_or(false, |n| n.contains("test"));
+    let is_test = std::env::var("CARGO_TEST").is_ok()
+        || std::thread::current()
+            .name()
+            .map_or(false, |n| n.contains("test"));
 
     if let Some(handler) = handler_lookup(&command) {
         let mut cmd_args = args.clone();
@@ -126,8 +128,8 @@ where
 {
     // Common commands to check for suggestions
     let common_commands = [
-        "help", "version", "status", "init", "build", "test", "run", "start", "stop",
-        "create", "delete", "list", "show", "get", "set", "config", "install", "update"
+        "help", "version", "status", "init", "build", "test", "run", "start", "stop", "create",
+        "delete", "list", "show", "get", "set", "config", "install", "update",
     ];
 
     let mut suggestions = Vec::new();
@@ -173,25 +175,37 @@ fn edit_distance(a: &str, b: &str) -> usize {
     let a_len = a_chars.len();
     let b_len = b_chars.len();
 
-    if a_len == 0 { return b_len; }
-    if b_len == 0 { return a_len; }
+    if a_len == 0 {
+        return b_len;
+    }
+    if b_len == 0 {
+        return a_len;
+    }
 
     let mut matrix = vec![vec![0; b_len + 1]; a_len + 1];
 
     // Initialize first row and column
-    for i in 0..=a_len { matrix[i][0] = i; }
-    for j in 0..=b_len { matrix[0][j] = j; }
+    for i in 0..=a_len {
+        matrix[i][0] = i;
+    }
+    for j in 0..=b_len {
+        matrix[0][j] = j;
+    }
 
     // Fill the matrix
     for i in 1..=a_len {
         for j in 1..=b_len {
-            let cost = if a_chars[i-1] == b_chars[j-1] { 0 } else { 1 };
+            let cost = if a_chars[i - 1] == b_chars[j - 1] {
+                0
+            } else {
+                1
+            };
             matrix[i][j] = std::cmp::min(
                 std::cmp::min(
-                    matrix[i-1][j] + 1,      // deletion
-                    matrix[i][j-1] + 1       // insertion
+                    matrix[i - 1][j] + 1, // deletion
+                    matrix[i][j - 1] + 1, // insertion
                 ),
-                matrix[i-1][j-1] + cost      // substitution
+                matrix[i - 1][j - 1] + cost, // substitution
             );
         }
     }

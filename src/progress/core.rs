@@ -4,9 +4,9 @@
 //! Zero dependencies - only uses std library.
 //! Designed for RSB extraction.
 
+use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
-use std::collections::HashMap;
 
 /// Unique identifier for a progress task
 pub type TaskId = u64;
@@ -225,7 +225,10 @@ impl ProgressTask {
     /// Check if task is finished (complete, failed, or cancelled)
     pub fn is_finished(&self) -> bool {
         let state = self.state.lock().unwrap().state;
-        matches!(state, ProgressState::Complete | ProgressState::Failed | ProgressState::Cancelled)
+        matches!(
+            state,
+            ProgressState::Complete | ProgressState::Failed | ProgressState::Cancelled
+        )
     }
 
     /// Emit progress event to all reporters
@@ -454,7 +457,7 @@ mod tests {
             1,
             "Test".to_string(),
             None,
-            vec![reporter1.clone(), reporter2.clone()]
+            vec![reporter1.clone(), reporter2.clone()],
         );
 
         task.update(10, "Progress");

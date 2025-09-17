@@ -6,7 +6,12 @@ use rsb::prelude::*;
 #[test]
 fn test_args_basic_operations() {
     // Test Args construction and basic operations
-    let test_args = vec!["program".to_string(), "arg1".to_string(), "arg2".to_string(), "--flag".to_string()];
+    let test_args = vec![
+        "program".to_string(),
+        "arg1".to_string(),
+        "arg2".to_string(),
+        "--flag".to_string(),
+    ];
     let args = Args::new(&test_args);
 
     // Test positional access (1-indexed, skips program name)
@@ -27,7 +32,12 @@ fn test_args_basic_operations() {
 #[test]
 fn test_args_flag_operations() {
     // Test flag presence and consumption
-    let test_args = vec!["program".to_string(), "--verbose".to_string(), "arg1".to_string(), "--debug".to_string()];
+    let test_args = vec![
+        "program".to_string(),
+        "--verbose".to_string(),
+        "arg1".to_string(),
+        "--debug".to_string(),
+    ];
     let mut args = Args::new(&test_args);
 
     // Test flag presence
@@ -48,7 +58,7 @@ fn test_args_key_value_operations() {
         "program".to_string(),
         "config=value".to_string(),
         "paths:file1,file2,file3".to_string(),
-        "--flag".to_string()
+        "--flag".to_string(),
     ];
     let mut args = Args::new(&test_args);
 
@@ -76,7 +86,11 @@ fn test_args_flag_with_values() {
     assert_eq!(args1.has_val("--config"), Some("test.conf".to_string()));
     assert_eq!(args1.has_val("--nonexistent"), None);
 
-    let test_args2 = vec!["program".to_string(), "--config".to_string(), "test.conf".to_string()];
+    let test_args2 = vec![
+        "program".to_string(),
+        "--config".to_string(),
+        "test.conf".to_string(),
+    ];
     let mut args2 = Args::new(&test_args2);
 
     assert_eq!(args2.has_val("--config"), Some("test.conf".to_string()));
@@ -87,7 +101,11 @@ fn test_args_expansion() {
     // Test template expansion with $1..$N, $@, $#
     set_var("TEST_VAR", "expanded");
 
-    let test_args = vec!["program".to_string(), "first".to_string(), "second".to_string()];
+    let test_args = vec![
+        "program".to_string(),
+        "first".to_string(),
+        "second".to_string(),
+    ];
     let args = Args::new(&test_args);
 
     // Test positional expansion
@@ -116,7 +134,12 @@ fn test_args_expansion() {
 #[test]
 fn test_args_utility_methods() {
     // Test remaining, all, join methods
-    let test_args = vec!["program".to_string(), "arg1".to_string(), "arg2".to_string(), "arg3".to_string()];
+    let test_args = vec![
+        "program".to_string(),
+        "arg1".to_string(),
+        "arg2".to_string(),
+        "arg3".to_string(),
+    ];
     let args = Args::new(&test_args);
 
     // Test remaining (should exclude program name)
@@ -181,7 +204,11 @@ fn test_edge_cases() {
     assert!(args.remaining().is_empty());
 
     // Test args with spaces and special characters
-    let special_args = vec!["program".to_string(), "arg with spaces".to_string(), "special=chars!@#".to_string()];
+    let special_args = vec![
+        "program".to_string(),
+        "arg with spaces".to_string(),
+        "special=chars!@#".to_string(),
+    ];
     let mut args = Args::new(&special_args);
     assert_eq!(args.get(1), "arg with spaces".to_string());
     assert_eq!(args.get_kv("special"), Some("chars!@#".to_string()));
@@ -200,13 +227,19 @@ fn test_complex_scenarios() {
         "--features=visual,dev-pty".to_string(),
         "--verbose".to_string(),
         "package1".to_string(),
-        "package2".to_string()
+        "package2".to_string(),
     ];
     let mut args = Args::new(&build_args);
 
     assert_eq!(args.get(1), "build".to_string());
-    assert_eq!(args.has_val("--target"), Some("x86_64-unknown-linux-gnu".to_string()));
-    assert_eq!(args.has_val("--features"), Some("visual,dev-pty".to_string()));
+    assert_eq!(
+        args.has_val("--target"),
+        Some("x86_64-unknown-linux-gnu".to_string())
+    );
+    assert_eq!(
+        args.has_val("--features"),
+        Some("visual,dev-pty".to_string())
+    );
     assert!(args.has("--verbose"));
     assert_eq!(args.get(3), "package1".to_string());
     assert_eq!(args.get(4), "package2".to_string());
@@ -217,13 +250,23 @@ fn test_complex_scenarios() {
         "database=postgresql://localhost/app".to_string(),
         "features:logging,metrics,auth".to_string(),
         "--env=production".to_string(),
-        "--dry-run".to_string()
+        "--dry-run".to_string(),
     ];
     let mut args = Args::new(&config_args);
 
-    assert_eq!(args.get_kv("database"), Some("postgresql://localhost/app".to_string()));
+    assert_eq!(
+        args.get_kv("database"),
+        Some("postgresql://localhost/app".to_string())
+    );
     let features = args.get_array("features").unwrap();
-    assert_eq!(features, vec!["logging".to_string(), "metrics".to_string(), "auth".to_string()]);
+    assert_eq!(
+        features,
+        vec![
+            "logging".to_string(),
+            "metrics".to_string(),
+            "auth".to_string()
+        ]
+    );
     assert_eq!(args.has_val("--env"), Some("production".to_string()));
     assert!(args.has("--dry-run"));
 }

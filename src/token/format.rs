@@ -19,8 +19,9 @@ use super::types::Token;
 /// ```
 pub fn quote_token(value: &str) -> String {
     // Don't double-quote if already quoted
-    if (value.starts_with('"') && value.ends_with('"')) ||
-       (value.starts_with('\'') && value.ends_with('\'')) {
+    if (value.starts_with('"') && value.ends_with('"'))
+        || (value.starts_with('\'') && value.ends_with('\''))
+    {
         value.to_string()
     } else {
         format!("\"{}\"", value)
@@ -42,9 +43,10 @@ pub fn quote_token(value: &str) -> String {
 pub fn unquote_token(value: &str) -> String {
     let value = value.trim();
     if value.len() >= 2 {
-        if (value.starts_with('"') && value.ends_with('"')) ||
-           (value.starts_with('\'') && value.ends_with('\'')) {
-            value[1..value.len()-1].to_string()
+        if (value.starts_with('"') && value.ends_with('"'))
+            || (value.starts_with('\'') && value.ends_with('\''))
+        {
+            value[1..value.len() - 1].to_string()
         } else {
             value.to_string()
         }
@@ -67,14 +69,14 @@ pub fn unquote_token(value: &str) -> String {
 /// ```
 pub fn escape_token(value: &str) -> String {
     value
-        .replace('\\', "\\\\")  // Escape backslashes first
-        .replace('"', "\\\"")   // Escape double quotes
-        .replace('\'', "\\'")   // Escape single quotes
-        .replace('\n', "\\n")   // Escape newlines
-        .replace('\t', "\\t")   // Escape tabs
-        .replace('\r', "\\r")   // Escape carriage returns
-        .replace(';', "\\;")    // Escape token separators
-        .replace('=', "\\=")    // Escape key-value separators
+        .replace('\\', "\\\\") // Escape backslashes first
+        .replace('"', "\\\"") // Escape double quotes
+        .replace('\'', "\\'") // Escape single quotes
+        .replace('\n', "\\n") // Escape newlines
+        .replace('\t', "\\t") // Escape tabs
+        .replace('\r', "\\r") // Escape carriage returns
+        .replace(';', "\\;") // Escape token separators
+        .replace('=', "\\=") // Escape key-value separators
 }
 
 /// Unescape special characters in a token value.
@@ -97,7 +99,7 @@ pub fn unescape_token(value: &str) -> String {
         .replace("\\=", "=")
         .replace("\\'", "'")
         .replace("\\\"", "\"")
-        .replace("\\\\", "\\")  // Handle escaped backslashes last
+        .replace("\\\\", "\\") // Handle escaped backslashes last
 }
 
 /// Join multiple token values with a separator.
@@ -126,7 +128,8 @@ pub fn join_tokens(values: &[&str], separator: &str) -> String {
 /// assert_eq!(join_quoted_tokens(&values, ", "), "\"apple pie\", \"banana split\", \"cherry tart\"");
 /// ```
 pub fn join_quoted_tokens(values: &[&str], separator: &str) -> String {
-    values.iter()
+    values
+        .iter()
         .map(|v| quote_token(v))
         .collect::<Vec<_>>()
         .join(separator)
@@ -228,7 +231,8 @@ pub fn format_token_table(tokens: &[Token]) -> String {
     }
 
     // Calculate column widths
-    let ns_width = tokens.iter()
+    let ns_width = tokens
+        .iter()
         .map(|t| match &t.namespace {
             Some(ns) => ns.to_string().len(),
             None => "[global]".len(),
@@ -236,10 +240,7 @@ pub fn format_token_table(tokens: &[Token]) -> String {
         .max()
         .unwrap_or(8);
 
-    let key_width = tokens.iter()
-        .map(|t| t.key.len())
-        .max()
-        .unwrap_or(8);
+    let key_width = tokens.iter().map(|t| t.key.len()).max().unwrap_or(8);
 
     let mut result = Vec::new();
 
@@ -345,7 +346,10 @@ mod tests {
     #[test]
     fn test_join_quoted_tokens() {
         let values = vec!["apple pie", "banana split"];
-        assert_eq!(join_quoted_tokens(&values, ", "), "\"apple pie\", \"banana split\"");
+        assert_eq!(
+            join_quoted_tokens(&values, ", "),
+            "\"apple pie\", \"banana split\""
+        );
     }
 
     #[test]
@@ -373,7 +377,7 @@ mod tests {
         let ns_token = Token::with_namespace(
             Namespace::from_string("db"),
             "user".to_string(),
-            "admin".to_string()
+            "admin".to_string(),
         );
         assert_eq!(format_token(&ns_token), "db:user=admin");
     }
@@ -393,7 +397,7 @@ mod tests {
             Token::with_namespace(
                 Namespace::from_string("db"),
                 "user".to_string(),
-                "admin".to_string()
+                "admin".to_string(),
             ),
         ];
 

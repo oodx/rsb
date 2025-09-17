@@ -14,60 +14,60 @@ impl XSed {
             content: content.into(),
         }
     }
-    
+
     /// Basic string replacement (like RSB sed)
     pub fn replace(self, from: &str, to: &str) -> Self {
         XSed {
             content: self.content.replace(from, to),
         }
     }
-    
+
     /// Replace with a closure (the magic!)
-    pub fn replace_with<F>(self, pattern: &str, f: F) -> Self 
+    pub fn replace_with<F>(self, pattern: &str, f: F) -> Self
     where
-        F: Fn(&str) -> String
+        F: Fn(&str) -> String,
     {
         // For now, do simple string matching and replacement
         // Later we could add regex support
         let result = self.content;
-        
+
         // Find all occurrences and replace with closure result
         let mut last_end = 0;
         let mut new_content = String::new();
-        
+
         while let Some(start) = result[last_end..].find(pattern) {
             let actual_start = last_end + start;
             let actual_end = actual_start + pattern.len();
-            
+
             // Add everything before the match
             new_content.push_str(&result[last_end..actual_start]);
-            
+
             // Apply the closure to the matched text
             let replacement = f(&result[actual_start..actual_end]);
             new_content.push_str(&replacement);
-            
+
             last_end = actual_end;
         }
-        
+
         // Add the rest
         new_content.push_str(&result[last_end..]);
-        
+
         XSed {
             content: new_content,
         }
     }
-    
+
     /// Replace with regex support (future enhancement)
     pub fn replace_regex(self, pattern: &str, replacement: &str) -> Self {
         // For now, fallback to simple replace
         // Later: use regex crate
         self.replace(pattern, replacement)
     }
-    
+
     /// Replace with regex + closure (ultimate power!)
-    pub fn replace_regex_with<F>(self, _pattern: &str, f: F) -> Self 
+    pub fn replace_regex_with<F>(self, _pattern: &str, f: F) -> Self
     where
-        F: Fn(&str) -> String
+        F: Fn(&str) -> String,
     {
         // Placeholder for regex + closure combo
         // For now, just apply closure to whole content
@@ -75,11 +75,11 @@ impl XSed {
             content: f(&self.content),
         }
     }
-    
+
     /// Transform token values specifically
     pub fn transform_values<F>(self, f: F) -> Self
     where
-        F: Fn(&str) -> String
+        F: Fn(&str) -> String,
     {
         let tokens: Vec<&str> = self.content.split(';').collect();
         let transformed: Vec<String> = tokens
@@ -94,16 +94,16 @@ impl XSed {
                 }
             })
             .collect();
-        
+
         XSed {
             content: transformed.join(";"),
         }
     }
-    
+
     /// Transform token keys
     pub fn transform_keys<F>(self, f: F) -> Self
     where
-        F: Fn(&str) -> String
+        F: Fn(&str) -> String,
     {
         let tokens: Vec<&str> = self.content.split(';').collect();
         let transformed: Vec<String> = tokens
@@ -128,29 +128,26 @@ impl XSed {
                 }
             })
             .collect();
-            
+
         XSed {
             content: transformed.join(";"),
         }
     }
-    
+
     /// Chain with RSB stream operations
     pub fn rsb_stream<F>(self, f: F) -> Self
     where
-        F: FnOnce(Stream) -> Stream
+        F: FnOnce(Stream) -> Stream,
     {
         let stream = Stream::from_string(&self.content);
         let result = f(stream).to_string();
-        XSed {
-            content: result,
-        }
+        XSed { content: result }
     }
-    
+
     /// Convert back to string
     pub fn to_string(self) -> String {
         self.content
     }
-    
 }
 
 /// Convenience function for creating XSed
@@ -178,15 +175,13 @@ impl ToXSed for &str {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_basic_replace() {
-        let result = xsed("hello world")
-            .replace("world", "rust")
-            .to_string();
+        let result = xsed("hello world").replace("world", "rust").to_string();
         assert_eq!(result, "hello rust");
     }
-    
+
     #[test]
     fn test_replace_with_closure() {
         let result = xsed("hello world")
@@ -194,7 +189,7 @@ mod tests {
             .to_string();
         assert_eq!(result, "hello WORLD");
     }
-    
+
     #[test]
     fn test_transform_values() {
         let result = xsed("key=\"hello\"; user=\"world\"")

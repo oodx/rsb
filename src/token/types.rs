@@ -110,7 +110,8 @@ impl FromStr for Token {
     type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let (key_part, value) = s.split_once('=')
+        let (key_part, value) = s
+            .split_once('=')
             .ok_or_else(|| "Token must contain '='".to_string())?;
 
         let (namespace, key) = match key_part.split_once(':') {

@@ -15,4 +15,3 @@ pub struct TraceStep {
     pub input: String,
     pub output: String,
 }
-

@@ -7,9 +7,13 @@ use super::traits::Streamable;
 pub struct DetectEmpty;
 impl Streamable for DetectEmpty {
     type Args = ();
-    
+
     fn stream_apply(stdin: &str, _args: Self::Args) -> String {
-        if stdin.trim().is_empty() { "0".to_string() } else { "1".to_string() }
+        if stdin.trim().is_empty() {
+            "0".to_string()
+        } else {
+            "1".to_string()
+        }
     }
 }
 
@@ -17,9 +21,13 @@ impl Streamable for DetectEmpty {
 pub struct DetectPattern;
 impl Streamable for DetectPattern {
     type Args = String;
-    
+
     fn stream_apply(stdin: &str, pattern: Self::Args) -> String {
-        if stdin.contains(&pattern) { "0".to_string() } else { "1".to_string() }
+        if stdin.contains(&pattern) {
+            "0".to_string()
+        } else {
+            "1".to_string()
+        }
     }
 }
 
@@ -27,11 +35,17 @@ impl Streamable for DetectPattern {
 pub struct DetectBinary;
 impl Streamable for DetectBinary {
     type Args = ();
-    
+
     fn stream_apply(stdin: &str, _args: Self::Args) -> String {
         // Check for non-text bytes (excluding tab, newline, carriage return)
-        let has_binary = stdin.bytes().any(|b| b < 0x20 && b != 0x09 && b != 0x0A && b != 0x0D);
-        if has_binary { "0".to_string() } else { "1".to_string() }
+        let has_binary = stdin
+            .bytes()
+            .any(|b| b < 0x20 && b != 0x09 && b != 0x0A && b != 0x0D);
+        if has_binary {
+            "0".to_string()
+        } else {
+            "1".to_string()
+        }
     }
 }
 
@@ -39,14 +53,18 @@ impl Streamable for DetectBinary {
 pub struct DetectRegex;
 impl Streamable for DetectRegex {
     type Args = String;
-    
+
     fn stream_apply(stdin: &str, pattern: Self::Args) -> String {
         use regex::Regex;
         match Regex::new(&pattern) {
             Ok(re) => {
-                if re.is_match(stdin) { "0".to_string() } else { "1".to_string() }
+                if re.is_match(stdin) {
+                    "0".to_string()
+                } else {
+                    "1".to_string()
+                }
             }
-            Err(_) => "error: invalid regex".to_string()
+            Err(_) => "error: invalid regex".to_string(),
         }
     }
 }
@@ -55,12 +73,14 @@ impl Streamable for DetectRegex {
 pub struct DetectDuplicates;
 impl Streamable for DetectDuplicates {
     type Args = ();
-    
+
     fn stream_apply(stdin: &str, _args: Self::Args) -> String {
         use std::collections::HashSet;
         let mut seen = HashSet::new();
         for line in stdin.lines() {
-            if !seen.insert(line) { return "0".to_string(); }
+            if !seen.insert(line) {
+                return "0".to_string();
+            }
         }
         "1".to_string()
     }
@@ -70,13 +90,13 @@ impl Streamable for DetectDuplicates {
 pub struct DetectEncoding;
 impl Streamable for DetectEncoding {
     type Args = ();
-    
+
     fn stream_apply(stdin: &str, _args: Self::Args) -> String {
         // Check if it's valid UTF-8
         if stdin.is_empty() {
             return "empty".to_string();
         }
-        
+
         // Check if all bytes are ASCII
         if stdin.bytes().all(|b| b < 128) {
             "ascii".to_string()
@@ -91,7 +111,7 @@ impl Streamable for DetectEncoding {
 pub struct CountPattern;
 impl Streamable for CountPattern {
     type Args = String;
-    
+
     fn stream_apply(stdin: &str, pattern: Self::Args) -> String {
         stdin.matches(&pattern).count().to_string()
     }
@@ -101,7 +121,7 @@ impl Streamable for CountPattern {
 pub struct CountLines;
 impl Streamable for CountLines {
     type Args = ();
-    
+
     fn stream_apply(stdin: &str, _args: Self::Args) -> String {
         stdin.lines().count().to_string()
     }
@@ -111,7 +131,7 @@ impl Streamable for CountLines {
 pub struct CountWords;
 impl Streamable for CountWords {
     type Args = ();
-    
+
     fn stream_apply(stdin: &str, _args: Self::Args) -> String {
         stdin.split_whitespace().count().to_string()
     }
@@ -121,10 +141,14 @@ impl Streamable for CountWords {
 pub struct DetectAllMatch;
 impl Streamable for DetectAllMatch {
     type Args = String;
-    
+
     fn stream_apply(stdin: &str, pattern: Self::Args) -> String {
         let all_match = stdin.lines().all(|line| line.contains(&pattern));
-        if all_match { "0".to_string() } else { "1".to_string() }
+        if all_match {
+            "0".to_string()
+        } else {
+            "1".to_string()
+        }
     }
 }
 
@@ -132,10 +156,14 @@ impl Streamable for DetectAllMatch {
 pub struct DetectAnyMatch;
 impl Streamable for DetectAnyMatch {
     type Args = String;
-    
+
     fn stream_apply(stdin: &str, pattern: Self::Args) -> String {
         let any_match = stdin.lines().any(|line| line.contains(&pattern));
-        if any_match { "0".to_string() } else { "1".to_string() }
+        if any_match {
+            "0".to_string()
+        } else {
+            "1".to_string()
+        }
     }
 }
 

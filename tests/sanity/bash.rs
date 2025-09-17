@@ -13,4 +13,3 @@ fn sanity_bash_network_and_archives_do_not_panic() {
     let res2 = rsb::bash::list_zip("/no/such/file.zip");
     assert!(res2.status != 0);
 }
-

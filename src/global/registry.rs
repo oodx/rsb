@@ -15,12 +15,9 @@ pub struct CallFrame {
 lazy_static! {
     pub(crate) static ref FUNCTION_REGISTRY: Arc<Mutex<HashMap<String, String>>> =
         Arc::new(Mutex::new(HashMap::new()));
-    pub(crate) static ref CALL_STACK: Arc<Mutex<Vec<CallFrame>>> =
-        Arc::new(Mutex::new(Vec::new()));
-
-    pub(crate) static ref COLORS: Arc<Mutex<HashMap<String, String>>> = {
-        Arc::new(Mutex::new(initialize_default_colors()))
-    };
+    pub(crate) static ref CALL_STACK: Arc<Mutex<Vec<CallFrame>>> = Arc::new(Mutex::new(Vec::new()));
+    pub(crate) static ref COLORS: Arc<Mutex<HashMap<String, String>>> =
+        { Arc::new(Mutex::new(initialize_default_colors())) };
     pub(crate) static ref GLYPHS: Arc<Mutex<HashMap<String, String>>> = {
         let mut m = HashMap::new();
         m.insert("info".to_string(), "ℹ".to_string());
@@ -102,20 +99,38 @@ pub fn show_help() {
     }
 
     // Built-in commands
-    println!("{}", crate::utils::expand_colors_unified("\n{bold}BUILT-IN COMMANDS:{reset}"));
-    println!("{}", crate::utils::expand_colors_unified(&format!(
-        "  {{green}}{:<15}{{reset}} Show this help message", "help"
-    )));
-    println!("{}", crate::utils::expand_colors_unified(&format!(
-        "  {{green}}{:<15}{{reset}} List all available functions", "inspect"
-    )));
-    println!("{}", crate::utils::expand_colors_unified(&format!(
-        "  {{green}}{:<15}{{reset}} Show the current call stack", "stack"
-    )));
+    println!(
+        "{}",
+        crate::utils::expand_colors_unified("\n{bold}BUILT-IN COMMANDS:{reset}")
+    );
+    println!(
+        "{}",
+        crate::utils::expand_colors_unified(&format!(
+            "  {{green}}{:<15}{{reset}} Show this help message",
+            "help"
+        ))
+    );
+    println!(
+        "{}",
+        crate::utils::expand_colors_unified(&format!(
+            "  {{green}}{:<15}{{reset}} List all available functions",
+            "inspect"
+        ))
+    );
+    println!(
+        "{}",
+        crate::utils::expand_colors_unified(&format!(
+            "  {{green}}{:<15}{{reset}} Show the current call stack",
+            "stack"
+        ))
+    );
 }
 
 pub fn show_functions() {
-    println!("{}", crate::utils::expand_colors_unified("{bold}Available functions:{reset}"));
+    println!(
+        "{}",
+        crate::utils::expand_colors_unified("{bold}Available functions:{reset}")
+    );
     for (name, desc) in list_functions() {
         let line = format!("  {{cyan}}{:<20}{{reset}} {}", name, desc);
         println!("{}", crate::utils::expand_colors_unified(&line));

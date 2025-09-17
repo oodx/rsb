@@ -4,11 +4,11 @@ use std::process::ExitCode;
 /// Canonical RSB exit kinds mapped onto process exit codes.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ExitKind {
-    Success,        // 0
-    Failure,        // 1 - General failure
-    SystemFailure,  // 2 - System/environment failure
-    LogicFailure,   // 3 - Logic/programming error
-    UserFailure,    // 4 - User input/usage error
+    Success,       // 0
+    Failure,       // 1 - General failure
+    SystemFailure, // 2 - System/environment failure
+    LogicFailure,  // 3 - Logic/programming error
+    UserFailure,   // 4 - User input/usage error
 }
 
 impl ExitKind {
@@ -24,33 +24,51 @@ impl ExitKind {
     }
 
     #[inline]
-    pub fn as_exit(self) -> ExitCode { ExitCode::from(self.code()) }
+    pub fn as_exit(self) -> ExitCode {
+        ExitCode::from(self.code())
+    }
 }
 
 /// Trait that converts values into process `ExitCode`.
-pub trait AsExit { fn as_exit(self) -> ExitCode; }
+pub trait AsExit {
+    fn as_exit(self) -> ExitCode;
+}
 
 impl AsExit for bool {
     #[inline]
-    fn as_exit(self) -> ExitCode { if self { ExitCode::SUCCESS } else { ExitCode::from(1) } }
+    fn as_exit(self) -> ExitCode {
+        if self {
+            ExitCode::SUCCESS
+        } else {
+            ExitCode::from(1)
+        }
+    }
 }
 
 impl AsExit for ExitKind {
     #[inline]
-    fn as_exit(self) -> ExitCode { ExitCode::from(self.code()) }
+    fn as_exit(self) -> ExitCode {
+        ExitCode::from(self.code())
+    }
 }
 
 // Helpers to classify exit codes from integer values
 #[inline]
-pub fn is_success(code: i32) -> bool { code == 0 }
+pub fn is_success(code: i32) -> bool {
+    code == 0
+}
 #[inline]
-pub fn is_fail(code: i32) -> bool { code != 0 }
+pub fn is_fail(code: i32) -> bool {
+    code != 0
+}
 
 // Import ToBool trait from bool module to add ExitKind implementation
 use super::bool::ToBool;
 
 impl ToBool for ExitKind {
-    fn to_bool(&self) -> bool { matches!(self, ExitKind::Success) }
+    fn to_bool(&self) -> bool {
+        matches!(self, ExitKind::Success)
+    }
 }
 
 impl ToString for ExitKind {

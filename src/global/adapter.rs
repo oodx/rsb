@@ -10,7 +10,9 @@ pub fn apply_env() {
 
 /// Load one or more config files into the global store.
 pub fn apply_config_files(paths: &[&str]) {
-    for p in paths { crate::global::load_config_file(p); }
+    for p in paths {
+        crate::global::load_config_file(p);
+    }
 }
 
 /// Hydrate the global store from env, then load config files in order.
@@ -27,7 +29,9 @@ pub fn import_env_simple() {
 }
 
 /// Apply environment (simple) then return; no modes are set.
-pub fn apply_env_simple() { import_env_simple(); }
+pub fn apply_env_simple() {
+    import_env_simple();
+}
 
 /// Hydrate using simple env import (no modes), then optional config files.
 pub fn hydrate_simple(paths: &[&str]) {

@@ -13,7 +13,9 @@ pub fn should_print_level(level: &str) -> bool {
     match level {
         "trace" | "think" => has_var("TRACE_MODE"),
         "debug" => has_var("DEBUG_MODE") || has_var("TRACE_MODE"),
-        "info" | "warn" | "okay" => has_var("DEBUG_MODE") || has_var("DEV_MODE") || has_var("TRACE_MODE"),
+        "info" | "warn" | "okay" => {
+            has_var("DEBUG_MODE") || has_var("DEV_MODE") || has_var("TRACE_MODE")
+        }
         "error" | "fatal" => true,
         _ => true,
     }
@@ -39,7 +41,9 @@ pub fn expand_colors_unified(text: &str) -> String {
                 let mut buf = String::new();
                 while let Some(&nc) = chars.peek() {
                     chars.next();
-                    if nc == '}' { break; }
+                    if nc == '}' {
+                        break;
+                    }
                     buf.push(nc);
                 }
                 // omit the tag (do not push '{buf}')
@@ -53,7 +57,9 @@ pub fn expand_colors_unified(text: &str) -> String {
 }
 
 pub fn stderrx(level: &str, message: &str) {
-    if !should_print_level(level) { return; }
+    if !should_print_level(level) {
+        return;
+    }
     let glyph = {
         #[cfg(feature = "glyphs")]
         {
@@ -69,11 +75,19 @@ pub fn stderrx(level: &str, message: &str) {
                     _ => "bullet",
                 };
                 let g = crate::visual::glyphs::glyph(key);
-                if !g.is_empty() { g.to_string() } else { "•".to_string() }
-            } else { "•".to_string() }
+                if !g.is_empty() {
+                    g.to_string()
+                } else {
+                    "•".to_string()
+                }
+            } else {
+                "•".to_string()
+            }
         }
         #[cfg(not(feature = "glyphs"))]
-        { "•".to_string() }
+        {
+            "•".to_string()
+        }
     };
 
     // Decide color name for level via visual registry if available, otherwise fallback mapping
@@ -84,8 +98,12 @@ pub fn stderrx(level: &str, message: &str) {
                 level
             } else {
                 match level {
-                    "info" => "cyan", "okay" => "green", "warn" => "yellow",
-                    "error" | "fatal" => "red", "debug" => "grey", "trace" => "magenta",
+                    "info" => "cyan",
+                    "okay" => "green",
+                    "warn" => "yellow",
+                    "error" | "fatal" => "red",
+                    "debug" => "grey",
+                    "trace" => "magenta",
                     _ => "reset",
                 }
             }
@@ -93,8 +111,12 @@ pub fn stderrx(level: &str, message: &str) {
         #[cfg(not(feature = "visual"))]
         {
             match level {
-                "info" => "cyan", "okay" => "green", "warn" => "yellow",
-                "error" | "fatal" => "red", "debug" => "grey", "trace" => "magenta",
+                "info" => "cyan",
+                "okay" => "green",
+                "warn" => "yellow",
+                "error" | "fatal" => "red",
+                "debug" => "grey",
+                "trace" => "magenta",
                 _ => "reset",
             }
         }
@@ -113,11 +135,12 @@ pub fn glyph_stderr(level: &str, message: &str) {
     stderrx(level, message)
 }
 
-
 // --- String & Name Helpers ---
 // Moved to crate::string::{is_name, str_equals, str_matches}
-pub use crate::string::{is_name};
-fn to_f64(s: &str) -> Option<f64> { s.parse::<f64>().ok() }
+pub use crate::string::is_name;
+fn to_f64(s: &str) -> Option<f64> {
+    s.parse::<f64>().ok()
+}
 pub fn num_eq(a: &str, b: &str) -> bool {
     match (to_f64(a), to_f64(b)) {
         (Some(na), Some(nb)) => (na - nb).abs() < f64::EPSILON,
@@ -126,7 +149,6 @@ pub fn num_eq(a: &str, b: &str) -> bool {
 }
 
 pub fn num_lt(a: &str, b: &str) -> bool {
-
     match (to_f64(a), to_f64(b)) {
         (Some(na), Some(nb)) => na < nb,
         _ => false,
@@ -134,7 +156,6 @@ pub fn num_lt(a: &str, b: &str) -> bool {
 }
 
 pub fn num_gt(a: &str, b: &str) -> bool {
-
     match (to_f64(a), to_f64(b)) {
         (Some(na), Some(nb)) => na > nb,
         _ => false,
@@ -168,7 +189,9 @@ pub fn get_array(key: &str) -> Vec<String> {
     let length_key = format!("{}_LENGTH", key);
     if !crate::global::has_var(&length_key) {
         let value = get_var(key);
-        if value.is_empty() { return Vec::new(); }
+        if value.is_empty() {
+            return Vec::new();
+        }
         return value.split_whitespace().map(|s| s.to_string()).collect();
     }
     let length: usize = get_var(&length_key).parse().unwrap_or(0);
@@ -181,7 +204,6 @@ pub fn get_array(key: &str) -> Vec<String> {
     }
     items
 }
-
 
 pub fn set_array(key: &str, items: &[&str]) {
     use crate::global::set_var;
@@ -207,7 +229,9 @@ pub fn prompt_user(message: &str, default: Option<&str>) -> String {
     io::stdout().flush().unwrap();
 
     let mut input = String::new();
-    io::stdin().read_line(&mut input).expect("Failed to read input");
+    io::stdin()
+        .read_line(&mut input)
+        .expect("Failed to read input");
 
     let trimmed = input.trim();
     if trimmed.is_empty() && default.is_some() {
@@ -228,7 +252,7 @@ pub fn confirm_action(message: &str, default: Option<bool>) -> bool {
     let default_text = match default {
         Some(true) => " [Y/n]",
         Some(false) => " [y/N]",
-        None => " [y/n]"
+        None => " [y/n]",
     };
 
     loop {
@@ -236,7 +260,9 @@ pub fn confirm_action(message: &str, default: Option<bool>) -> bool {
         io::stdout().flush().unwrap();
 
         let mut input = String::new();
-        io::stdin().read_line(&mut input).expect("Failed to read input");
+        io::stdin()
+            .read_line(&mut input)
+            .expect("Failed to read input");
 
         match input.trim().to_lowercase().as_str() {
             "y" | "yes" => return true,
@@ -254,9 +280,11 @@ pub fn confirm_action(message: &str, default: Option<bool>) -> bool {
 // --- Boolean helpers (temporary location) ---
 // These mirror context integer-boolean semantics and will move into the
 // dedicated logic (lx) package later.
-pub fn is_true(key: &str) -> bool { crate::global::is_true(key) }
-pub fn is_false(key: &str) -> bool { crate::global::is_false(key) }
-
-
+pub fn is_true(key: &str) -> bool {
+    crate::global::is_true(key)
+}
+pub fn is_false(key: &str) -> bool {
+    crate::global::is_false(key)
+}
 
 // note: tests moved adjacent to specific modules

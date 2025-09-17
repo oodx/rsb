@@ -1,7 +1,7 @@
 use crate::global::expand_vars;
+use lazy_static::lazy_static;
 use std::path::Path;
 use std::sync::Mutex;
-use lazy_static::lazy_static;
 
 lazy_static! {
     static ref TEMP_FILES_TO_CLEAN: Mutex<Vec<String>> = Mutex::new(Vec::new());
@@ -24,12 +24,19 @@ pub fn write_file(path: &str, content: &str) {
     let expanded_path = expand_vars(path);
     if let Some(parent) = Path::new(&expanded_path).parent() {
         if let Err(e) = std::fs::create_dir_all(parent) {
-            eprintln!("rsb-error: Failed to create directory '{}': {}", parent.display(), e);
+            eprintln!(
+                "rsb-error: Failed to create directory '{}': {}",
+                parent.display(),
+                e
+            );
             std::process::exit(1);
         }
     }
     if let Err(e) = std::fs::write(&expanded_path, content) {
-        eprintln!("rsb-error: Failed to write to file '{}': {}", expanded_path, e);
+        eprintln!(
+            "rsb-error: Failed to write to file '{}': {}",
+            expanded_path, e
+        );
         std::process::exit(1);
     }
 }
@@ -41,7 +48,11 @@ pub fn append_file(path: &str, content: &str) {
     let expanded_path = expand_vars(path);
     if let Some(parent) = Path::new(&expanded_path).parent() {
         if let Err(e) = std::fs::create_dir_all(parent) {
-            eprintln!("rsb-error: Failed to create directory '{}': {}", parent.display(), e);
+            eprintln!(
+                "rsb-error: Failed to create directory '{}': {}",
+                parent.display(),
+                e
+            );
             std::process::exit(1);
         }
     }
@@ -54,29 +65,45 @@ pub fn append_file(path: &str, content: &str) {
     {
         Ok(f) => f,
         Err(e) => {
-            eprintln!("rsb-error: Failed to open file '{}' for appending: {}", expanded_path, e);
+            eprintln!(
+                "rsb-error: Failed to open file '{}' for appending: {}",
+                expanded_path, e
+            );
             std::process::exit(1);
         }
     };
 
     if let Err(e) = writeln!(file, "{}", content) {
-        eprintln!("rsb-error: Failed to append to file '{}': {}", expanded_path, e);
+        eprintln!(
+            "rsb-error: Failed to append to file '{}': {}",
+            expanded_path, e
+        );
         std::process::exit(1);
     }
 }
 
 // --- File System Manipulation Functions ---
 
-pub fn mkdir_p(path: &str) -> bool { std::fs::create_dir_all(expand_vars(path)).is_ok() }
+pub fn mkdir_p(path: &str) -> bool {
+    std::fs::create_dir_all(expand_vars(path)).is_ok()
+}
 
 pub fn rm(path: &str) -> bool {
     let expanded_path = expand_vars(path);
-    if Path::new(&expanded_path).is_dir() { std::fs::remove_dir(&expanded_path).is_ok() } else { std::fs::remove_file(&expanded_path).is_ok() }
+    if Path::new(&expanded_path).is_dir() {
+        std::fs::remove_dir(&expanded_path).is_ok()
+    } else {
+        std::fs::remove_file(&expanded_path).is_ok()
+    }
 }
 
 pub fn rm_rf(path: &str) -> bool {
     let expanded_path = expand_vars(path);
-    if Path::new(&expanded_path).is_dir() { std::fs::remove_dir_all(&expanded_path).is_ok() } else { std::fs::remove_file(&expanded_path).is_ok() }
+    if Path::new(&expanded_path).is_dir() {
+        std::fs::remove_dir_all(&expanded_path).is_ok()
+    } else {
+        std::fs::remove_file(&expanded_path).is_ok()
+    }
 }
 
 pub fn cp(src: &str, dest: &str) -> bool {
@@ -91,17 +118,27 @@ pub fn cp_r(src: &str, dest: &str) -> bool {
     let dest_exp = expand_vars(dest);
 
     if is_command("cp") {
-        let status = std::process::Command::new("cp").arg("-r").arg(&src_exp).arg(&dest_exp).status();
+        let status = std::process::Command::new("cp")
+            .arg("-r")
+            .arg(&src_exp)
+            .arg(&dest_exp)
+            .status();
         status.map(|s| s.success()).unwrap_or(false)
     } else {
-        if !is_dir(&src_exp) { return false; }
-        if !mkdir_p(&dest_exp) { return false; }
+        if !is_dir(&src_exp) {
+            return false;
+        }
+        if !mkdir_p(&dest_exp) {
+            return false;
+        }
         for entry in std::fs::read_dir(&src_exp).unwrap() {
             let entry = entry.unwrap();
             let entry_path = entry.path();
             let dest_path = Path::new(&dest_exp).join(entry.file_name());
             if entry_path.is_dir() {
-                if !cp_r(entry_path.to_str().unwrap(), dest_path.to_str().unwrap()) { return false; }
+                if !cp_r(entry_path.to_str().unwrap(), dest_path.to_str().unwrap()) {
+                    return false;
+                }
             } else if let Err(_) = std::fs::copy(&entry_path, &dest_path) {
                 return false;
             }
@@ -110,14 +147,18 @@ pub fn cp_r(src: &str, dest: &str) -> bool {
     }
 }
 
-pub fn mv(src: &str, dest: &str) -> bool { std::fs::rename(expand_vars(src), expand_vars(dest)).is_ok() }
+pub fn mv(src: &str, dest: &str) -> bool {
+    std::fs::rename(expand_vars(src), expand_vars(dest)).is_ok()
+}
 
 pub fn touch(path: &str) -> bool {
     use std::fs::OpenOptions;
     let expanded_path = expand_vars(path);
     if Path::new(&expanded_path).exists() {
         let file = OpenOptions::new().append(true).open(&expanded_path);
-        if let Ok(file) = file { return file.set_len(file.metadata().unwrap().len()).is_ok(); }
+        if let Ok(file) = file {
+            return file.set_len(file.metadata().unwrap().len()).is_ok();
+        }
         false
     } else {
         std::fs::File::create(&expanded_path).is_ok()
@@ -134,7 +175,9 @@ pub fn extract_meta_from_file(path: &str) -> std::collections::HashMap<String, S
         if let Some(caps) = re.captures(line) {
             let key = caps.get(1).map_or("", |m| m.as_str()).trim().to_string();
             let value = caps.get(2).map_or("", |m| m.as_str()).trim().to_string();
-            if !key.is_empty() { meta.insert(key, value); }
+            if !key.is_empty() {
+                meta.insert(key, value);
+            }
         }
     }
     meta
@@ -160,7 +203,9 @@ pub fn chmod(path: &str, mode: &str) -> Result<(), std::io::Error> {
 }
 
 #[cfg(not(unix))]
-pub fn chmod(_path: &str, _mode: &str) -> Result<(), std::io::Error> { Ok(()) }
+pub fn chmod(_path: &str, _mode: &str) -> Result<(), std::io::Error> {
+    Ok(())
+}
 
 // --- Path Utilities ---
 
@@ -172,10 +217,18 @@ pub fn path_split(path: &str) -> std::collections::HashMap<String, String> {
     let p = std::path::Path::new(path);
     let mut map = std::collections::HashMap::new();
     map.insert("path".to_string(), path.to_string());
-    if let Some(parent) = p.parent().and_then(|s| s.to_str()) { map.insert("parent".to_string(), parent.to_string()); }
-    if let Some(file_name) = p.file_name().and_then(|s| s.to_str()) { map.insert("file_name".to_string(), file_name.to_string()); }
-    if let Some(stem) = p.file_stem().and_then(|s| s.to_str()) { map.insert("file_stem".to_string(), stem.to_string()); }
-    if let Some(extension) = p.extension().and_then(|s| s.to_str()) { map.insert("extension".to_string(), extension.to_string()); }
+    if let Some(parent) = p.parent().and_then(|s| s.to_str()) {
+        map.insert("parent".to_string(), parent.to_string());
+    }
+    if let Some(file_name) = p.file_name().and_then(|s| s.to_str()) {
+        map.insert("file_name".to_string(), file_name.to_string());
+    }
+    if let Some(stem) = p.file_stem().and_then(|s| s.to_str()) {
+        map.insert("file_stem".to_string(), stem.to_string());
+    }
+    if let Some(extension) = p.extension().and_then(|s| s.to_str()) {
+        map.insert("extension".to_string(), extension.to_string());
+    }
     map
 }
 
@@ -183,9 +236,13 @@ pub fn parse_meta_keys(path: &str, into: &str) {
     let content = read_file(path);
     for line in content.lines() {
         let trimmed = line.trim_start();
-        if !trimmed.starts_with('#') { break; }
+        if !trimmed.starts_with('#') {
+            break;
+        }
         let rest = trimmed.trim_start_matches('#').trim();
-        if rest.is_empty() { continue; }
+        if rest.is_empty() {
+            continue;
+        }
         if let Some((k, v)) = rest.split_once(':') {
             let key = k.trim();
             let value = v.trim();
@@ -196,28 +253,46 @@ pub fn parse_meta_keys(path: &str, into: &str) {
     }
 }
 
-pub fn is_file(path: &str) -> bool { Path::new(&expand_vars(path)).is_file() }
-pub fn is_dir(path: &str) -> bool { Path::new(&expand_vars(path)).is_dir() }
-pub fn is_entity(path: &str) -> bool { Path::new(&expand_vars(path)).exists() }
-pub fn is_link(path: &str) -> bool { Path::new(&expand_vars(path)).is_symlink() }
+pub fn is_file(path: &str) -> bool {
+    Path::new(&expand_vars(path)).is_file()
+}
+pub fn is_dir(path: &str) -> bool {
+    Path::new(&expand_vars(path)).is_dir()
+}
+pub fn is_entity(path: &str) -> bool {
+    Path::new(&expand_vars(path)).exists()
+}
+pub fn is_link(path: &str) -> bool {
+    Path::new(&expand_vars(path)).is_symlink()
+}
 
 pub fn is_readable(path: &str) -> bool {
-    std::fs::metadata(&expand_vars(path)).map(|m| !m.permissions().readonly()).unwrap_or(false)
+    std::fs::metadata(&expand_vars(path))
+        .map(|m| !m.permissions().readonly())
+        .unwrap_or(false)
 }
 pub fn is_writable(path: &str) -> bool {
-    std::fs::metadata(&expand_vars(path)).map(|m| !m.permissions().readonly()).unwrap_or(false)
+    std::fs::metadata(&expand_vars(path))
+        .map(|m| !m.permissions().readonly())
+        .unwrap_or(false)
 }
 
 #[cfg(unix)]
 pub fn is_executable(path: &str) -> bool {
     use std::os::unix::fs::PermissionsExt;
-    std::fs::metadata(&expand_vars(path)).map(|m| m.permissions().mode() & 0o111 != 0).unwrap_or(false)
+    std::fs::metadata(&expand_vars(path))
+        .map(|m| m.permissions().mode() & 0o111 != 0)
+        .unwrap_or(false)
 }
 #[cfg(not(unix))]
-pub fn is_executable(path: &str) -> bool { is_file(path) }
+pub fn is_executable(path: &str) -> bool {
+    is_file(path)
+}
 
 pub fn is_nonempty_file(path: &str) -> bool {
-    std::fs::metadata(&expand_vars(path)).map(|m| m.is_file() && m.len() > 0).unwrap_or(false)
+    std::fs::metadata(&expand_vars(path))
+        .map(|m| m.is_file() && m.len() > 0)
+        .unwrap_or(false)
 }
 
 pub fn load_dict_from_file(path: &str) -> Vec<String> {
@@ -227,13 +302,19 @@ pub fn load_dict_from_file(path: &str) -> Vec<String> {
 
 // --- Counters (wc-like) ---
 /// Count lines in a string (splits on '\n').
-pub fn count_lines_str(s: &str) -> usize { s.lines().count() }
+pub fn count_lines_str(s: &str) -> usize {
+    s.lines().count()
+}
 
 /// Count words in a string (whitespace-delimited).
-pub fn count_words_str(s: &str) -> usize { s.split_whitespace().count() }
+pub fn count_words_str(s: &str) -> usize {
+    s.split_whitespace().count()
+}
 
 /// Count Unicode scalar characters in a string.
-pub fn count_chars_str(s: &str) -> usize { s.chars().count() }
+pub fn count_chars_str(s: &str) -> usize {
+    s.chars().count()
+}
 
 /// Return wc-like triple for a string: (lines, words, chars).
 pub fn wc_tuple_str(s: &str) -> (usize, usize, usize) {
@@ -323,7 +404,9 @@ pub fn capture_stream_to_temp_file(stream: &mut crate::streams::Stream) -> Strin
 
 pub fn cleanup_temp_files() {
     if let Ok(files) = TEMP_FILES_TO_CLEAN.lock() {
-        for file in files.iter() { let _ = std::fs::remove_file(file); }
+        for file in files.iter() {
+            let _ = std::fs::remove_file(file);
+        }
     }
 }
 

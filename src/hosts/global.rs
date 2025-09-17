@@ -15,13 +15,23 @@ pub fn import_env_with_prefix(prefix: &str, strip_prefix: bool) {
     let up = prefix.to_string();
     for (k, v) in std::env::vars() {
         if k.starts_with(&up) {
-            let key_to_store = if strip_prefix { k[up.len()..].to_string() } else { k.clone() };
+            let key_to_store = if strip_prefix {
+                k[up.len()..].to_string()
+            } else {
+                k.clone()
+            };
             crate::global::set_var(key_to_store, v);
         }
     }
 }
 
 /// Namespacing helpers delegate to core global namespace utilities.
-pub fn ns_set(ns: &str, key: &str, value: &str) { crate::global::ns_set(ns, key, value) }
-pub fn ns_get(ns: &str, key: &str) -> String { crate::global::ns_get(ns, key) }
-pub fn ns_get_all(ns: &str) -> Vec<(String, String)> { crate::global::ns_get_all(ns) }
+pub fn ns_set(ns: &str, key: &str, value: &str) {
+    crate::global::ns_set(ns, key, value)
+}
+pub fn ns_get(ns: &str, key: &str) -> String {
+    crate::global::ns_get(ns, key)
+}
+pub fn ns_get_all(ns: &str) -> Vec<(String, String)> {
+    crate::global::ns_get_all(ns)
+}

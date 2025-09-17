@@ -31,7 +31,7 @@ pub fn avg(numbers: &[f64]) -> Option<f64> {
 }
 
 pub fn mean(numbers: &[f64]) -> Option<f64> {
-    avg(numbers)  // mean is same as average
+    avg(numbers) // mean is same as average
 }
 
 pub fn median(numbers: &[f64]) -> Option<f64> {
@@ -44,8 +44,8 @@ pub fn median(numbers: &[f64]) -> Option<f64> {
 
     let len = sorted.len();
     if len % 2 == 0 {
-        Some((sorted[len/2 - 1] + sorted[len/2]) / 2.0)
+        Some((sorted[len / 2 - 1] + sorted[len / 2]) / 2.0)
     } else {
-        Some(sorted[len/2])
+        Some(sorted[len / 2])
     }
 }

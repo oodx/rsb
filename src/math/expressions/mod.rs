@@ -38,7 +38,11 @@ fn parse_math_tokens(expr: &str) -> Result<Vec<MathToken>, String> {
                         break;
                     }
                 }
-                tokens.push(MathToken::Number(num_str.parse::<f64>().map_err(|_| format!("Invalid number: {}", num_str))?));
+                tokens.push(MathToken::Number(
+                    num_str
+                        .parse::<f64>()
+                        .map_err(|_| format!("Invalid number: {}", num_str))?,
+                ));
             }
             'a'..='z' | 'A'..='Z' | '_' => {
                 let mut var_str = String::new();
@@ -60,8 +64,11 @@ fn parse_math_tokens(expr: &str) -> Result<Vec<MathToken>, String> {
                 chars.next();
                 // Check if this is a negative number (unary minus)
                 // It's unary if: at start, after operator, or after opening paren
-                let is_unary = tokens.is_empty() ||
-                    matches!(tokens.last(), Some(MathToken::Operator(_)) | Some(MathToken::LeftParen));
+                let is_unary = tokens.is_empty()
+                    || matches!(
+                        tokens.last(),
+                        Some(MathToken::Operator(_)) | Some(MathToken::LeftParen)
+                    );
 
                 if is_unary && chars.peek().map_or(false, |c| c.is_digit(10) || *c == '.') {
                     // Parse negative number
@@ -74,7 +81,11 @@ fn parse_math_tokens(expr: &str) -> Result<Vec<MathToken>, String> {
                             break;
                         }
                     }
-                    tokens.push(MathToken::Number(num_str.parse::<f64>().map_err(|_| format!("Invalid negative number: {}", num_str))?));
+                    tokens.push(MathToken::Number(
+                        num_str
+                            .parse::<f64>()
+                            .map_err(|_| format!("Invalid negative number: {}", num_str))?,
+                    ));
                 } else {
                     // It's a binary minus operator
                     tokens.push(MathToken::Operator('-'));
@@ -165,12 +176,18 @@ fn evaluate_rpn(rpn_queue: Vec<MathToken>) -> Result<f64, String> {
             MathToken::Number(n) => value_stack.push(n),
             MathToken::Variable(var_name) => {
                 let val_str = get_var(&var_name);
-                let val = val_str.parse::<f64>().map_err(|_| format!("Variable '{}' is not a valid number: {}", var_name, val_str))?;
+                let val = val_str.parse::<f64>().map_err(|_| {
+                    format!("Variable '{}' is not a valid number: {}", var_name, val_str)
+                })?;
                 value_stack.push(val);
             }
             MathToken::Operator(op) => {
-                let b = value_stack.pop().ok_or("Invalid expression: missing operand")?;
-                let a = value_stack.pop().ok_or("Invalid expression: missing operand")?;
+                let b = value_stack
+                    .pop()
+                    .ok_or("Invalid expression: missing operand")?;
+                let a = value_stack
+                    .pop()
+                    .ok_or("Invalid expression: missing operand")?;
                 let result = match op {
                     '+' => a + b,
                     '-' => a - b,
@@ -219,7 +236,10 @@ pub fn evaluate_expression(full_expr: &str) -> Result<f64, String> {
 
     // Validate that var_name is a simple variable identifier
     if !is_valid_variable_name(var_name) {
-        return Err(format!("Invalid variable name: '{}'. Must be a simple identifier.", var_name));
+        return Err(format!(
+            "Invalid variable name: '{}'. Must be a simple identifier.",
+            var_name
+        ));
     }
 
     let tokens = parse_math_tokens(expr_str)?;
@@ -228,7 +248,12 @@ pub fn evaluate_expression(full_expr: &str) -> Result<f64, String> {
 
     if op != '=' {
         let current_val_str = get_var(var_name);
-        let current_val = current_val_str.parse::<f64>().map_err(|_| format!("Variable '{}' for shorthand op is not a valid number: {}", var_name, current_val_str))?;
+        let current_val = current_val_str.parse::<f64>().map_err(|_| {
+            format!(
+                "Variable '{}' for shorthand op is not a valid number: {}",
+                var_name, current_val_str
+            )
+        })?;
         result = match op {
             '+' => current_val + result,
             '-' => current_val - result,

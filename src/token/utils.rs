@@ -5,8 +5,8 @@
 //!
 //! For general usage, prefer importing from the main `token` module.
 
+pub use super::parse::{is_token_streamable, tokenize_string};
 pub use super::types::*;
-pub use super::parse::{tokenize_string, is_token_streamable};
 
 /// Convenience function for creating a simple token without namespace.
 ///
@@ -52,14 +52,18 @@ pub fn make_namespaced_token(namespace: &str, key: &str, value: &str) -> Token {
 /// let db_tokens = extract_namespace_tokens(&tokens, Some("db"));
 /// assert_eq!(db_tokens.len(), 2);
 /// ```
-pub fn extract_namespace_tokens<'a>(tokens: &'a [Token], namespace_name: Option<&str>) -> Vec<&'a Token> {
-    tokens.iter().filter(|token| {
-        match (&token.namespace, namespace_name) {
+pub fn extract_namespace_tokens<'a>(
+    tokens: &'a [Token],
+    namespace_name: Option<&str>,
+) -> Vec<&'a Token> {
+    tokens
+        .iter()
+        .filter(|token| match (&token.namespace, namespace_name) {
             (None, None) => true,
             (Some(ns), Some(name)) => ns.to_string() == name,
             _ => false,
-        }
-    }).collect()
+        })
+        .collect()
 }
 
 /// Get all unique namespace names from a token collection.
@@ -74,7 +78,8 @@ pub fn extract_namespace_tokens<'a>(tokens: &'a [Token], namespace_name: Option<
 /// assert!(namespaces.contains(&"auth".to_string()));
 /// ```
 pub fn get_namespace_names(tokens: &[Token]) -> Vec<String> {
-    let mut namespaces: Vec<String> = tokens.iter()
+    let mut namespaces: Vec<String> = tokens
+        .iter()
         .filter_map(|token| token.namespace.as_ref().map(|ns| ns.to_string()))
         .collect();
     namespaces.sort();
@@ -112,7 +117,8 @@ pub fn token_to_string(token: &Token) -> String {
 /// assert_eq!(result, "host=localhost; port=8080");
 /// ```
 pub fn tokens_to_string(tokens: &[Token]) -> String {
-    tokens.iter()
+    tokens
+        .iter()
         .map(|token| token.to_string())
         .collect::<Vec<String>>()
         .join("; ")
@@ -140,7 +146,8 @@ mod tests {
 
     #[test]
     fn test_extract_namespace_tokens() {
-        let tokens = tokenize_string(r#"host="localhost"; db:user="admin"; db:pass="secret";"#).unwrap();
+        let tokens =
+            tokenize_string(r#"host="localhost"; db:user="admin"; db:pass="secret";"#).unwrap();
 
         let db_tokens = extract_namespace_tokens(&tokens, Some("db"));
         assert_eq!(db_tokens.len(), 2);
@@ -152,7 +159,10 @@ mod tests {
 
     #[test]
     fn test_get_namespace_names() {
-        let tokens = tokenize_string(r#"host="localhost"; db:user="admin"; auth:token="xyz"; db:pass="secret";"#).unwrap();
+        let tokens = tokenize_string(
+            r#"host="localhost"; db:user="admin"; auth:token="xyz"; db:pass="secret";"#,
+        )
+        .unwrap();
         let namespaces = get_namespace_names(&tokens);
         assert_eq!(namespaces, vec!["auth", "db"]);
     }

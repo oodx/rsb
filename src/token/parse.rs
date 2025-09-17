@@ -3,7 +3,7 @@
 //! Provides robust parsing of key=value token streams with validation,
 //! quote stripping, and comprehensive error handling.
 
-use super::types::{Token, Namespace, TokenError, TokenResult, TokenStreamable};
+use super::types::{Namespace, Token, TokenError, TokenResult, TokenStreamable};
 
 /// Strip quotes from a value string.
 ///
@@ -12,9 +12,8 @@ use super::types::{Token, Namespace, TokenError, TokenResult, TokenStreamable};
 fn strip_quotes(s: &str) -> String {
     let s = s.trim();
     if s.len() >= 2 {
-        if (s.starts_with('"') && s.ends_with('"')) ||
-           (s.starts_with('\'') && s.ends_with('\'')) {
-            s[1..s.len()-1].to_string()
+        if (s.starts_with('"') && s.ends_with('"')) || (s.starts_with('\'') && s.ends_with('\'')) {
+            s[1..s.len() - 1].to_string()
         } else {
             s.to_string()
         }
@@ -59,7 +58,9 @@ pub fn tokenize_string(input: &str) -> TokenResult<Vec<Token>> {
     for token_str in input.split(';') {
         // Only trim leading spaces (allow space after ;) but not trailing spaces (no space before ;)
         let token_str = token_str.trim_start();
-        if token_str.is_empty() { continue; }
+        if token_str.is_empty() {
+            continue;
+        }
 
         // Check for trailing spaces (space before ;)
         if token_str != token_str.trim_end() {
@@ -81,7 +82,7 @@ pub fn tokenize_string(input: &str) -> TokenResult<Vec<Token>> {
                     });
                 }
                 continue;
-            },
+            }
         };
 
         // Check for spaces around '=' - key should not have trailing spaces, value should not have leading spaces
@@ -129,7 +130,7 @@ pub fn tokenize_string(input: &str) -> TokenResult<Vec<Token>> {
                 // Parse namespace with its internal delimiter
                 let namespace = Namespace::from_string(ns);
                 (Some(namespace), k.to_string())
-            },
+            }
             None => {
                 // Even non-prefixed keys shouldn't have spaces
                 if key_part.contains(' ') {
@@ -139,10 +140,14 @@ pub fn tokenize_string(input: &str) -> TokenResult<Vec<Token>> {
                     });
                 }
                 (None, key_part.to_string())
-            },
+            }
         };
 
-        tokens.push(Token { namespace, key, value });
+        tokens.push(Token {
+            namespace,
+            key,
+            value,
+        });
     }
 
     if tokens.is_empty() {
@@ -221,15 +226,18 @@ mod tests {
     fn test_quote_stripping() {
         let tokens = tokenize_string(r#"key1="value1"; key2='value2'; key3=unquoted;"#).unwrap();
         assert_eq!(tokens.len(), 3);
-        assert_eq!(tokens[0].value, "value1");  // double quotes stripped
-        assert_eq!(tokens[1].value, "value2");  // single quotes stripped
+        assert_eq!(tokens[0].value, "value1"); // double quotes stripped
+        assert_eq!(tokens[1].value, "value2"); // single quotes stripped
         assert_eq!(tokens[2].value, "unquoted"); // no quotes to strip
     }
 
     #[test]
     fn test_empty_input() {
         assert!(matches!(tokenize_string(""), Err(TokenError::EmptyInput)));
-        assert!(matches!(tokenize_string("   "), Err(TokenError::EmptyInput)));
+        assert!(matches!(
+            tokenize_string("   "),
+            Err(TokenError::EmptyInput)
+        ));
     }
 
     #[test]

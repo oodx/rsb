@@ -8,7 +8,11 @@ pub fn percent_of(total: f64, percent: f64) -> f64 {
 
 pub fn percent_change(original: f64, new: f64) -> f64 {
     if original == 0.0 {
-        if new == 0.0 { 0.0 } else { f64::INFINITY }
+        if new == 0.0 {
+            0.0
+        } else {
+            f64::INFINITY
+        }
     } else {
         ((new - original) / original) * 100.0
     }

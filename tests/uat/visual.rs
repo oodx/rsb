@@ -1,6 +1,8 @@
 // moved from tests/uat_visual.rs
 use rsb::prelude::*;
-use rsb::visual::colors::{color_enable_with, color_mode, color, bg, colored, colorize, colorize_bg};
+use rsb::visual::colors::{
+    bg, color, color_enable_with, color_mode, colored, colorize, colorize_bg,
+};
 #[cfg(feature = "glyphs")]
 use rsb::visual::glyphs::glyph_enable;
 
@@ -20,10 +22,17 @@ fn uat_visual_combo_demo() {
         "{bg:slate}{white}{g:dots} TRACE{reset}",
         "{bg:gold}{black}{g:box} BOX{reset}",
     ];
-    for s in samples { println!("{}", colored(s)); }
-    let line = format!("{}{} {}{}", bg("amber"), color("black"), "HELPER-BG", color("reset") );
+    for s in samples {
+        println!("{}", colored(s));
+    }
+    let line = format!(
+        "{}{} {}{}",
+        bg("amber"),
+        color("black"),
+        "HELPER-BG",
+        color("reset")
+    );
     println!("{}", line);
     println!("{}{}{}", color("red"), "FG-ONLY", color("reset"));
     println!("{}", colorize_bg(&colorize("GLYPH", "white"), "violet"));
 }
-

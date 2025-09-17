@@ -40,4 +40,3 @@ pub fn bootstrap_from_env() {
     let args: Vec<String> = std::env::args().collect();
     bootstrap(&args);
 }
-

@@ -39,7 +39,11 @@ fn test_id_generators() {
 #[test]
 fn test_collection_helpers() {
     // Test random selection from slice
-    let test_items = vec!["apple".to_string(), "banana".to_string(), "cherry".to_string()];
+    let test_items = vec![
+        "apple".to_string(),
+        "banana".to_string(),
+        "cherry".to_string(),
+    ];
 
     let selection = rsb::gx::collection::get_rand_from_slice(&test_items);
     assert!(selection.is_some());

@@ -26,4 +26,3 @@ fn adapter_apply_env_and_config() {
     assert_eq!(get_var("ADAPTER_ENV_2"), "xyz");
     assert_eq!(get_var("K"), "V");
 }
-

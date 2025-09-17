@@ -7,9 +7,10 @@ use super::traits::Streamable;
 pub struct FilterLines;
 impl Streamable for FilterLines {
     type Args = String;
-    
+
     fn stream_apply(stdin: &str, pattern: Self::Args) -> String {
-        stdin.lines()
+        stdin
+            .lines()
             .filter(|line| line.contains(&pattern))
             .collect::<Vec<_>>()
             .join("\n")
@@ -20,9 +21,10 @@ impl Streamable for FilterLines {
 pub struct FilterEmpty;
 impl Streamable for FilterEmpty {
     type Args = ();
-    
+
     fn stream_apply(stdin: &str, _args: Self::Args) -> String {
-        stdin.lines()
+        stdin
+            .lines()
             .filter(|line| !line.trim().is_empty())
             .collect::<Vec<_>>()
             .join("\n")
@@ -33,10 +35,11 @@ impl Streamable for FilterEmpty {
 pub struct FilterByLength;
 impl Streamable for FilterByLength {
     type Args = (usize, usize); // (min, max)
-    
+
     fn stream_apply(stdin: &str, args: Self::Args) -> String {
         let (min, max) = args;
-        stdin.lines()
+        stdin
+            .lines()
             .filter(|line| {
                 let len = line.len();
                 len >= min && len <= max
@@ -50,11 +53,12 @@ impl Streamable for FilterByLength {
 pub struct FilterRegex;
 impl Streamable for FilterRegex {
     type Args = String;
-    
+
     fn stream_apply(stdin: &str, pattern: Self::Args) -> String {
         use regex::Regex;
         let re = Regex::new(&pattern).unwrap_or_else(|_| Regex::new(".*").unwrap());
-        stdin.lines()
+        stdin
+            .lines()
             .filter(|line| re.is_match(line))
             .collect::<Vec<_>>()
             .join("\n")
@@ -65,9 +69,10 @@ impl Streamable for FilterRegex {
 pub struct FilterNotContains;
 impl Streamable for FilterNotContains {
     type Args = String;
-    
+
     fn stream_apply(stdin: &str, pattern: Self::Args) -> String {
-        stdin.lines()
+        stdin
+            .lines()
             .filter(|line| !line.contains(&pattern))
             .collect::<Vec<_>>()
             .join("\n")
@@ -78,11 +83,12 @@ impl Streamable for FilterNotContains {
 pub struct FilterDuplicates;
 impl Streamable for FilterDuplicates {
     type Args = ();
-    
+
     fn stream_apply(stdin: &str, _args: Self::Args) -> String {
         use std::collections::HashSet;
         let mut seen = HashSet::new();
-        stdin.lines()
+        stdin
+            .lines()
             .filter(|line| seen.insert(line.to_string()))
             .collect::<Vec<_>>()
             .join("\n")
@@ -93,9 +99,10 @@ impl Streamable for FilterDuplicates {
 pub struct FilterStartsWith;
 impl Streamable for FilterStartsWith {
     type Args = String;
-    
+
     fn stream_apply(stdin: &str, pattern: Self::Args) -> String {
-        stdin.lines()
+        stdin
+            .lines()
             .filter(|line| line.starts_with(&pattern))
             .collect::<Vec<_>>()
             .join("\n")
@@ -106,9 +113,10 @@ impl Streamable for FilterStartsWith {
 pub struct FilterEndsWith;
 impl Streamable for FilterEndsWith {
     type Args = String;
-    
+
     fn stream_apply(stdin: &str, pattern: Self::Args) -> String {
-        stdin.lines()
+        stdin
+            .lines()
             .filter(|line| line.ends_with(&pattern))
             .collect::<Vec<_>>()
             .join("\n")
@@ -119,12 +127,9 @@ impl Streamable for FilterEndsWith {
 pub struct TakeLines;
 impl Streamable for TakeLines {
     type Args = usize;
-    
+
     fn stream_apply(stdin: &str, n: Self::Args) -> String {
-        stdin.lines()
-            .take(n)
-            .collect::<Vec<_>>()
-            .join("\n")
+        stdin.lines().take(n).collect::<Vec<_>>().join("\n")
     }
 }
 
@@ -132,12 +137,9 @@ impl Streamable for TakeLines {
 pub struct SkipLines;
 impl Streamable for SkipLines {
     type Args = usize;
-    
+
     fn stream_apply(stdin: &str, n: Self::Args) -> String {
-        stdin.lines()
-            .skip(n)
-            .collect::<Vec<_>>()
-            .join("\n")
+        stdin.lines().skip(n).collect::<Vec<_>>().join("\n")
     }
 }
 

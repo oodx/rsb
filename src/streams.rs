@@ -1,7 +1,7 @@
 // src/streams.rs
 
-use crate::global::{expand_vars, get_var, set_var};
 use crate::fs::{append_file, read_file, write_file};
+use crate::global::{expand_vars, get_var, set_var};
 use crate::os::run_cmd;
 use std::collections::HashSet;
 use std::io::Write;
@@ -75,7 +75,6 @@ impl Stream {
         }
     }
 
-
     // --- Chainable Operations ---
 
     /// Filters lines in the stream, keeping only those that contain the pattern.
@@ -86,7 +85,11 @@ impl Stream {
 
     /// Replaces all occurrences of a pattern in the stream.
     pub fn sed(mut self, from: &str, to: &str) -> Self {
-        self.lines = self.lines.iter().map(|line| line.replace(from, to)).collect();
+        self.lines = self
+            .lines
+            .iter()
+            .map(|line| line.replace(from, to))
+            .collect();
         self
     }
 
@@ -154,14 +157,30 @@ impl Stream {
     }
 
     /// Case conversions per-line using string::case helpers (line-size safe)
-    pub fn snake(self) -> Self { self.map(|l| crate::string::to_snake_case(l)) }
-    pub fn kebab(self) -> Self { self.map(|l| crate::string::to_kebab_case(l)) }
-    pub fn slug(self) -> Self { self.kebab() }
-    pub fn dot(self) -> Self { self.map(|l| crate::string::to_dot_case(l)) }
-    pub fn space(self) -> Self { self.map(|l| crate::string::to_space_case(l)) }
-    pub fn camel(self) -> Self { self.map(|l| crate::string::to_camel_case(l)) }
-    pub fn lower(self) -> Self { self.map(|l| l.to_lowercase()) }
-    pub fn upper(self) -> Self { self.map(|l| l.to_uppercase()) }
+    pub fn snake(self) -> Self {
+        self.map(|l| crate::string::to_snake_case(l))
+    }
+    pub fn kebab(self) -> Self {
+        self.map(|l| crate::string::to_kebab_case(l))
+    }
+    pub fn slug(self) -> Self {
+        self.kebab()
+    }
+    pub fn dot(self) -> Self {
+        self.map(|l| crate::string::to_dot_case(l))
+    }
+    pub fn space(self) -> Self {
+        self.map(|l| crate::string::to_space_case(l))
+    }
+    pub fn camel(self) -> Self {
+        self.map(|l| crate::string::to_camel_case(l))
+    }
+    pub fn lower(self) -> Self {
+        self.map(|l| l.to_lowercase())
+    }
+    pub fn upper(self) -> Self {
+        self.map(|l| l.to_uppercase())
+    }
 
     /// Replaces a block of text between two patterns.
     pub fn sed_block(mut self, start_pattern: &str, end_pattern: &str, replacement: &str) -> Self {
@@ -179,7 +198,11 @@ impl Stream {
                 buffer.push(line);
                 // Perform the replacement on the entire block
                 let block_content = buffer.join("\n");
-                result_lines.push(block_content.replace(start_pattern, replacement).replace(end_pattern, ""));
+                result_lines.push(
+                    block_content
+                        .replace(start_pattern, replacement)
+                        .replace(end_pattern, ""),
+                );
                 buffer.clear();
             } else if in_block {
                 buffer.push(line);
@@ -202,10 +225,10 @@ impl Stream {
             self.lines.clear();
             return self;
         }
-        
+
         let start_idx = start_line.saturating_sub(1);
         let end_idx = std::cmp::min(end_line, self.lines.len());
-        
+
         if start_idx >= self.lines.len() {
             self.lines.clear();
         } else {
@@ -218,13 +241,13 @@ impl Stream {
     pub fn sed_around(mut self, pattern: &str, context_lines: usize) -> Self {
         let mut result_lines = Vec::new();
         let total_lines = self.lines.len();
-        
+
         for (i, line) in self.lines.iter().enumerate() {
             if line.contains(pattern) {
                 // Calculate range with context
                 let start_idx = i.saturating_sub(context_lines);
                 let end_idx = std::cmp::min(i + context_lines + 1, total_lines);
-                
+
                 // Add context lines
                 for j in start_idx..end_idx {
                     if j < total_lines {
@@ -233,42 +256,47 @@ impl Stream {
                 }
             }
         }
-        
+
         // Remove duplicates while preserving order
         let mut unique_lines = Vec::new();
         let mut seen_lines = std::collections::HashSet::new();
-        
+
         for line in result_lines {
             if seen_lines.insert(line.clone()) {
                 unique_lines.push(line);
             }
         }
         result_lines = unique_lines;
-        
+
         self.lines = result_lines;
         self
     }
 
     /// Inserts content at a unique sentinel location. Errors if sentinel is not unique.
     pub fn sed_insert(mut self, content: &str, sentinel: &str) -> Result<Self, String> {
-        let matches: Vec<usize> = self.lines
+        let matches: Vec<usize> = self
+            .lines
             .iter()
             .enumerate()
             .filter(|(_, line)| line.contains(sentinel))
             .map(|(i, _)| i)
             .collect();
-            
+
         if matches.is_empty() {
             return Err(format!("Sentinel '{}' not found", sentinel));
         }
-        
+
         if matches.len() > 1 {
-            return Err(format!("Sentinel '{}' found {} times, must be unique", sentinel, matches.len()));
+            return Err(format!(
+                "Sentinel '{}' found {} times, must be unique",
+                sentinel,
+                matches.len()
+            ));
         }
-        
+
         let insert_idx = matches[0];
         let content_lines: Vec<String> = content.lines().map(|s| s.to_string()).collect();
-        
+
         // Replace the sentinel line with the content
         self.lines.splice(insert_idx..=insert_idx, content_lines);
         Ok(self)
@@ -284,7 +312,6 @@ impl Stream {
         self
     }
 
-
     /// Pipes the stream's content as stdin to another shell command.
     pub fn pipe_to_cmd(self, command: &str) -> Self {
         let input = self.to_string();
@@ -299,13 +326,16 @@ impl Stream {
             .expect("Failed to spawn command for pipe_to_cmd");
 
         if let Some(mut stdin) = child.stdin.take() {
-            stdin.write_all(input.as_bytes()).expect("Failed to write to stdin");
+            stdin
+                .write_all(input.as_bytes())
+                .expect("Failed to write to stdin");
         }
 
-        let output = child.wait_with_output().expect("Failed to read stdout from piped command");
+        let output = child
+            .wait_with_output()
+            .expect("Failed to read stdout from piped command");
         Self::from_string(&String::from_utf8_lossy(&output.stdout))
     }
-
 
     // --- Sink (Consuming) Operations ---
 

@@ -66,8 +66,8 @@ fn test_command_argument_parsing() {
 
     // Simulate command line arguments: ["rsb", "init", "my-project"]
     // Reset test state for parsed args
-    array_push("PARSED_ARGS", "rsb");      // program name
-    array_push("PARSED_ARGS", "init");     // command
+    array_push("PARSED_ARGS", "rsb"); // program name
+    array_push("PARSED_ARGS", "init"); // command
     array_push("PARSED_ARGS", "my-project"); // argument
 
     assert_eq!(array_length("PARSED_ARGS"), 3);

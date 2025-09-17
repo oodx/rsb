@@ -3,7 +3,7 @@
 //! Bash-like stream constructors and shell helpers for building pipelines.
 
 // Re-export names for selective imports if desired
-pub use crate::{cat, cmd, pipe, stream, run, shell};
+pub use crate::{cat, cmd, pipe, run, shell, stream};
 
 #[macro_export]
 macro_rules! cat {
@@ -12,10 +12,18 @@ macro_rules! cat {
 }
 
 #[macro_export]
-macro_rules! cmd { ($command:expr) => { $crate::streams::Stream::from_cmd($command) }; }
+macro_rules! cmd {
+    ($command:expr) => {
+        $crate::streams::Stream::from_cmd($command)
+    };
+}
 
 #[macro_export]
-macro_rules! pipe { ($input:expr) => { $crate::streams::Stream::from_string(&$input.to_string()) }; }
+macro_rules! pipe {
+    ($input:expr) => {
+        $crate::streams::Stream::from_string(&$input.to_string())
+    };
+}
 
 #[macro_export]
 macro_rules! stream {
@@ -67,4 +75,3 @@ macro_rules! shell {
         }
     };
 }
-

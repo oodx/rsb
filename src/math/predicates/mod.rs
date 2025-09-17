@@ -19,9 +19,13 @@ pub fn modulo(a: i64, b: i64) -> Result<i64, String> {
 }
 
 pub fn sign(n: f64) -> i32 {
-    if n > 0.0 { 1 }
-    else if n < 0.0 { -1 }
-    else { 0 }
+    if n > 0.0 {
+        1
+    } else if n < 0.0 {
+        -1
+    } else {
+        0
+    }
 }
 
 pub fn same_sign(a: f64, b: f64) -> bool {

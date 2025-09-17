@@ -39,11 +39,20 @@ fn uat_global_basic_demo() {
     rsb::global::set_var("opt_quiet", "true");
     rsb::global::set_var("opt_trace", "false");
     println!("is_true(opt_quiet) → {}", rsb::global::is_true("opt_quiet"));
-    println!("is_false(opt_trace) → {}", rsb::global::is_false("opt_trace"));
+    println!(
+        "is_false(opt_trace) → {}",
+        rsb::global::is_false("opt_trace")
+    );
 
     // Token stream check
-    println!("is_token_stream('a=1,b=2') → {}", rsb::global::is_token_stream("a=1,b=2"));
-    println!("is_token_stream('=bad') → {}", rsb::global::is_token_stream("=bad"));
+    println!(
+        "is_token_stream('a=1,b=2') → {}",
+        rsb::global::is_token_stream("a=1,b=2")
+    );
+    println!(
+        "is_token_stream('=bad') → {}",
+        rsb::global::is_token_stream("=bad")
+    );
 
     // Config parsing (content)
     let cfg = r#"
@@ -53,9 +62,15 @@ ARRAY=(item1 item2 "item 3")
 "#;
     rsb::global::parse_config_content(cfg);
     println!("CONFIG KEY → {}", rsb::global::get_var("KEY"));
-    println!("CONFIG KEY_WITH_SPACES → {}", rsb::global::get_var("KEY_WITH_SPACES"));
+    println!(
+        "CONFIG KEY_WITH_SPACES → {}",
+        rsb::global::get_var("KEY_WITH_SPACES")
+    );
     println!("CONFIG ARRAY → {}", rsb::global::get_var("ARRAY"));
-    println!("CONFIG ARRAY_LENGTH → {}", rsb::global::get_var("ARRAY_LENGTH"));
+    println!(
+        "CONFIG ARRAY_LENGTH → {}",
+        rsb::global::get_var("ARRAY_LENGTH")
+    );
     println!("CONFIG ARRAY_2 → {}", rsb::global::get_var("ARRAY_2"));
 
     // Config I/O (save → load)
@@ -81,7 +96,9 @@ ARRAY=(item1 item2 "item 3")
     rsb::global::register_function("demo", "Runs the uat demo");
     let funcs = rsb::global::list_functions();
     println!("FUNCTIONS REGISTERED → {}", funcs.len());
-    for (name, desc) in funcs { println!("  - {} : {}", name, desc); }
+    for (name, desc) in funcs {
+        println!("  - {} : {}", name, desc);
+    }
     // Push/pop one frame
     rsb::global::push_call("demo", &["--flag".into()]);
     rsb::global::show_call_stack();

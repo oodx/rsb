@@ -16,19 +16,15 @@
 pub fn setup_xdg_paths() {
     let home = std::env::var("HOME").unwrap_or_else(|_| "/tmp".to_string());
 
-    let xdg_config = std::env::var("XDG_CONFIG_HOME").unwrap_or_else(|_| {
-        format!("{}/.config", home)
-    });
+    let xdg_config =
+        std::env::var("XDG_CONFIG_HOME").unwrap_or_else(|_| format!("{}/.config", home));
     crate::global::set_var("XDG_CONFIG_HOME", &xdg_config);
 
-    let xdg_cache = std::env::var("XDG_CACHE_HOME").unwrap_or_else(|_| {
-        format!("{}/.cache", home)
-    });
+    let xdg_cache = std::env::var("XDG_CACHE_HOME").unwrap_or_else(|_| format!("{}/.cache", home));
     crate::global::set_var("XDG_CACHE_HOME", &xdg_cache);
 
-    let xdg_data_initial = std::env::var("XDG_DATA_HOME").unwrap_or_else(|_| {
-        format!("{}/.local/share", home)
-    });
+    let xdg_data_initial =
+        std::env::var("XDG_DATA_HOME").unwrap_or_else(|_| format!("{}/.local/share", home));
     crate::global::set_var("XDG_DATA_HOME", &xdg_data_initial);
 
     // XDG+ (BashFX) extensions

@@ -8,7 +8,9 @@ fn main() {
     // Benchmark a simple operation
     let _ = rsb::threads::bench("add", || {
         let mut acc = 0;
-        for i in 0..10_000 { acc += i; }
+        for i in 0..10_000 {
+            acc += i;
+        }
         let _ = acc;
     });
 
@@ -22,4 +24,3 @@ fn main() {
         echo!("running: [{}] {}", id, cmd);
     }
 }
-

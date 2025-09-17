@@ -39,7 +39,9 @@ fn ascii_normalize_to_separators(s: &str) -> String {
 pub fn split_words(s: &str) -> Vec<String> {
     let chars: Vec<char> = s.chars().collect();
     let n = chars.len();
-    if n == 0 { return Vec::new(); }
+    if n == 0 {
+        return Vec::new();
+    }
 
     let mut words: Vec<String> = Vec::new();
     let mut start = 0usize;
@@ -49,7 +51,9 @@ pub fn split_words(s: &str) -> Vec<String> {
     let mut flush = |from: usize, to: usize| {
         if to > from {
             let t: String = chars[from..to].iter().collect();
-            if !t.is_empty() { words.push(t); }
+            if !t.is_empty() {
+                words.push(t);
+            }
         }
     };
 
@@ -85,7 +89,9 @@ pub fn split_words(s: &str) -> Vec<String> {
                     }
                 } else {
                     // letter<->digit boundaries
-                    if (p.is_ascii_digit() && !c.is_ascii_digit()) || (!p.is_ascii_digit() && c.is_ascii_digit()) {
+                    if (p.is_ascii_digit() && !c.is_ascii_digit())
+                        || (!p.is_ascii_digit() && c.is_ascii_digit())
+                    {
                         flush(start, i);
                         start = i;
                     }
@@ -104,15 +110,23 @@ pub fn split_words(s: &str) -> Vec<String> {
     words
 }
 
-pub fn to_lower(s: &str) -> String { s.to_lowercase() }
-pub fn to_upper(s: &str) -> String { s.to_uppercase() }
+pub fn to_lower(s: &str) -> String {
+    s.to_lowercase()
+}
+pub fn to_upper(s: &str) -> String {
+    s.to_uppercase()
+}
 
 /// ASCII-SAFE: yes
 pub fn to_snake_case(s: &str) -> String {
     with_case_guard("to_snake_case", s, |s| {
         let norm = ascii_normalize_to_separators(s);
         let words = split_words(&norm);
-        words.into_iter().map(|w| w.to_lowercase()).collect::<Vec<_>>().join("_")
+        words
+            .into_iter()
+            .map(|w| w.to_lowercase())
+            .collect::<Vec<_>>()
+            .join("_")
     })
 }
 
@@ -121,7 +135,11 @@ pub fn to_kebab_case(s: &str) -> String {
     with_case_guard("to_kebab_case", s, |s| {
         let norm = ascii_normalize_to_separators(s);
         let words = split_words(&norm);
-        words.into_iter().map(|w| w.to_lowercase()).collect::<Vec<_>>().join("-")
+        words
+            .into_iter()
+            .map(|w| w.to_lowercase())
+            .collect::<Vec<_>>()
+            .join("-")
     })
 }
 
@@ -130,7 +148,11 @@ pub fn to_dot_case(s: &str) -> String {
     with_case_guard("to_dot_case", s, |s| {
         let norm = ascii_normalize_to_separators(s);
         let words = split_words(&norm);
-        words.into_iter().map(|w| w.to_lowercase()).collect::<Vec<_>>().join(".")
+        words
+            .into_iter()
+            .map(|w| w.to_lowercase())
+            .collect::<Vec<_>>()
+            .join(".")
     })
 }
 
@@ -139,7 +161,11 @@ pub fn to_space_case(s: &str) -> String {
     with_case_guard("to_space_case", s, |s| {
         let norm = ascii_normalize_to_separators(s);
         let words = split_words(&norm);
-        words.into_iter().map(|w| w.to_lowercase()).collect::<Vec<_>>().join(" ")
+        words
+            .into_iter()
+            .map(|w| w.to_lowercase())
+            .collect::<Vec<_>>()
+            .join(" ")
     })
 }
 
@@ -148,7 +174,9 @@ pub fn to_camel_case(s: &str) -> String {
     with_case_guard("to_camel_case", s, |s| {
         let norm = ascii_normalize_to_separators(s);
         let words = split_words(&norm);
-        if words.is_empty() { return String::new(); }
+        if words.is_empty() {
+            return String::new();
+        }
         let mut out = String::new();
         for (idx, w) in words.into_iter().enumerate() {
             if idx == 0 {

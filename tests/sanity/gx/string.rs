@@ -46,9 +46,9 @@ mod tests {
         let result = get_rand_alpha(100);
 
         // Verify only expected characters appear
-        assert!(result.chars().all(|c| {
-            (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')
-        }));
+        assert!(result
+            .chars()
+            .all(|c| { (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') }));
     }
 
     #[test]
@@ -65,9 +65,9 @@ mod tests {
         let result = get_rand_hex(100);
 
         // Verify only lowercase hex characters
-        assert!(result.chars().all(|c| {
-            (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f')
-        }));
+        assert!(result
+            .chars()
+            .all(|c| { (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') }));
     }
 
     #[test]
@@ -76,9 +76,9 @@ mod tests {
         assert_eq!(result.len(), 20);
 
         // Verify all characters are printable and non-whitespace
-        assert!(result.chars().all(|c| {
-            c.is_ascii_graphic() && !c.is_whitespace()
-        }));
+        assert!(result
+            .chars()
+            .all(|c| { c.is_ascii_graphic() && !c.is_whitespace() }));
     }
 
     #[test]
@@ -100,7 +100,13 @@ mod tests {
         let s3 = get_rand_alnum(20);
 
         // Basic randomness check - shouldn't all be identical
-        assert!(!(s1 == s2 && s2 == s3), "Generated strings are identical: {}, {}, {}", s1, s2, s3);
+        assert!(
+            !(s1 == s2 && s2 == s3),
+            "Generated strings are identical: {}, {}, {}",
+            s1,
+            s2,
+            s3
+        );
     }
 
     #[test]

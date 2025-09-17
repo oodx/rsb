@@ -10,10 +10,19 @@ pub fn str_sub(var: &str, offset: usize, length: Option<usize>) -> String {
 }
 
 /// Try substring by absolute index and optional length.
-pub fn try_str_sub_abs(var: &str, offset: usize, length: Option<usize>) -> Result<String, StringError> {
+pub fn try_str_sub_abs(
+    var: &str,
+    offset: usize,
+    length: Option<usize>,
+) -> Result<String, StringError> {
     let chars: Vec<char> = var.chars().collect();
     let n = chars.len();
-    if offset > n { return Err(StringError::IndexOutOfBounds { index: offset as isize, len: n }); }
+    if offset > n {
+        return Err(StringError::IndexOutOfBounds {
+            index: offset as isize,
+            len: n,
+        });
+    }
     let take_len = length.unwrap_or(n - offset);
     let end = offset.saturating_add(take_len).min(n);
     Ok(chars[offset..end].iter().collect())
@@ -29,11 +38,16 @@ pub fn try_str_sub_rel(var: &str, start: isize, len: Option<isize>) -> Result<St
         Some(l) if l >= 0 => (i + l).min(n),
         Some(l) => (n + l).max(i),
     };
-    if j < i || i < 0 || j > n { return Err(StringError::IndexOutOfBounds { index: start, len: chars.len() }); }
+    if j < i || i < 0 || j > n {
+        return Err(StringError::IndexOutOfBounds {
+            index: start,
+            len: chars.len(),
+        });
+    }
     Ok(chars[i as usize..j as usize].iter().collect())
 }
 
-use crate::string::error::{StringError, log_string_error};
+use crate::string::error::{log_string_error, StringError};
 
 // --- Try variants (Result-returning) ---
 
@@ -44,8 +58,11 @@ pub fn try_str_prefix(var: &str, pattern: &str, longest: bool) -> Result<String,
             .replace('.', r"\.")
             .replace('*', ".*")
             .replace('?', ".");
-        let re = regex::Regex::new(&format!("^{}$", regex_pattern))
-            .map_err(|_| StringError::RegexCompile { pattern: pattern.to_string() })?;
+        let re = regex::Regex::new(&format!("^{}$", regex_pattern)).map_err(|_| {
+            StringError::RegexCompile {
+                pattern: pattern.to_string(),
+            }
+        })?;
 
         let mut best_match_len = 0usize;
         let mut found = false;
@@ -55,11 +72,17 @@ pub fn try_str_prefix(var: &str, pattern: &str, longest: bool) -> Result<String,
                 if !found || (longest && i > best_match_len) || (!longest && i < best_match_len) {
                     best_match_len = i;
                     found = true;
-                    if !longest { break; }
+                    if !longest {
+                        break;
+                    }
                 }
             }
         }
-        if found { Ok(var[best_match_len..].to_string()) } else { Ok(var.to_string()) }
+        if found {
+            Ok(var[best_match_len..].to_string())
+        } else {
+            Ok(var.to_string())
+        }
     } else if var.starts_with(pattern) {
         Ok(var.strip_prefix(pattern).unwrap_or(var).to_string())
     } else {
@@ -74,8 +97,11 @@ pub fn try_str_suffix(var: &str, pattern: &str, longest: bool) -> Result<String,
             .replace('.', r"\.")
             .replace('*', ".*")
             .replace('?', ".");
-        let re = regex::Regex::new(&format!("^{}$", regex_pattern))
-            .map_err(|_| StringError::RegexCompile { pattern: pattern.to_string() })?;
+        let re = regex::Regex::new(&format!("^{}$", regex_pattern)).map_err(|_| {
+            StringError::RegexCompile {
+                pattern: pattern.to_string(),
+            }
+        })?;
 
         let mut best_start = var.len();
         let mut found = false;
@@ -88,11 +114,17 @@ pub fn try_str_suffix(var: &str, pattern: &str, longest: bool) -> Result<String,
                 if !found || (longest && i < best_start) || (!longest && i > best_start) {
                     best_start = i;
                     found = true;
-                    if !longest { break; }
+                    if !longest {
+                        break;
+                    }
                 }
             }
         }
-        if found { Ok(var[..best_start].to_string()) } else { Ok(var.to_string()) }
+        if found {
+            Ok(var[..best_start].to_string())
+        } else {
+            Ok(var.to_string())
+        }
     } else if var.ends_with(pattern) {
         Ok(var.strip_suffix(pattern).unwrap_or(var).to_string())
     } else {
@@ -101,21 +133,33 @@ pub fn try_str_suffix(var: &str, pattern: &str, longest: bool) -> Result<String,
 }
 
 /// Try to uppercase/lowercase the first character of the first substring matching a glob pattern.
-pub fn try_str_case_first_match(var: &str, pattern: &str, to_upper: bool) -> Result<String, StringError> {
+pub fn try_str_case_first_match(
+    var: &str,
+    pattern: &str,
+    to_upper: bool,
+) -> Result<String, StringError> {
     let mut regex_pattern = regex::escape(pattern);
     regex_pattern = regex_pattern.replace(r"\*", ".*").replace(r"\?", ".");
     let anchored = format!("^{}", regex_pattern);
-    let re = regex::Regex::new(&anchored)
-        .map_err(|_| StringError::RegexCompile { pattern: pattern.to_string() })?;
+    let re = regex::Regex::new(&anchored).map_err(|_| StringError::RegexCompile {
+        pattern: pattern.to_string(),
+    })?;
 
-    for (start, _) in std::iter::once((0usize, '\0')).chain(var.char_indices()).take_while(|(i, _)| *i <= var.len()) {
+    for (start, _) in std::iter::once((0usize, '\0'))
+        .chain(var.char_indices())
+        .take_while(|(i, _)| *i <= var.len())
+    {
         let suffix = &var[start..];
         if let Some(m) = re.find(suffix) {
             if m.start() == 0 {
                 let prefix = &var[..start];
                 let mut chars = suffix.chars();
                 if let Some(first) = chars.next() {
-                    let transformed = if to_upper { first.to_uppercase().collect::<String>() } else { first.to_lowercase().collect::<String>() };
+                    let transformed = if to_upper {
+                        first.to_uppercase().collect::<String>()
+                    } else {
+                        first.to_lowercase().collect::<String>()
+                    };
                     let rest = &suffix[first.len_utf8()..];
                     return Ok(format!("{}{}{}", prefix, transformed, rest));
                 }
@@ -145,7 +189,11 @@ pub fn str_suffix(var: &str, pattern: &str, longest: bool) -> String {
 
 /// Replace first occurrence or all occurrences of a pattern.
 pub fn str_replace(var: &str, pattern: &str, replacement: &str, all: bool) -> String {
-    if all { var.replace(pattern, replacement) } else { var.replacen(pattern, replacement, 1) }
+    if all {
+        var.replace(pattern, replacement)
+    } else {
+        var.replacen(pattern, replacement, 1)
+    }
 }
 
 /// Uppercase the first character or the whole string depending on `all`.
@@ -154,7 +202,10 @@ pub fn str_upper(var: &str, all: bool) -> String {
         var.to_uppercase()
     } else {
         let mut c = var.chars();
-        match c.next() { None => String::new(), Some(f) => f.to_uppercase().collect::<String>() + c.as_str() }
+        match c.next() {
+            None => String::new(),
+            Some(f) => f.to_uppercase().collect::<String>() + c.as_str(),
+        }
     }
 }
 
@@ -164,7 +215,10 @@ pub fn str_lower(var: &str, all: bool) -> String {
         var.to_lowercase()
     } else {
         let mut c = var.chars();
-        match c.next() { None => String::new(), Some(f) => f.to_lowercase().collect::<String>() + c.as_str() }
+        match c.next() {
+            None => String::new(),
+            Some(f) => f.to_lowercase().collect::<String>() + c.as_str(),
+        }
     }
 }
 
@@ -181,10 +235,15 @@ pub fn str_case_first_match(var: &str, pattern: &str, to_upper: bool) -> String 
 
 // --- Name and Comparison Helpers ---
 pub fn is_name(value: &str) -> bool {
-    !value.is_empty() && value.chars().all(|c| c.is_alphanumeric() || c == '_' || c == '-')
+    !value.is_empty()
+        && value
+            .chars()
+            .all(|c| c.is_alphanumeric() || c == '_' || c == '-')
 }
 
-pub fn str_equals(a: &str, b: &str) -> bool { a == b }
+pub fn str_equals(a: &str, b: &str) -> bool {
+    a == b
+}
 
 pub fn str_matches(text: &str, pattern: &str) -> bool {
     match regex::Regex::new(pattern) {
@@ -198,9 +257,18 @@ mod tests {
     use super::*;
     #[test]
     fn test_str_replace() {
-        assert_eq!(str_replace("hello world", "world", "rust", false), "hello rust");
-        assert_eq!(str_replace("hello world world", "world", "rust", false), "hello rust world");
-        assert_eq!(str_replace("hello world world", "world", "rust", true), "hello rust rust");
+        assert_eq!(
+            str_replace("hello world", "world", "rust", false),
+            "hello rust"
+        );
+        assert_eq!(
+            str_replace("hello world world", "world", "rust", false),
+            "hello rust world"
+        );
+        assert_eq!(
+            str_replace("hello world world", "world", "rust", true),
+            "hello rust rust"
+        );
     }
 
     #[test]

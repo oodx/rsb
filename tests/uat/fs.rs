@@ -16,7 +16,10 @@ fn uat_fs_file_operations_demo() {
     let content = rsb::fs::read_file(test_file);
     println!("{}", content);
 
-    println!("\nFile exists check: {}", std::path::Path::new(test_file).exists());
+    println!(
+        "\nFile exists check: {}",
+        std::path::Path::new(test_file).exists()
+    );
 
     // Get file info
     if let Ok(metadata) = fs::metadata(test_file) {
@@ -34,7 +37,10 @@ fn uat_fs_file_operations_demo() {
     // Clean up
     println!("\nCleaning up test file...");
     fs::remove_file(test_file).ok();
-    println!("File deleted: {}", !std::path::Path::new(test_file).exists());
+    println!(
+        "File deleted: {}",
+        !std::path::Path::new(test_file).exists()
+    );
 }
 
 #[test]
@@ -46,11 +52,17 @@ fn uat_fs_directory_operations_demo() {
 
     println!("Creating test directory: {}", test_dir);
     rsb::fs::mkdir_p(test_dir);
-    println!("Directory exists: {}", std::path::Path::new(test_dir).exists());
+    println!(
+        "Directory exists: {}",
+        std::path::Path::new(test_dir).exists()
+    );
 
     println!("Creating nested directory: {}", nested_dir);
     rsb::fs::mkdir_p(nested_dir);
-    println!("Nested directory exists: {}", std::path::Path::new(nested_dir).exists());
+    println!(
+        "Nested directory exists: {}",
+        std::path::Path::new(nested_dir).exists()
+    );
 
     // Create some test files
     let file1 = format!("{}/file1.txt", test_dir);
@@ -80,7 +92,10 @@ fn uat_fs_directory_operations_demo() {
     // Clean up
     println!("\nCleaning up test directories...");
     fs::remove_dir_all(test_dir).ok();
-    println!("Directory removed: {}", !std::path::Path::new(test_dir).exists());
+    println!(
+        "Directory removed: {}",
+        !std::path::Path::new(test_dir).exists()
+    );
 }
 
 #[test]
@@ -91,9 +106,20 @@ fn uat_fs_path_operations_demo() {
     let path = std::path::Path::new(file_path);
 
     println!("Path: {}", file_path);
-    println!("Basename: {}", path.file_name().unwrap_or_default().to_string_lossy());
-    println!("Dirname: {}", path.parent().unwrap_or_else(|| std::path::Path::new("/")).display());
-    println!("Extension: {}", path.extension().unwrap_or_default().to_string_lossy());
+    println!(
+        "Basename: {}",
+        path.file_name().unwrap_or_default().to_string_lossy()
+    );
+    println!(
+        "Dirname: {}",
+        path.parent()
+            .unwrap_or_else(|| std::path::Path::new("/"))
+            .display()
+    );
+    println!(
+        "Extension: {}",
+        path.extension().unwrap_or_default().to_string_lossy()
+    );
 
     // Path manipulation using std::path
     let without_ext = path.with_extension("");

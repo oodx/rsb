@@ -52,21 +52,21 @@
 //! ```
 
 // Internal modules
-mod helpers;
-mod types;
-mod parse;
 mod error;
+mod helpers;
+mod parse;
+mod types;
 
 // Public modules following MODULE_SPEC
-pub mod utils;
 pub mod bucket;
 pub mod format;
+pub mod utils;
 
 // Re-export main API surface (orchestrator pattern)
-pub use types::*;
-pub use parse::{tokenize_string, is_token_streamable};
-pub use bucket::{TokenBucket, BucketMode, collect_tokens};
+pub use bucket::{collect_tokens, BucketMode, TokenBucket};
 pub use error::{TokenBucketError, TokenBucketResult};
+pub use parse::{is_token_streamable, tokenize_string};
+pub use types::*;
 
 // Keep module-owned macros compiled/included
 pub mod macros;

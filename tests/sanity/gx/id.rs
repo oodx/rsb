@@ -27,10 +27,10 @@ mod tests {
         // Split by hyphens and verify segment lengths
         let parts: Vec<&str> = uuid.split('-').collect();
         assert_eq!(parts.len(), 5);
-        assert_eq!(parts[0].len(), 8);  // First segment
-        assert_eq!(parts[1].len(), 4);  // Second segment
-        assert_eq!(parts[2].len(), 4);  // Third segment
-        assert_eq!(parts[3].len(), 4);  // Fourth segment
+        assert_eq!(parts[0].len(), 8); // First segment
+        assert_eq!(parts[1].len(), 4); // Second segment
+        assert_eq!(parts[2].len(), 4); // Third segment
+        assert_eq!(parts[3].len(), 4); // Fourth segment
         assert_eq!(parts[4].len(), 12); // Fifth segment
 
         // Verify all parts are valid hex
@@ -64,10 +64,15 @@ mod tests {
         // The variant should be 8, 9, A, or B (first char of fourth segment)
         let variant_char = parts[3].chars().nth(0).unwrap();
         assert!(
-            variant_char == '8' || variant_char == '9' ||
-            variant_char == 'a' || variant_char == 'b' ||
-            variant_char == 'A' || variant_char == 'B',
-            "Invalid UUID v4 variant: {} in UUID: {}", variant_char, uuid
+            variant_char == '8'
+                || variant_char == '9'
+                || variant_char == 'a'
+                || variant_char == 'b'
+                || variant_char == 'A'
+                || variant_char == 'B',
+            "Invalid UUID v4 variant: {} in UUID: {}",
+            variant_char,
+            uuid
         );
     }
 }

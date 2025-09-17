@@ -2,7 +2,7 @@
 // Tests verify the token module functions work as documented in FEATURES_TOKENS
 
 use rsb::prelude::*;
-use rsb::token::{tokenize_string, is_token_streamable, Token, TokenStreamable};
+use rsb::token::{is_token_streamable, tokenize_string, Token, TokenStreamable};
 
 #[test]
 fn test_basic_token_parsing() {
@@ -286,7 +286,7 @@ fn test_edge_cases() {
 fn test_token_utilities() {
     // Test utility functions if available
 
-    use rsb::token::utils::{make_token, make_namespaced_token};
+    use rsb::token::utils::{make_namespaced_token, make_token};
 
     // Test make_token
     let token1 = make_token("key", "value");

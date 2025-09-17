@@ -1,5 +1,5 @@
-use rsb::prelude::*;
 use rsb::cli::Args;
+use rsb::prelude::*;
 
 #[test]
 fn uat_cli_args_demo() {

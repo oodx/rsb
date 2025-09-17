@@ -8,4 +8,3 @@ fn sanity_global_adapter_simple() {
     println!("SANITY_SIMPLE => {}", get_var("SANITY_SIMPLE"));
     assert_eq!(get_var("SANITY_SIMPLE"), "yes");
 }
-

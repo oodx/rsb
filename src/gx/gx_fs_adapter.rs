@@ -9,7 +9,8 @@ pub fn load_dict(path: &str) -> Vec<String> {
 /// Pick a random word from a dictionary file.
 pub fn rand_from_dict_file(path: &str) -> Option<String> {
     let words = load_dict(path);
-    if words.is_empty() { return None; }
+    if words.is_empty() {
+        return None;
+    }
     crate::gx::collection::get_rand_from_slice(&words)
 }
-

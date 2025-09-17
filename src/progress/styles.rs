@@ -353,7 +353,11 @@ pub mod presets {
     }
 
     /// Get appropriate style based on operation characteristics
-    pub fn auto_select(has_total: bool, total_value: Option<u64>, operation_type: &str) -> ProgressStyle {
+    pub fn auto_select(
+        has_total: bool,
+        total_value: Option<u64>,
+        operation_type: &str,
+    ) -> ProgressStyle {
         match (has_total, total_value, operation_type) {
             (true, Some(total), "files") if total > 1 => ProgressStyle::Bar { total },
             (true, Some(total), "bytes") => ProgressStyle::Bytes { total_bytes: total },

@@ -2,7 +2,7 @@
 #![allow(unused_imports)]
 
 mod helpers; // internal per MODULE_SPEC
-// Curated low-level surface
+             // Curated low-level surface
 pub mod utils;
 pub use utils::*;
 

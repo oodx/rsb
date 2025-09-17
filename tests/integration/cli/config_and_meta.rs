@@ -8,7 +8,8 @@ fn test_configuration_parsing() {
     // Test configuration file parsing without CLI dependencies
 
     // Create temporary config content using correct format for meta_keys! (header meta only)
-    let config_content = "# project_name: test-project\n# version: 1.0.0\n# author: Test Author\nBody content\n";
+    let config_content =
+        "# project_name: test-project\n# version: 1.0.0\n# author: Test Author\nBody content\n";
 
     // Write to temporary file and test parsing
     let temp_dir = std::env::temp_dir();

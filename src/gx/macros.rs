@@ -3,37 +3,63 @@
 
 // Namespaced re-exports for selective imports
 pub use crate::{
-    rand_alnum, rand_alpha, rand_hex, rand_string, rand_uuid, rand_range,
-    rand_dict, gen_dict,
+    gen_dict, rand_alnum, rand_alpha, rand_dict, rand_hex, rand_range, rand_string, rand_uuid,
 };
 
 // --- Random Data Macros ---
 #[macro_export]
-macro_rules! rand_alnum { ($n:expr) => { $crate::gx::string::get_rand_alnum($n) }; }
+macro_rules! rand_alnum {
+    ($n:expr) => {
+        $crate::gx::string::get_rand_alnum($n)
+    };
+}
 
 #[macro_export]
-macro_rules! rand_alpha { ($n:expr) => { $crate::gx::string::get_rand_alpha($n) }; }
+macro_rules! rand_alpha {
+    ($n:expr) => {
+        $crate::gx::string::get_rand_alpha($n)
+    };
+}
 
 #[macro_export]
-macro_rules! rand_hex { ($n:expr) => { $crate::gx::string::get_rand_hex($n) }; }
+macro_rules! rand_hex {
+    ($n:expr) => {
+        $crate::gx::string::get_rand_hex($n)
+    };
+}
 
 #[macro_export]
-macro_rules! rand_string { ($n:expr) => { $crate::gx::string::get_rand_string($n) }; }
+macro_rules! rand_string {
+    ($n:expr) => {
+        $crate::gx::string::get_rand_string($n)
+    };
+}
 
 #[macro_export]
-macro_rules! rand_uuid { () => { $crate::gx::id::get_rand_uuid() }; }
+macro_rules! rand_uuid {
+    () => {
+        $crate::gx::id::get_rand_uuid()
+    };
+}
 
 // --- Simple random range macro (inclusive) ---
 #[macro_export]
-macro_rules! rand_range { ($min:expr, $max:expr) => {{ $crate::gx::rand_usize_inclusive($min as usize, $max as usize) }}; }
+macro_rules! rand_range {
+    ($min:expr, $max:expr) => {{
+        $crate::gx::rand_usize_inclusive($min as usize, $max as usize)
+    }};
+}
 
 // --- Dictionary Macros (array-backed and generators) ---
 #[macro_export]
 macro_rules! rand_dict {
     ($arr_name:expr) => {
-        $crate::gx::collection::get_rand_from_slice(&$crate::utils::get_array($arr_name)).unwrap_or_default()
+        $crate::gx::collection::get_rand_from_slice(&$crate::utils::get_array($arr_name))
+            .unwrap_or_default()
     };
-    ($arr_name:expr, $n:expr) => { $crate::rand_dict!($arr_name, $n, " ") };
+    ($arr_name:expr, $n:expr) => {
+        $crate::rand_dict!($arr_name, $n, " ")
+    };
     ($arr_name:expr, $n:expr, $delim:expr) => {{
         let words = $crate::utils::get_array($arr_name);
         if words.is_empty() {
@@ -41,7 +67,8 @@ macro_rules! rand_dict {
         } else {
             let mut result = Vec::new();
             for _ in 0..$n {
-                result.push($crate::gx::collection::get_rand_from_slice(&words).unwrap_or_default());
+                result
+                    .push($crate::gx::collection::get_rand_from_slice(&words).unwrap_or_default());
             }
             result.join($delim)
         }

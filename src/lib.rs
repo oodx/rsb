@@ -6,24 +6,24 @@ pub mod os;
 pub mod streamable;
 pub mod streams;
 // Time helpers moved into the `date` module
-pub mod date;
-pub mod utils;
-pub mod string;
-pub mod random;
-pub mod math;
-pub mod threads;
 pub mod bash;
+pub mod date;
 pub mod deps;
-pub mod xcls;
 pub mod global;
+pub mod math;
+pub mod random;
+pub mod string;
+pub mod threads;
+pub mod utils;
+pub mod xcls;
 
 pub mod gx;
 // Dev/testing namespace (aggregated low-level helpers)
 pub mod prelude_dev;
 
 // Host discovery namespace (env/paths/script awareness)
-pub mod hosts;
 pub mod cli;
+pub mod hosts;
 
 // EZ prelude for rapid prototyping
 pub mod prelude_ez;

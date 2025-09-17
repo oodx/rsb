@@ -37,7 +37,10 @@ pub fn get_rand_hex(n: usize) -> String {
 ///
 /// **Deprecated**: This function has moved to `rsb::gx::string::get_rand_string`.
 /// This re-export is provided for backward compatibility.
-#[deprecated(since = "0.2.19", note = "Use rsb::gx::string::get_rand_string instead")]
+#[deprecated(
+    since = "0.2.19",
+    note = "Use rsb::gx::string::get_rand_string instead"
+)]
 pub fn get_rand_string(n: usize) -> String {
     crate::gx::string::get_rand_string(n)
 }
@@ -55,7 +58,10 @@ pub fn get_rand_uuid() -> String {
 ///
 /// **Deprecated**: This function has moved to `rsb::gx::collection::get_rand_from_slice`.
 /// This re-export is provided for backward compatibility.
-#[deprecated(since = "0.2.19", note = "Use rsb::gx::collection::get_rand_from_slice instead")]
+#[deprecated(
+    since = "0.2.19",
+    note = "Use rsb::gx::collection::get_rand_from_slice instead"
+)]
 pub fn get_rand_from_slice(words: &[String]) -> Option<String> {
     crate::gx::collection::get_rand_from_slice(words)
 }
@@ -68,7 +74,5 @@ pub fn rand_range_usize(min: usize, max: usize) -> usize {
     }
     rng.random_range(min..=max)
 }
-
-
 
 // TODO: support jynx/boxy stderr colors

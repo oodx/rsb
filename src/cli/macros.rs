@@ -18,7 +18,11 @@ macro_rules! args {
 }
 
 #[macro_export]
-macro_rules! appref { () => { std::env::args().next().unwrap_or_default() } }
+macro_rules! appref {
+    () => {
+        std::env::args().next().unwrap_or_default()
+    };
+}
 
 // --- Options Parsing ---
 #[macro_export]

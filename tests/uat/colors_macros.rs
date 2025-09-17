@@ -1,6 +1,6 @@
 // moved from tests/uat_colors_macros.rs
-use rsb::visual::colors::{color_enable_with, color_mode};
 use rsb::colored;
+use rsb::visual::colors::{color_enable_with, color_mode};
 
 #[test]
 fn uat_colors_macros_inline_tags() {
@@ -27,4 +27,3 @@ fn uat_colors_macros_glyphs() {
     assert!(line.contains("PASS"));
     assert!(line.contains("\x1B[0m"));
 }
-
