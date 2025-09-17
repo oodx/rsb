@@ -112,6 +112,10 @@ mod fs;
 #[path = "sanity/visual.rs"]
 mod visual;
 
-// The following modules are archived in tests/sanity/_archive/ pending fresh rewrites:
-// - hosts, token
-// They will be added back as modern sanity tests are written
+// Hosts module sanity tests (MODERN - environment, XDG/RSB paths, script context)
+#[path = "sanity/hosts.rs"]
+mod hosts;
+
+// Token module sanity tests (MODERN - key=value parsing with namespace support)
+#[path = "sanity/token.rs"]
+mod token;
