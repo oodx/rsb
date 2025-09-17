@@ -115,18 +115,12 @@ fn uat_gx_adapters_and_ranges_demo() {
     // Test file system adapter for dictionary loading
     let dict_path = "src/gx/data/dict/colors.txt";
     if std::path::Path::new(dict_path).exists() {
-        match rsb::gx::load_dict_file(dict_path) {
-            Ok(dict) => {
-                println!("✓ Dictionary loaded: {} entries", dict.len());
-                if !dict.is_empty() {
-                    // Test random selection from loaded dictionary
-                    if let Some(random_item) = rsb::gx::rand_from_dict_file(dict_path) {
-                        println!("✓ Random from dict file: {}", random_item);
-                    }
-                }
-            }
-            Err(e) => {
-                println!("⚠ Dictionary load failed: {}", e);
+        let dict = rsb::gx::load_dict_file(dict_path);
+        println!("✓ Dictionary loaded: {} entries", dict.len());
+        if !dict.is_empty() {
+            // Test random selection from loaded dictionary
+            if let Some(random_item) = rsb::gx::rand_from_dict_file(dict_path) {
+                println!("✓ Random from dict file: {}", random_item);
             }
         }
     } else {
