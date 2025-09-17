@@ -1,9 +1,10 @@
 // Wrapper: features/prompts tests
 #![cfg(feature = "prompts")]
 
-#[path = "features/prompts/macros.rs"]
+// features/prompts modules moved under prompts/; point wrapper at the live files.
+#[path = "prompts/macros.rs"]
 mod features_prompts_macros;
-#[path = "features/prompts/functions.rs"]
+#[path = "prompts/functions.rs"]
 mod features_prompts_functions;
-#[path = "features/prompts/contexts.rs"]
+#[path = "prompts/contexts.rs"]
 mod features_prompts_contexts;

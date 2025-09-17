@@ -1,16 +1,16 @@
 # RSB Session Resume Guide
 
 ## Immediate Truths (2025-09-17)
-- Visual macros are now module-owned (`src/visual/macros.rs`), re-exported via
-  `rsb::visual::{macros::*, …}`. Legacy `src/macros/visual.rs` is gone.
-- CLI sanity, visual sanity, and full UAT cargo suites are green.
-- Full `cargo test` still fails: `tests/unit/features_prompts.rs` points at a
-  non-existent `tests/unit/features/prompts/macros.rs` (real files live in
-  `tests/unit/prompts/`). Fixing that wrapper is prerequisite for an all-green run.
-- `./bin/test.sh` is currently broken: the linter path calls `boxy` themes that
-  do not exist in the bundled tool (theme `magic`). Runner commands bail before
-  running tests. Next task must focus on repairing `test.sh` (theme handling and
-  any other drift) so we align with enforced project workflow.
+- Visual macros now live in `src/visual/macros.rs` (legacy `src/macros/visual.rs`
+  removed). Re-exports wired through `visual::mod.rs`.
+- CLI sanity, visual sanity, and UAT cargo suites pass; prompts unit wrapper was
+  repointed to `tests/unit/prompts/*.rs` so the full unit suite builds.
+- `./bin/test.sh` has a partial repair: Boxy theme failures now fall back to
+  stderr, but the script still violates BashFX-v3 structure (no `main`,
+  `options`, or layered dispatch). Legendary rewrite is the next major task.
+- Unit runner currently fails due to legacy expectations in
+  `tests/unit/streams/core.rs` and `tests/unit/string/errors_test.rs` (non-critical
+  for upcoming BashFX migration but worth revisiting post-rewrite).
 
 ## Rehydrate Checklist
 1. **Docs to revisit**
@@ -20,34 +20,35 @@
    - Modernization playbook: `docs/tech/development/HOWTO_UPDATE_RSB.md`
    - Feature gating roadmap: `docs/tech/development/FEATURES_GATING_PLAN.md`
    - Visual feature guide: `./bin/test.sh docs visuals`
- - Test organization: `./bin/test.sh docs org`
+   - Test organization: `./bin/test.sh docs org`
+   - BashFX fundamentals (external reference): `docs/tech/reference/BASHFX-v3.md`
 
-The project root keeps additional quick references:
-- `CHANGELOG.md` – latest fixes made in this working copy
-- `REFRESH_CONTEXT.md` – snapshot of current test status, commands, and outstanding work
-- `CONTINUE.md` – this resume guide; update as the state evolves
+Repository quick references:
+- `CHANGELOG.md` – latest code/documentation deltas
+- `REFRESH_CONTEXT.md` – live test status + outstanding work
+- `CONTINUE.md` – this resume guide; update with each major phase change
 
 2. **Command refresher**
-   - Sanity (module focused): `cargo test --test sanity <module> -- --nocapture`
+   - Sanity focus: `cargo test --test sanity <module> -- --nocapture`
    - UAT: `cargo test --test uat -- --nocapture`
-   - Full test runner (after repairs): `./bin/test.sh run sanity|uat|unit`
-   - Linter (after repairs): `./bin/test.sh lint`
+   - Runner lanes (post-rewrite): `./bin/test.sh run sanity|uat|unit`
+   - Linter (post-rewrite): `./bin/test.sh lint`
 
-3. **Known follow-up tasks**
-   - Repair `./bin/test.sh` themes/output so linting and runner commands work.
-   - Update `tests/unit/features_prompts.rs` to reference the actual prompts tests
-     (or relocate files) and restore a clean `cargo test` baseline.
-   - Once the above are green, rerun Tina’s validation (`.eggs/red_egg*`) before
-     claiming completion.
+3. **Next major objective**
+   - Design a BashFX-v3 compliant legendary scaffold for `test.sh` (explicit
+     `options`, `main`, dispatcher tree) before porting existing commands.
+   - Stage a new `fx-testsh` repo under `repos/shell/bashfx/` for development and
+     eventually sync the rewritten script back into RSB.
+   - Capture Boxy fallback decisions and helper library requirements for the
+     rewrite (see `BASHFX_TESTSH_PLAN`).
 
 4. **Historical caveat**
    - `.session/PROJECT_STATUS_SUMMARY.md`, `FINAL_ACHIEVEMENT_REPORT.md`, and
-     `TEST_TASKS*.txt` still proclaim 100% modernization with zero errors. Treat
-     those as stale. `CHANGELOG.md` and `REFRESH_CONTEXT.md` now reflect the real
-     state.
+     `TEST_TASKS*.txt` remain outdated (claiming full modernization). Rely on the
+     docs above for accurate state tracking.
 
 ## Next Session Kickoff
-1. Fix `./bin/test.sh` (theme handling, lint execution) and confirm runner commands
-   work end-to-end.
-2. Patch prompts unit wrapper, rerun unit/sanity/uat via runner.
-3. Feed Tina (#tina) after the suites are verified to avoid future false greens.
+1. Review `BASHFX_TESTSH_PLAN` for the BashFX legend scaffold and helper inventory.
+2. Establish or sync into `repos/shell/bashfx/fx-testsh` once accessible.
+3. Begin implementing the scaffold (options/main/dispatch) and port lint/run/docs
+   commands in iterative slices, validating Boxy output at each step.

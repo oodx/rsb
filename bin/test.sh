@@ -47,6 +47,18 @@ ctest() {
 }
 
 
+# Emit content to stderr when boxy is unavailable or returns an error.
+boxy_stderr_fallback() {
+    local content="$1"
+    local title="$2"
+    local theme="$3"
+
+    {
+        [[ -n "$title" ]] && printf '[boxy:%s] %s\n' "${theme:-plain}" "$title"
+        printf '%s\n' "$content"
+    } >&2
+}
+
 # Boxy Orchestrator - Centralized boxy call handler
 # Usage: boxy_display <content> <theme> <title> [width]
 boxy_display() {
@@ -55,29 +67,20 @@ boxy_display() {
     local title="$3"
     local width="${4:-max}"
 
-    if command -v boxy &> /dev/null; then
-        if [[ -n "$title" ]]; then
-            echo "$content" | boxy --theme "$theme" --title "$title" --width "$width"
-        else
-            echo "$content" | boxy --theme "$theme" --width "$width"
-        fi
-    else
-        # Fallback ASCII presentation
-        local border_symbol
-        case "$theme" in
-            error) border_symbol="❌" ;;
-            warning) border_symbol="⚠️" ;;
-            success) border_symbol="✅" ;;
-            info) border_symbol="ℹ️" ;;
-            magic) border_symbol="🎭" ;;
-            silly) border_symbol="🤪" ;;
-            *) border_symbol="•" ;;
-        esac
+    if command -v boxy >/dev/null 2>&1; then
+        local args=()
+        [[ -n "$theme" ]] && args+=(--theme "$theme")
+        [[ -n "$title" ]] && args+=(--title "$title")
+        [[ -n "$width" ]] && args+=(--width "$width")
 
-        echo "$border_symbol ═══════════════════════════════════════════════════════════════════════════════"
-        [[ -n "$title" ]] && echo "   $title"
-        echo "$content" | sed 's/^/   /'
-        echo "   ═══════════════════════════════════════════════════════════════════════════════"
+        local boxy_status=0
+        set +e
+        printf '%s\n' "$content" | boxy "${args[@]}"
+        boxy_status=$?
+        set -e
+        [[ $boxy_status -ne 0 ]] && boxy_stderr_fallback "$content" "$title" "$theme"
+    else
+        boxy_stderr_fallback "$content" "$title" "$theme"
     fi
     echo
 }
@@ -457,7 +460,7 @@ comprehensive validation across all modules and categories.
 
 🏆 Outstanding work achieving complete test compliance! 🏆"
 
-        boxy_display "$celebration_text" "magic" "🎯 RSB TEST ORGANIZATION: PERFECT COMPLIANCE"
+        boxy_display "$celebration_text" "success" "🎯 RSB TEST ORGANIZATION: PERFECT COMPLIANCE"
     fi
 
     return 0
