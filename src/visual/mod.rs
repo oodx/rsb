@@ -38,6 +38,12 @@ pub mod glyphs;
 #[cfg(feature = "prompts")]
 pub mod prompts;
 
+#[cfg(feature = "visual")]
+pub mod utils;
+
+#[cfg(feature = "visual")]
+pub mod macros;
+
 // Re-export commonly used items when features are enabled
 #[cfg(feature = "colors-simple")]
 pub use colors::simple::*;
@@ -54,6 +60,15 @@ pub use glyphs::*;
 #[cfg(feature = "prompts")]
 pub use prompts::*;
 
-// MODULE_SPEC: Utils namespace for curated low-level functions
+// MODULE_SPEC: Curated low-level helpers and macro surfaces
 #[cfg(feature = "visual")]
-pub mod utils;
+pub use utils::*;
+
+#[cfg(feature = "visual")]
+pub use crate::{colored, debug, error, fatal, info, okay, trace, warn};
+
+#[cfg(all(feature = "visual", feature = "prompts"))]
+pub use crate::{
+    ask, ask_timeout, confirm, confirm_default, confirm_timeout, prompt, prompt_timeout, select,
+    select_timeout,
+};

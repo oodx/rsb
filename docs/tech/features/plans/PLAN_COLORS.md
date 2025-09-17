@@ -9,7 +9,7 @@ Tests: tests/features/colors/{sanity.rs, runtime.rs}; UAT under tests/uat/colors
 
 Gaps/Findings
 - Feature-gated; ensure no leakage via prelude; require explicit `use rsb::visual::colors::*`.
-- Enabling `--features visuals` currently fails with macro redefinition: `error!` defined in both `src/macros/visual.rs` and a core macro module (`stderr.rs` in build context). Needs unification/gating so only one `error!` exists.
+- Enabling `--features visuals` used to fail due to macro redefinitions (`error!` existed in both the visual bundle and `macros/stderr.rs`). Issue resolved by relocating the visual macros to `src/visual/macros.rs` and gating the core fallbacks behind `#[cfg(not(feature = "visual"))]`.
 - Verify runtime toggles and glyph integration behind features.
 
 Plan

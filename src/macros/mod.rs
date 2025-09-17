@@ -4,5 +4,3 @@ pub mod jobs_events;
 pub mod math;
 pub mod stderr;
 pub mod test_helpers;
-#[cfg(feature = "visual")]
-pub mod visual;
