@@ -84,6 +84,10 @@ mod progress;
 #[path = "sanity/string.rs"]
 mod string;
 
+// GX comprehensive sanity test (MODERN - covers all generator functionality)
+#[path = "sanity/gx.rs"]
+mod gx;
+
 // The following modules are archived in tests/sanity/_archive/ pending fresh rewrites:
-// - dev, gx, parse, cli, fs, hosts, param, token, visual
+// - dev, parse, cli, fs, hosts, param, token, visual
 // They will be added back as modern sanity tests are written
