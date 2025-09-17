@@ -10,6 +10,9 @@
 - Updated UAT demonstrations (`tests/uat/dev.rs`, `tests/uat/gx.rs`,
   `tests/uat/parse.rs`) to respect real feature gates and API signatures so the
   suite builds cleanly without optional features.
+- Migrated optional visual/prompt macros from the legacy bundle to
+  `src/visual/macros.rs`, wired re-exports through `visual::mod.rs`, and removed the
+  old `src/macros/visual.rs` module.
 
 ### Testing
 - `cargo test --test sanity cli -- --nocapture`

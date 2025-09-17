@@ -186,6 +186,8 @@ use rsb::visual::colors::{
 
 // Macro (re-exported at crate root)
 use rsb::colored;
+// or explicitly opt-in via the module surface
+use rsb::visual::macros::colored;
 ```
 
 ### Glyphs API
@@ -197,6 +199,21 @@ use rsb::visual::glyphs::{
     // Lookup functions
     glyph, get_all_glyphs
 };
+```
+
+### Macro Surface (`rsb::visual::macros`)
+```rust
+// Opt-in macro imports (not part of the core prelude)
+use rsb::visual::macros::{
+    colored, info, warn, error, fatal, debug, trace, okay,
+    confirm, confirm_default, confirm_timeout,
+    ask, ask_timeout,
+    select, select_timeout,
+    prompt, prompt_timeout,
+};
+
+info!("Visual macros live under `visual::macros` now");
+let answer = confirm!("Deploy to production?");
 ```
 
 ### Prompts API

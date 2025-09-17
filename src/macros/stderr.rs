@@ -1,4 +1,4 @@
-// --- I/O Macros (core, visual macros split to macros/visual.rs) ---
+// --- I/O Macros (core; visual macros live under `visual::macros`) ---
 // Namespaced re-exports for selective imports
 pub use crate::{echo, printf, readline, stderr};
 #[macro_export]

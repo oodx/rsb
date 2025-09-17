@@ -46,6 +46,7 @@ ctest() {
     fi
 }
 
+
 # Boxy Orchestrator - Centralized boxy call handler
 # Usage: boxy_display <content> <theme> <title> [width]
 boxy_display() {
@@ -80,6 +81,9 @@ boxy_display() {
     fi
     echo
 }
+
+#boxy_display " hello test " "magic" "lets go it"
+
 
 # Show override warning with boxy
 show_override_warning() {
@@ -1508,7 +1512,7 @@ case "${1:-status}" in
         ;;
     "status")
         # Default behavior - show help AND test organization status
-        show_help
+        #show_help
         echo
         echo
 
@@ -1527,10 +1531,9 @@ case "${1:-status}" in
 
         # Show available tests
         list_tests
-        echo
 
         # Show adhoc tests
-        list_adhoc_tests
+        #list_adhoc_tests
         ;;
     "help"|"--help"|"-h")
         show_help
