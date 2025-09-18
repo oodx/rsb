@@ -1,6 +1,17 @@
 // Exit code modeling and bridges
 use std::process::ExitCode;
 
+/// Lightweight wrapper for explicit exit codes used by scripting helpers.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ErrorCode(pub i32);
+
+impl ErrorCode {
+    #[inline]
+    pub fn exit(self) -> ! {
+        std::process::exit(self.0);
+    }
+}
+
 /// Canonical RSB exit kinds mapped onto process exit codes.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ExitKind {
@@ -49,6 +60,13 @@ impl AsExit for ExitKind {
     #[inline]
     fn as_exit(self) -> ExitCode {
         ExitCode::from(self.code())
+    }
+}
+
+impl AsExit for ErrorCode {
+    #[inline]
+    fn as_exit(self) -> ExitCode {
+        ExitCode::from(self.0 as u8)
     }
 }
 

@@ -713,3 +713,54 @@ rm tests/_adhoc/experiment.sh
 ---
 
 **Remember**: The test organization system is **strictly enforced**. Tests will be blocked if the organization doesn't comply. Use `./bin/test.sh docs` to understand the complete requirements.
+
+
+## NEW
+
+
+# How To Update RSB With fx-testsh Changes
+
+**Status**: Draft
+**Audience**: Maintainers syncing `fx-testsh` back into `rsb/bin/test.sh`
+
+## Checklist
+
+1. **Refresh Build Artifacts**
+   - Run `./bin/build.sh build` to regenerate `test.sh` from `parts/`.
+   - Include `parts/` (and `bin/build.sh`) in the sync if the RSB repo will adopt the BashFX build pattern.
+
+2. **Review Profiles**
+   - Ensure the `rsb` profile in `test.sh` exports the full lane map.
+   - Confirm doc overrides (‘org’, ‘modules’, ‘prelude’, `runner`, `howto`) resolve inside the RSB tree.
+
+3. **Sync Script**
+   - Copy the regenerated `test.sh` to `rsb/bin/test.sh`.
+   - Verify shebang and execution bit (`chmod +x`).
+   - Update version meta via `semv bump` to match release intent.
+
+4. **Docs**
+   - Mirror `docs/reference/RSB_TEST_RUNNER.md` into RSB’s docs tree.
+   - Update `docs/rebel/` artefacts if new sections were referenced.
+   - Keep `docs/development/HOWTO_UPDATE_RSB.md` in sync so profile overrides stay aligned.
+
+5. **Tests**
+   - `test.sh lint` (strict) – should show the “perfect compliance” banner.
+   - `test.sh --rsb run sanity` / `run uat` / `run smoke` – confirm run headers + summaries render via Boxy.
+   - `test.sh --rsb docs runner` / `docs org` – verify doc overlays resolve in the RSB tree.
+   - Kick an adhoc lane if editing experimental suites.
+
+6. **Commit**
+   - Use semantic commit messages (`fix:` for patches, `feat:` for surfaced lanes).
+   - Reference the sync in changelog or release notes.
+
+7. **Follow-up**
+   - Open an RSB PR with summary + testing results.
+   - Tag maintainers if ceremony or enforcement rules changed.
+
+## Notes
+
+- Keep BashFX naming conventions intact when editing helpers—downstream automation expects the tiers.
+- The runner now ships as a `parts/` assembly; treat direct edits to `test.sh` as generated output.
+- Run/status commands emit Boxy headers and summaries—ensure RSB’s CI environments have `boxy` (or expect the stderr fallback).
+- If new shared libraries are introduced (e.g., Boxy helpers), place them under `rsb/lib/` and source from the script.
+- Treat Tina integration as a follow-up task; the profile hook is ready but unset.

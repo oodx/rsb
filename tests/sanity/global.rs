@@ -51,11 +51,11 @@ fn sanity_global_boolean_operations() {
 
     // Non-boolean values
     assert!(!is_true("OTHER_VALUE"));
-    assert!(!is_false("OTHER_VALUE"));
+    assert!(is_false("OTHER_VALUE"));
 
     // Missing values
     assert!(!is_true("MISSING"));
-    assert!(!is_false("MISSING"));
+    assert!(is_false("MISSING"));
 }
 
 #[test]

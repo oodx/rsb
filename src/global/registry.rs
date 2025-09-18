@@ -17,7 +17,7 @@ lazy_static! {
         Arc::new(Mutex::new(HashMap::new()));
     pub(crate) static ref CALL_STACK: Arc<Mutex<Vec<CallFrame>>> = Arc::new(Mutex::new(Vec::new()));
     pub(crate) static ref COLORS: Arc<Mutex<HashMap<String, String>>> =
-        { Arc::new(Mutex::new(initialize_default_colors())) };
+        Arc::new(Mutex::new(initialize_default_colors()));
     pub(crate) static ref GLYPHS: Arc<Mutex<HashMap<String, String>>> = {
         let mut m = HashMap::new();
         m.insert("info".to_string(), "ℹ".to_string());

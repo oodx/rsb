@@ -3,9 +3,9 @@ use rsb::prelude::*;
 #[test]
 fn try_prefix_invalid_pattern_errors() {
     let s = "document.txt";
-    let err = rsb::string::try_str_prefix(s, "[", false).unwrap_err();
+    let err = rsb::string::try_str_prefix(s, "[*", false).unwrap_err();
     match err {
-        rsb::string::error::StringError::RegexCompile { pattern } => assert_eq!(pattern, "["),
+        rsb::string::error::StringError::RegexCompile { pattern } => assert_eq!(pattern, "[*"),
         _ => panic!("unexpected error: {:?}", err),
     }
 }

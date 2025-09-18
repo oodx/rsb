@@ -1,3 +1,4 @@
+use crate::com::ErrorCode;
 use crate::global::expand_vars;
 use lazy_static::lazy_static;
 use std::path::Path;
@@ -15,7 +16,7 @@ pub fn read_file(path: &str) -> String {
         Ok(content) => content,
         Err(e) => {
             eprintln!("rsb-error: Failed to read file '{}': {}", expanded_path, e);
-            std::process::exit(1);
+            ErrorCode(1).exit();
         }
     }
 }

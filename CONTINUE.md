@@ -1,16 +1,14 @@
 # RSB Session Resume Guide
 
 ## Immediate Truths (2025-09-17)
-- Visual macros now live in `src/visual/macros.rs` (legacy `src/macros/visual.rs`
-  removed). Re-exports wired through `visual::mod.rs`.
-- CLI sanity, visual sanity, and UAT cargo suites pass; prompts unit wrapper was
-  repointed to `tests/unit/prompts/*.rs` so the full unit suite builds.
-- `./bin/test.sh` has a partial repair: Boxy theme failures now fall back to
-  stderr, but the script still violates BashFX-v3 structure (no `main`,
-  `options`, or layered dispatch). Legendary rewrite is the next major task.
-- Unit runner currently fails due to legacy expectations in
-  `tests/unit/streams/core.rs` and `tests/unit/string/errors_test.rs` (non-critical
-  for upcoming BashFX migration but worth revisiting post-rewrite).
+- Legendary runner scaffold (`fx-testsh` v2.2.0) now powers `bin/test.sh`; the
+  `--rsb` profile pre-wires lane aliases, doc overrides, and Boxy ceremony.
+- Sanity, smoke, unit, and regression suites are green through the runner; cargo
+  still surfaces intentional warnings for unused token helpers and style nits.
+- Visual macros remain in `src/visual/macros.rs` with curated re-exports via
+  `visual::mod.rs`.
+- Integration host-paths tests guard `HOME`/`XDG_*` mutations with a mutex and
+  temp seeding; monitor for regressions if new env consumers appear.
 
 ## Rehydrate Checklist
 1. **Docs to revisit**
@@ -35,12 +33,9 @@ Repository quick references:
    - Linter (post-rewrite): `./bin/test.sh lint`
 
 3. **Next major objective**
-   - Design a BashFX-v3 compliant legendary scaffold for `test.sh` (explicit
-     `options`, `main`, dispatcher tree) before porting existing commands.
-   - Stage a new `fx-testsh` repo under `repos/shell/bashfx/` for development and
-     eventually sync the rewritten script back into RSB.
-   - Capture Boxy fallback decisions and helper library requirements for the
-     rewrite (see `BASHFX_TESTSH_PLAN`).
+   - Keep docs aligned with the generated runner (lane tables, profile notes).
+   - Ensure cargo stays warning-free after runner-driven test passes.
+   - Prep the final PR narrative once docs/tests settle.
 
 4. **Historical caveat**
    - `.session/PROJECT_STATUS_SUMMARY.md`, `FINAL_ACHIEVEMENT_REPORT.md`, and
@@ -48,7 +43,16 @@ Repository quick references:
      docs above for accurate state tracking.
 
 ## Next Session Kickoff
-1. Review `BASHFX_TESTSH_PLAN` for the BashFX legend scaffold and helper inventory.
-2. Establish or sync into `repos/shell/bashfx/fx-testsh` once accessible.
-3. Begin implementing the scaffold (options/main/dispatch) and port lint/run/docs
-   commands in iterative slices, validating Boxy output at each step.
+1. Run `./bin/test.sh --rsb lint` and `./bin/test.sh --rsb run sanity` as the
+   quick health check before continuing edits.
+2. Skim the refreshed docs (`docs/tech/reference/RSB_TEST_RUNNER.md`,
+   `docs/tech/reference/RSB_TESTSH_INTEGRATION.md`) to confirm terminology
+   sticks.
+3. Draft the PR summary / changelog entry once the checks stay green.
+
+## Latest Sync Update
+- Runner swapped to fx-testsh scaffold (`bin/test.sh`); review before landing.
+- Docs: fx sync checklist appended to `docs/tech/development/HOWTO_TEST.md`; verify final wording.
+- FS/hosts/parse/param tests adjusted for new semantics; keep an eye on warnings (unused helpers, deprecated bool shim removal).
+- Environment guard added for integration host paths; confirm expected TMP behavior (`XDG_TMP_HOME` seeded per test).
+- All suites currently green (`./bin/test.sh --rsb run sanity|smoke`, `cargo test --all --quiet`).
