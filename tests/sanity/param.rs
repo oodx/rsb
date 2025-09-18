@@ -178,11 +178,12 @@ fn test_bootstrap_context_loading() {
     // Note: This assumes bootstrap has been called during test setup
 
     // These should be available after bootstrap
+    rsb::hosts::setup_execution_context(&["/tmp/sanity_param_test.sh".to_string()]);
     let script_name = get_var("SCRIPT_NAME");
     assert!(!script_name.is_empty());
 
     // XDG paths should be set up
-    let xdg_config = get_var("XDG_CONFIG_HOME");
+    let _xdg_config = get_var("XDG_CONFIG_HOME");
     // XDG_CONFIG_HOME might be empty if not set, but the variable should exist
     // after bootstrap sets it up
 }
@@ -216,7 +217,7 @@ fn test_complex_param_scenarios() {
     set_var("CONFIG_FILE", "config.production.json");
 
     // Build config path with fallback
-    let config_dir = param!("XDG_CONFIG_HOME", default: "$USER_HOME/.config");
+    let _config_dir = param!("XDG_CONFIG_HOME", default: "$USER_HOME/.config");
     let config_path = expand_vars("$config_dir/$APP_NAME/$CONFIG_FILE");
     assert!(config_path.contains("/myapp/config.production.json"));
 
@@ -232,7 +233,7 @@ fn test_complex_param_scenarios() {
     let date_part = rsb::string::str_suffix(&date_part, ".error.log", false); // Chain operations
     assert_eq!(date_part, "2025-01-15");
 
-    let extension = param!("LOG_FILE", prefix: "*.");
+    let extension = param!("LOG_FILE", prefix: "*.", longest);
     assert_eq!(extension, "log");
 
     unset_var("USER_HOME");

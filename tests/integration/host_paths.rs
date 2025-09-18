@@ -1,9 +1,38 @@
 use assert_fs::TempDir;
+use lazy_static::lazy_static;
 use rsb::prelude::*;
+use std::collections::HashMap;
+use std::sync::Mutex;
+
+lazy_static! {
+    static ref ENV_GUARD: Mutex<()> = Mutex::new(());
+}
 
 #[test]
 fn host_xdg_and_rsb_paths_and_dirs() {
     // Use a temp HOME to avoid touching real user dirs
+    let _lock = ENV_GUARD.lock().unwrap();
+    let original_home = std::env::var("HOME").ok();
+    let tracked_keys = [
+        "XDG_CONFIG_HOME",
+        "XDG_CACHE_HOME",
+        "XDG_DATA_HOME",
+        "XDG_HOME",
+        "XDG_LIB_HOME",
+        "XDG_ETC_HOME",
+        "XDG_BIN_HOME",
+        "XDG_TMP_HOME",
+        "XDG_TMP",
+        "RSB_LIB_HOME",
+        "RSB_ETC_HOME",
+        "RSB_DATA_HOME",
+        "RSB_BIN_HOME",
+    ];
+    let mut saved_env: HashMap<&str, Option<String>> = HashMap::new();
+    for key in tracked_keys {
+        saved_env.insert(key, std::env::var(key).ok());
+    }
+
     let tmp_home = TempDir::new().unwrap();
     let home_str = tmp_home.path().to_string_lossy().to_string();
     std::env::set_var("HOME", &home_str);
@@ -17,8 +46,26 @@ fn host_xdg_and_rsb_paths_and_dirs() {
         "XDG_ETC_HOME",
         "XDG_BIN_HOME",
         "XDG_TMP",
+        "XDG_TMP_HOME",
     ] {
         std::env::remove_var(k);
+    }
+    let fallback_tmp = format!("{}/.cache/tmp", home_str);
+    std::env::set_var("XDG_TMP_HOME", &fallback_tmp);
+
+    // Clear any previously seeded global keys (other tests may have run)
+    for key in [
+        "XDG_CONFIG_HOME",
+        "XDG_CACHE_HOME",
+        "XDG_DATA_HOME",
+        "XDG_HOME",
+        "XDG_LIB_HOME",
+        "XDG_ETC_HOME",
+        "XDG_BIN_HOME",
+        "XDG_TMP_HOME",
+        "XDG_TMP",
+    ] {
+        rsb::global::unset_var(key);
     }
 
     // Set up XDG and ensure directories
@@ -81,6 +128,14 @@ fn host_xdg_and_rsb_paths_and_dirs() {
     }
 
     // Now RSB paths
+    for key in [
+        "RSB_LIB_HOME",
+        "RSB_ETC_HOME",
+        "RSB_DATA_HOME",
+        "RSB_BIN_HOME",
+    ] {
+        rsb::global::unset_var(key);
+    }
     rsb::hosts::setup_rsb_paths();
     assert_eq!(
         rsb::global::get_var("RSB_LIB_HOME"),
@@ -98,6 +153,39 @@ fn host_xdg_and_rsb_paths_and_dirs() {
         rsb::global::get_var("RSB_BIN_HOME"),
         format!("{}/.local/bin/rsb", home_str)
     );
+
+    // Restore environment to avoid leaking into other tests
+    for key in [
+        "RSB_LIB_HOME",
+        "RSB_ETC_HOME",
+        "RSB_DATA_HOME",
+        "RSB_BIN_HOME",
+        "XDG_CONFIG_HOME",
+        "XDG_CACHE_HOME",
+        "XDG_DATA_HOME",
+        "XDG_HOME",
+        "XDG_LIB_HOME",
+        "XDG_ETC_HOME",
+        "XDG_BIN_HOME",
+        "XDG_TMP_HOME",
+        "XDG_TMP",
+    ] {
+        rsb::global::unset_var(key);
+    }
+
+    for key in tracked_keys {
+        if let Some(value) = saved_env.remove(key).flatten() {
+            std::env::set_var(key, value);
+        } else {
+            std::env::remove_var(key);
+        }
+    }
+
+    if let Some(home) = original_home {
+        std::env::set_var("HOME", home);
+    } else {
+        std::env::remove_var("HOME");
+    }
 }
 
 #[test]

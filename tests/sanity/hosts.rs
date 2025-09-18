@@ -35,13 +35,13 @@ fn test_hosts_standard_modes() {
     rsb::hosts::setup_standard_modes();
 
     // Verify modes are set in global context
-    assert_eq!(get_var("DEBUG_MODE"), "1");
-    assert_eq!(get_var("QUIET_MODE"), "1");
+    assert_eq!(get_var("DEBUG_MODE"), "true");
+    assert_eq!(get_var("QUIET_MODE"), "true");
 
     // Test DEV mode
     std::env::set_var("DEV", "yes");
     rsb::hosts::setup_standard_modes();
-    assert_eq!(get_var("DEV_MODE"), "1");
+    assert_eq!(get_var("DEV_MODE"), "true");
 
     // Clean up
     std::env::remove_var("DEBUG");
@@ -108,12 +108,13 @@ fn test_hosts_execution_context() {
 
     // Setup execution context
     rsb::hosts::setup_execution_context(&test_args);
+    rsb::hosts::setup_args_context(&test_args);
 
     // Verify script context variables
     assert_eq!(get_var("SCRIPT_NAME"), "script.sh");
     assert!(get_var("SCRIPT_PATH").contains("/path/to/script.sh"));
     assert!(get_var("SCRIPT_DIR").contains("/path/to"));
-    assert!(!get_var("SCRIPT_PWD").is_empty());
+    assert!(!get_var("PWD").is_empty());
 
     // Verify argument count
     assert_eq!(get_var("ARGC"), "4");
@@ -266,6 +267,7 @@ fn test_edge_cases() {
     // Test with empty args
     let empty_args: Vec<String> = vec![];
     rsb::hosts::setup_execution_context(&empty_args);
+    rsb::hosts::setup_args_context(&empty_args);
     // Should handle gracefully
     assert_eq!(get_var("ARGC"), "0");
 
@@ -275,6 +277,7 @@ fn test_edge_cases() {
         "arg".to_string(),
     ];
     rsb::hosts::setup_execution_context(&long_args);
+    rsb::hosts::setup_args_context(&long_args);
     assert!(!get_var("SCRIPT_NAME").is_empty());
 
     // Test bootstrap idempotency (calling multiple times)

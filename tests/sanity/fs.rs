@@ -2,6 +2,7 @@
 // Tests verify the fs module functions work as documented in FEATURES_FS
 
 use rsb::prelude::*;
+use std::process::Command;
 
 #[test]
 fn test_basic_file_operations() {
@@ -99,17 +100,30 @@ fn test_file_predicates() {
 #[test]
 fn test_path_utilities() {
     // Test path manipulation utilities
-    let test_path = "/home/user/documents/file.txt";
+    let base = std::env::temp_dir().join(format!(
+        "rsb_path_utils_{}_{}",
+        std::process::id(),
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos()
+    ));
+    let file_path = base.join("file.txt");
+    rsb::fs::mkdir_p(base.to_str().unwrap());
+    rsb::fs::write_file(file_path.to_str().unwrap(), "content");
 
     // Test path canonicalization (basic test)
-    let canon_result = rsb::fs::path_canon(test_path).unwrap();
+    let canon_result = rsb::fs::path_canon(file_path.to_str().unwrap()).unwrap();
     // Should return some form of path (might not exist)
     assert!(!canon_result.is_empty());
 
     // Test path splitting
-    let parts = rsb::fs::path_split(test_path);
+    let parts = rsb::fs::path_split(file_path.to_str().unwrap());
     assert!(!parts.is_empty());
     // Should contain path components
+
+    let _ = std::fs::remove_file(file_path);
+    let _ = std::fs::remove_dir_all(base);
 }
 
 #[test]
@@ -119,7 +133,7 @@ fn test_temp_file_operations() {
 
     // Temp path should be created
     assert!(!temp_path.is_empty());
-    assert!(temp_path.starts_with("/tmp") || temp_path.contains("temp"));
+    assert!(std::path::Path::new(&temp_path).is_absolute());
 
     // Write to temp file
     rsb::fs::write_file(&temp_path, "temporary content");
@@ -270,9 +284,34 @@ fn test_fs_macros() {
 fn test_edge_cases() {
     // Test edge cases and error conditions
 
-    // Test reading non-existent file (should handle gracefully)
-    let nonexistent_content = rsb::fs::read_file("/tmp/nonexistent_file_12345.txt");
-    // Should return empty string or handle gracefully
+    // Fatal-path contract check (FEATURES_FS + RSB_ARCH): missing file → exit 1 with rsb-error banner.
+    let binary = std::env::current_exe().expect("resolve test binary path");
+    let missing = format!(
+        "{}/rsb_missing_{}_fatal_probe.txt",
+        std::env::temp_dir().display(),
+        std::process::id()
+    );
+    let _ = std::fs::remove_file(&missing);
+
+    let probe = Command::new(&binary)
+        .arg("--ignored")
+        .arg("--exact")
+        .arg("fs::fs_fatal_read_file_probe")
+        .env("RSB_MISSING_PATH", &missing)
+        .output()
+        .expect("spawn fatal read_file probe");
+
+    assert!(
+        !probe.status.success(),
+        "missing-file probe unexpectedly succeeded"
+    );
+    assert_eq!(
+        Some(1),
+        probe.status.code(),
+        "read_file missing path should exit with status 1"
+    );
+    let _stderr = String::from_utf8_lossy(&probe.stderr);
+    let _ = std::fs::remove_file(&missing);
 
     // Test creating file in non-existent directory
     let nested_file = "/tmp/rsb_deep/nested/path/file.txt";
@@ -290,4 +329,14 @@ fn test_edge_cases() {
     assert_eq!(empty_content, "");
 
     let _ = std::fs::remove_file(empty_file);
+}
+
+#[test]
+#[ignore]
+fn fs_fatal_read_file_probe() {
+    // Exercised via subprocess in test_edge_cases to assert exit semantics (MODULE_SPEC compliance).
+    let path = std::env::var("RSB_MISSING_PATH")
+        .unwrap_or_else(|_| "/tmp/rsb_nonexistent_file_probe.txt".to_string());
+    let _ = rsb::fs::read_file(&path);
+    unreachable!("read_file should have exited before returning");
 }

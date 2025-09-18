@@ -58,7 +58,7 @@ fn test_sed_insert_macro() {
     let base_content = "Header\n<!-- INSERT_POINT -->\nFooter";
     let insert_content = "Inserted content\nMultiple lines";
 
-    let result = sed_insert!(base_content, "<!-- INSERT_POINT -->", insert_content);
+    let result = sed_insert!(insert_content, "<!-- INSERT_POINT -->", base_content);
     assert!(result.contains("Header"));
     assert!(result.contains("Inserted content"));
     assert!(result.contains("Multiple lines"));
@@ -93,7 +93,8 @@ fn test_template_replace_with_sentinel() {
     set_var("CONTENT", "This is the main content");
 
     let base = "# {{TITLE}}\n\n{{CONTENT}}\n\nEnd";
-    let result = sed_template!(base, "{{", "}}");
+    let with_title = sed_template!(&get_var("TITLE"), "{{TITLE}}", base);
+    let result = sed_template!(&get_var("CONTENT"), "{{CONTENT}}", &with_title);
 
     assert!(result.contains("My Document"));
     assert!(result.contains("This is the main content"));
@@ -145,7 +146,7 @@ fn test_parse_content_insertion() {
     let html_base = "<html>\n<head>\n<!-- META_INSERT -->\n</head>\n<body></body>\n</html>";
     let meta_content = "<meta charset='utf-8'>\n<title>Test Page</title>";
 
-    let result = sed_insert!(html_base, "<!-- META_INSERT -->", meta_content);
+    let result = sed_insert!(meta_content, "<!-- META_INSERT -->", html_base);
     assert!(result.contains("<meta charset='utf-8'>"));
     assert!(result.contains("<title>Test Page</title>"));
     assert!(!result.contains("<!-- META_INSERT -->"));
@@ -154,7 +155,7 @@ fn test_parse_content_insertion() {
     let config_base = "# Configuration\nhost=localhost\n# ADDITIONAL_CONFIG\nport=8080";
     let additional = "timeout=30\nretries=3";
 
-    let config_result = sed_insert!(config_base, "# ADDITIONAL_CONFIG", additional);
+    let config_result = sed_insert!(additional, "# ADDITIONAL_CONFIG", config_base);
     assert!(config_result.contains("timeout=30"));
     assert!(config_result.contains("retries=3"));
 }

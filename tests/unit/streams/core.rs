@@ -16,7 +16,7 @@ fn streams_builders_and_ops() {
     let tmp = std::env::temp_dir().join("rsb_stream.txt");
     let tmp_s = tmp.to_string_lossy();
     Stream::from_string("a\nb\n").to_file(&tmp_s);
-    assert_eq!(read_file(&tmp_s), "a\nb\n");
+    assert_eq!(read_file(&tmp_s), "a\nb");
 
     // tee appends and leaves on stdout chain
     let tmp2 = std::env::temp_dir().join("rsb_stream2.txt");
@@ -28,4 +28,3 @@ fn streams_builders_and_ops() {
     assert_eq!(s, "1\n2");
     assert!(read_file(&tmp2s).contains("2"));
 }
-

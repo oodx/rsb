@@ -53,17 +53,8 @@ pub trait ToBool {
     fn to_bool(&self) -> bool;
 }
 
-#[deprecated(
-    note = "Converting bool to bool is an identity operation. Did you really mean to cast bool to bool?"
-)]
-fn bool_to_bool_identity_warning() -> bool {
-    true // This function exists only to trigger a deprecation warning
-}
-
 impl ToBool for bool {
     fn to_bool(&self) -> bool {
-        // Trigger compile-time warning by calling the deprecated function (but don't use its value)
-        let _ = bool_to_bool_identity_warning();
         *self
     }
 }

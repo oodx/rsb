@@ -3,24 +3,13 @@
 //! Provides robust parsing of key=value token streams with validation,
 //! quote stripping, and comprehensive error handling.
 
-use super::types::{Namespace, Token, TokenError, TokenResult, TokenStreamable};
-
-/// Strip quotes from a value string.
-///
-/// Removes matching single or double quotes from the beginning and end of a string.
-/// Used internally by the tokenization process.
-fn strip_quotes(s: &str) -> String {
-    let s = s.trim();
-    if s.len() >= 2 {
-        if (s.starts_with('"') && s.ends_with('"')) || (s.starts_with('\'') && s.ends_with('\'')) {
-            s[1..s.len() - 1].to_string()
-        } else {
-            s.to_string()
-        }
-    } else {
-        s.to_string()
-    }
-}
+use super::helpers::{
+    strip_quotes_internal,
+    validate_key_parts,
+    validate_no_trailing_spaces,
+    validate_token_format,
+};
+use super::types::{Token, TokenError, TokenResult, TokenStreamable};
 
 /// Parse a string into a vector of tokens.
 ///
@@ -62,13 +51,7 @@ pub fn tokenize_string(input: &str) -> TokenResult<Vec<Token>> {
             continue;
         }
 
-        // Check for trailing spaces (space before ;)
-        if token_str != token_str.trim_end() {
-            return Err(TokenError::MalformedToken {
-                token: token_str.trim_end().to_string(),
-                reason: "trailing spaces not allowed".to_string(),
-            });
-        }
+        validate_no_trailing_spaces(token_str)?;
 
         // Split on first '='
         let (key_part, value_part) = match token_str.split_once('=') {
@@ -85,63 +68,12 @@ pub fn tokenize_string(input: &str) -> TokenResult<Vec<Token>> {
             }
         };
 
-        // Check for spaces around '=' - key should not have trailing spaces, value should not have leading spaces
-        if key_part != key_part.trim_end() {
-            return Err(TokenError::MalformedToken {
-                token: token_str.to_string(),
-                reason: "space before '=' not allowed".to_string(),
-            });
-        }
-        if value_part != value_part.trim_start() {
-            return Err(TokenError::MalformedToken {
-                token: token_str.to_string(),
-                reason: "space after '=' not allowed".to_string(),
-            });
-        }
+        validate_token_format(token_str, key_part, value_part)?;
 
-        let key_part = key_part.trim(); // Allow leading spaces in key for consistency
-        let value = strip_quotes(value_part);
+        let key_part = key_part.trim();
+        let value = strip_quotes_internal(value_part);
 
-        // Check for empty key
-        if key_part.is_empty() {
-            return Err(TokenError::MalformedToken {
-                token: token_str.to_string(),
-                reason: "empty key".to_string(),
-            });
-        }
-
-        // Check for namespace separator ':'
-        let (namespace, key) = match key_part.split_once(':') {
-            Some((ns, k)) => {
-                // Validate namespace - no spaces allowed
-                if ns.contains(' ') {
-                    return Err(TokenError::MalformedToken {
-                        token: token_str.to_string(),
-                        reason: format!("spaces not allowed in namespace '{}'", ns),
-                    });
-                }
-                // Validate key part - no spaces allowed
-                if k.contains(' ') {
-                    return Err(TokenError::MalformedToken {
-                        token: token_str.to_string(),
-                        reason: format!("spaces not allowed in key '{}'", k),
-                    });
-                }
-                // Parse namespace with its internal delimiter
-                let namespace = Namespace::from_string(ns);
-                (Some(namespace), k.to_string())
-            }
-            None => {
-                // Even non-prefixed keys shouldn't have spaces
-                if key_part.contains(' ') {
-                    return Err(TokenError::MalformedToken {
-                        token: token_str.to_string(),
-                        reason: format!("spaces not allowed in key '{}'", key_part),
-                    });
-                }
-                (None, key_part.to_string())
-            }
-        };
+        let (namespace, key) = validate_key_parts(token_str, key_part)?;
 
         tokens.push(Token {
             namespace,
