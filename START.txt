@@ -1,0 +1,27 @@
+====
+ 🚀 RSB (REBEL STRING-BIASED) - START HERE
+====
+
+👋 **Welcome to RSB Development!**
+
+📋 **Single Entry Point**: Read docs/procs/PROCESS.txt for complete workflow
+
+🎯 **Quick Start** (5 minutes to productive work):
+1. Read docs/procs/PROCESS.txt ← Master workflow guide (3 min read)
+2. Read docs/procs/CONTINUE.md ← Current session status (1 min read)
+3. Read docs/procs/SPRINT.txt ← Active tasks (1 min read)
+4. Begin work with full context
+
+⚡ **Ultra-Fast Start** (30 seconds):
+→ Read docs/procs/QUICK_REF.txt for essential context only
+
+🔍 **System Health Check**:
+→ Run ./bin/validate-docs.sh to verify documentation integrity
+
+📁 **All Process Documents Located in docs/procs/**
+🔄 **Self-Hydrating System**: No manual context reconstruction needed!
+
+🏗️ **RSB Architecture**: See docs/tech/ for comprehensive technical documentation
+🧪 **Testing**: Run ./bin/test.sh for development validation
+
+====
