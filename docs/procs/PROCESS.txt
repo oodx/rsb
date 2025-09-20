@@ -1,0 +1,206 @@
+====
+ 🚀 RSB (REBEL STRING-BIASED) - MASTER WORKFLOW GUIDE
+====
+
+📋 **Meta Process v2**: Self-hydrating workflow system for RSB development
+🏗️ **Project**: Advanced Rust string manipulation framework with bash integration
+📈 **Current State**: Post-Epic 4 - API modernization complete, testing infrastructure mature
+
+====
+ 📁 PROJECT STRUCTURE & KEY DOCUMENTS
+====
+
+## Essential Process Documents (docs/procs/)
+- **PROCESS.txt** ← This master workflow guide
+- **CONTINUE.md** ← Current session status and handoffs
+- **QUICK_REF.txt** ← 30-second ultra-fast context
+- **SPRINT.txt** ← Current iteration tasks
+- **ROADMAP.txt** ← Strategic milestones and objectives
+- **TASKS.txt** ← Detailed development task breakdown
+
+## Core Technical References (docs/tech/)
+- **INDEX.md** ← Master technical documentation index
+- **development/** ← How-to guides, test organization, module specs
+- **features/** ← Complete feature documentation (19 modules)
+- **features/plans/** ← Implementation planning guides
+- **reference/** ← Architecture, RSB philosophy, BashFX alignment
+
+## Historical Wisdom (docs/misc/archive/)
+- **eggs/** ← China/Tina analysis results and consolidated insights
+- **sessions/** ← Historical session documentation and decisions
+
+====
+ 🔄 SELF-HYDRATING WORKFLOW PROCESS
+====
+
+## Step 1: Context Hydration Checklist
+✅ **Read START.txt** (Single entry point - completed if you're here!)
+✅ **Read this PROCESS.txt** (Master workflow - you're doing it now!)
+✅ **Read CONTINUE.md** (Current session state and immediate context)
+✅ **Read SPRINT.txt** (Active tasks and current priorities)
+✅ **Skim QUICK_REF.txt** (Essential project context in 30 seconds)
+
+## Step 2: Phase Detection & Orientation
+**Development Phase**: Post-Epic 4 Stabilization & Future Planning
+- ✅ API Modernization: COMPLETE (61+ working tests)
+- ✅ Test Infrastructure: COMPLETE (fx-testsh v2.2.0 integration)
+- ✅ Documentation: COMPREHENSIVE (36 technical docs, systematic organization)
+- 🔄 Current Focus: Meta Process v2 implementation & future enhancements
+
+## Step 3: Work Execution Patterns
+
+### 🧪 **Development Session Pattern**
+1. **Health Check**: `./bin/test.sh --rsb lint && ./bin/test.sh --rsb run sanity`
+2. **Context Verification**: Review CONTINUE.md for latest session state
+3. **Task Selection**: Check SPRINT.txt for priority work items
+4. **Implementation**: Follow MODULE_SPEC patterns and RSB conventions
+5. **Validation**: Run targeted tests for modified modules
+6. **Documentation**: Update relevant docs/tech/ files if needed
+7. **Session Closure**: Update CONTINUE.md with handoff information
+
+### 📋 **Planning Session Pattern**
+1. **Strategic Review**: Read ROADMAP.txt for long-term objectives
+2. **Task Analysis**: Review TASKS.txt for detailed work breakdown
+3. **Priority Assessment**: Update SPRINT.txt with current iteration focus
+4. **Documentation**: Update planning documents as needed
+5. **Session Closure**: Document planning decisions in CONTINUE.md
+
+### 🔍 **Analysis Session Pattern**
+1. **Scope Definition**: Identify analysis target (code, docs, architecture)
+2. **Tool Selection**: Use China (summary) or Tina (validation) agents as needed
+3. **Data Collection**: Gather relevant documentation and code samples
+4. **Insight Consolidation**: Create analysis results in .analysis/
+5. **Action Items**: Convert insights to actionable tasks in SPRINT.txt
+6. **Documentation**: Update relevant reference docs with findings
+
+## Step 4: Session Closure & Handoff Requirements
+**MANDATORY**: Update CONTINUE.md every session with:
+- Session duration and branch information
+- Completed work with specific file references
+- Any blockers encountered with context
+- Critical actions required for next agent/session
+- Git commit SHA for context hash
+- Modified files count
+
+====
+ 📊 PROJECT STATUS QUICK REFERENCE
+====
+
+## Current Priorities & Focus Areas
+- **Meta Process v2**: Implementing self-hydrating workflow system
+- **Future Development**: OsString types, UAT expansion, performance optimization
+- **Documentation**: Maintaining alignment with fx-testsh runner integration
+- **Quality**: Zero cargo warnings, comprehensive test coverage
+
+## Progress Tracking Metrics
+- **API Modernization**: 100% complete (Epic 4 achievement)
+- **Test Coverage**: 61+ working tests across 10 modules
+- **Documentation**: 36 technical documents, systematic organization
+- **Infrastructure**: fx-testsh v2.2.0 integration complete
+
+## Decision Points & Context
+- **Testing Strategy**: Legendary runner scaffold powers bin/test.sh
+- **Architecture**: RSB (Rebel String-Biased) philosophy with bash integration
+- **Quality Gates**: Sanity/smoke/unit/regression suites must stay green
+- **Documentation Standard**: Comprehensive feature docs with implementation plans
+
+====
+ 🔧 COMMON WORKFLOWS
+====
+
+## Sprint Planning Workflow
+1. Review ROADMAP.txt for strategic alignment
+2. Analyze TASKS.txt for available work items
+3. Prioritize based on current phase and dependencies
+4. Update SPRINT.txt with iteration goals
+5. Communicate sprint objectives in CONTINUE.md
+
+## Development Session Workflow
+1. Health check: `./bin/test.sh --rsb lint run sanity`
+2. Module focus: `cargo test --test sanity <module> -- --nocapture`
+3. Implementation following MODULE_SPEC patterns
+4. Targeted validation: `./bin/test.sh run sanity|uat|unit`
+5. Documentation updates in docs/tech/ as needed
+
+## Milestone Transition Workflow
+1. Archive completed work to DONE.txt
+2. Update ROADMAP.txt with progress and next milestones
+3. Refresh QUICK_REF.txt with new project focus
+4. Consolidate session insights into reference documentation
+5. Plan next phase in SPRINT.txt
+
+## Quality Assurance Workflow
+1. Run comprehensive test suite: `./bin/test.sh --rsb run all`
+2. Validation check: `./bin/validate-docs.sh` (when implemented)
+3. Documentation review for currency and accuracy
+4. Performance verification for critical paths
+5. Integration testing with bash environment
+
+====
+ 🎯 AGENT QUICK START GUIDE
+====
+
+## Essential Context for New Team Members/Agents
+- **RSB Philosophy**: Rebel String-Biased approach to string manipulation
+- **Epic 4 Legacy**: Massive modernization effort successfully completed
+- **Testing Excellence**: Comprehensive test infrastructure with fx-testsh integration
+- **Documentation Discipline**: Systematic organization with 36 technical documents
+
+## Key Project Background & Architecture
+- **Framework**: Advanced Rust string manipulation with bash integration
+- **Testing**: Sanity/smoke/unit/regression suites using cargo + fx-testsh
+- **Documentation**: Layered system - process docs, technical refs, feature specs
+- **Analysis Pipeline**: China/Tina agent collaboration for wisdom consolidation
+
+## Workflow Rules & Conventions
+- **Entry Point**: Always start with START.txt, then this PROCESS.txt
+- **Session Management**: MANDATORY CONTINUE.md updates every session
+- **Testing**: Health check before and after development work
+- **Documentation**: Keep docs/tech/ structure pristine, use docs/procs/ for process
+- **Quality**: Zero cargo warnings, green test suites before handoffs
+
+## RSB-Specific Development Patterns
+- **Module Structure**: Follow MODULE_SPEC patterns in docs/tech/development/
+- **Prelude Policy**: Strict rules in docs/tech/development/PRELUDE_POLICY.md
+- **Feature Implementation**: Use docs/tech/features/plans/ for guidance
+- **Testing Strategy**: Comprehensive sanity tests for all 10 modules
+
+====
+ 📚 REFERENCE LINKS
+====
+
+## Essential Files by Priority
+1. **CONTINUE.md** ← Current session state (READ FIRST)
+2. **QUICK_REF.txt** ← 30-second context for urgent starts
+3. **SPRINT.txt** ← Active tasks and current priorities
+4. **docs/tech/INDEX.md** ← Master technical documentation index
+5. **ROADMAP.txt** ← Strategic objectives and milestones
+
+## Topic-Specific References in docs/tech/
+- **Architecture**: RSB_ARCH.md, RSB_V2.md, REBEL.md
+- **Development**: MODULE_SPEC.md, PRELUDE_POLICY.md, HOWTO_UPDATE_RSB.md
+- **Testing**: HOWTO_TEST.md, TEST_ORGANIZATION.md, RSB_TEST_RUNNER.md
+- **Features**: Complete documentation in features/ and features/plans/
+- **Integration**: RSB_BASHFX_ALIGN.md, BASHFX-v3.md
+
+## Testing & Validation Tools
+- **Health Check**: `./bin/test.sh --rsb lint run sanity`
+- **Module Testing**: `cargo test --test sanity <module> -- --nocapture`
+- **Comprehensive**: `./bin/test.sh --rsb run all`
+- **Documentation**: `./bin/validate-docs.sh` (Meta Process v2 requirement)
+- **UAT**: `cargo test --test uat -- --nocapture`
+
+====
+ 🚨 CRITICAL SUCCESS FACTORS
+====
+
+1. **DISCIPLINE**: MUST update CONTINUE.md every session (mandatory)
+2. **HEALTH CHECKS**: Always verify test status before and after work
+3. **DOCUMENTATION**: Keep docs/tech/ structure pristine (36 files)
+4. **QUALITY**: Zero cargo warnings, green test suites required
+5. **CONTEXT**: Use QUICK_REF.txt for urgent starts, full process for comprehensive work
+
+====
+Last Updated: 2025-09-20 (Meta Process v2 Implementation)
+Next Review: After Phase 5 automation implementation
+====
