@@ -1,7 +1,7 @@
-#![cfg(feature = "visual")]
+#![cfg(all(feature = "colors-named", feature = "colors-status"))]
 // moved from tests/sanity-colors.rs
+use rsb::colors::{color_enable_with, color_mode, colorize, get_all_colors, get_color};
 use rsb::prelude::*;
-use rsb::visual::colors::{get_color, colorize, get_all_colors, color_enable_with, color_mode};
 
 fn ensure_colors_enabled() {
     color_mode("always");
@@ -11,7 +11,9 @@ fn ensure_colors_enabled() {
 #[test]
 fn test_basic_colors_exist() {
     ensure_colors_enabled();
-    let basic_colors = ["red", "green", "blue", "yellow", "magenta", "cyan", "black", "white", "grey"];    
+    let basic_colors = [
+        "red", "green", "blue", "yellow", "magenta", "cyan", "black", "white", "grey",
+    ];
     for color in &basic_colors {
         let escape_code = get_color(color);
         assert!(!escape_code.is_empty());
@@ -35,7 +37,10 @@ fn test_status_colors_exist() {
 #[test]
 fn test_extended_colors_exist() {
     ensure_colors_enabled();
-    let extended_colors = ["crimson", "emerald", "azure", "purple", "amber", "lime", "orange", "coral", "bronze", "navy", "teal", "indigo"];    
+    let extended_colors = [
+        "crimson", "emerald", "azure", "purple", "amber", "lime", "orange", "coral", "bronze",
+        "navy", "teal", "indigo",
+    ];
     for color in &extended_colors {
         let escape_code = get_color(color);
         assert!(!escape_code.is_empty());
@@ -108,12 +113,26 @@ fn test_specific_escape_codes() {
 #[test]
 fn test_color_names_sampling() {
     ensure_colors_enabled();
-    let sample_colors = ["red", "green", "blue", "crimson", "emerald", "azure", "magic", "trace", "okay", "lightred", "darkblue", "brightgreen"];    
+    let sample_colors = [
+        "red",
+        "green",
+        "blue",
+        "crimson",
+        "emerald",
+        "azure",
+        "magic",
+        "trace",
+        "okay",
+        "lightred",
+        "darkblue",
+        "brightgreen",
+    ];
     let mut found_colors = 0;
     for color in &sample_colors {
         let escape = get_color(color);
-        if !escape.is_empty() { found_colors += 1; }
+        if !escape.is_empty() {
+            found_colors += 1;
+        }
     }
     assert!(found_colors >= sample_colors.len() / 2);
 }
-

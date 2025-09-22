@@ -38,10 +38,8 @@ FEATURE_MAP: Dict[str, Sequence[str]] = {
         "src/bash",
     ],
     "colors": [
-        "src/visual/colors",
-        "src/visual/glyphs",
-        "src/visual/mod.rs",
-        "src/visual/utils.rs",
+        "src/colors",
+        "src/utils.rs",
         "src/visual/macros.rs",
     ],
     "date": [

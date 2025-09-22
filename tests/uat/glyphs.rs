@@ -1,5 +1,7 @@
+#![cfg(feature = "colors-core")]
+
 // moved from tests/uat_glyphs.rs
-use rsb::visual::colors::{color, color_enable_with, color_mode, colored};
+use rsb::colors::{color, color_enable_with, color_mode, colored};
 #[cfg(feature = "glyphs")]
 use rsb::visual::glyphs::{get_all_glyphs, glyph, glyph_enable};
 

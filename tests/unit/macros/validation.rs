@@ -66,4 +66,3 @@ fn file_in_variants() {
     });
     assert!(content_len >= 2);
 }
-

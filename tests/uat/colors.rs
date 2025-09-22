@@ -1,5 +1,11 @@
+#![cfg(all(
+    feature = "colors-simple",
+    feature = "colors-status",
+    feature = "colors-named"
+))]
+
 // moved from tests/uat_colors.rs
-use rsb::visual::colors::{
+use rsb::colors::{
     bg, color, color_enable_with, color_mode, colored, colorize, colorize_bg, get_all_colors,
 };
 

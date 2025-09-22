@@ -27,4 +27,3 @@ fn test_string_macros_via_prelude_alias() {
     assert!(str_in!("lo", in: "hello"));
     assert_eq!(str_line!('=', 3), "===");
 }
-

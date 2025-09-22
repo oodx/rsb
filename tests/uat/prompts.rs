@@ -1,3 +1,5 @@
+#![cfg(feature = "prompts")]
+
 // moved from tests/uat_prompts.rs
 use rsb::prelude::*;
 use rsb::{ask, confirm, select};
@@ -7,7 +9,7 @@ fn uat_prompts_demo() {
     println!("\n=== UAT: Prompts (confirm/ask/select) ===\n");
     #[cfg(feature = "visual")]
     {
-        use rsb::visual::colors::{color_enable_with, color_mode, colored};
+        use rsb::colors::{color_enable_with, color_mode, colored};
         color_mode("always");
         color_enable_with("simple");
         println!("{}", colored("{green}Prompts demo active{reset}"));
@@ -44,7 +46,7 @@ fn uat_prompts_demo() {
     set_var("opt_quiet", "");
     #[cfg(feature = "visual")]
     {
-        use rsb::visual::colors::colored;
+        use rsb::colors::colored;
         println!(
             "{}",
             colored("{yellow}?{reset} This line shows the prompt style")

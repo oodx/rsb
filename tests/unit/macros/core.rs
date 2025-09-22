@@ -13,4 +13,3 @@ fn core_bootstrap_and_args() {
     get_env!();
     assert_eq!(get_var("FOO"), "bar");
 }
-

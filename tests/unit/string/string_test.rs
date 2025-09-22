@@ -19,7 +19,10 @@ fn test_str_sub_basic_and_unicode() {
 fn test_str_prefix_literal_and_wildcards() {
     // Literal
     assert_eq!(str_prefix("/home/user", "/home", false), "/user");
-    assert_eq!(str_prefix("/path/to/file.txt", "/path/to", false), "/file.txt");
+    assert_eq!(
+        str_prefix("/path/to/file.txt", "/path/to", false),
+        "/file.txt"
+    );
     assert_eq!(str_prefix("/home/user", "/none", false), "/home/user");
 
     // Wildcards (shortest vs longest)
@@ -38,8 +41,14 @@ fn test_str_suffix_literal_and_wildcards() {
     assert_eq!(str_suffix("file.txt", ".pdf", false), "file.txt");
 
     // Wildcards
-    assert_eq!(str_suffix("document.backup.txt", "*.txt", false), "document.backup");
-    assert_eq!(str_suffix("/path/to/file.backup.txt", "*.backup.txt", false), "/path/to/file");
+    assert_eq!(
+        str_suffix("document.backup.txt", "*.txt", false),
+        "document.backup"
+    );
+    assert_eq!(
+        str_suffix("/path/to/file.backup.txt", "*.backup.txt", false),
+        "/path/to/file"
+    );
     // Longest match removes the longest suffix matching the pattern
     assert_eq!(str_suffix("a.b.c.txt", "*.txt", true), "");
 }

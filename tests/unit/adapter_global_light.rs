@@ -18,4 +18,3 @@ fn adapter_apply_env_simple_only() {
     assert_eq!(get_var("QUIET_MODE"), "");
     assert_eq!(get_var("TRACE_MODE"), "");
 }
-

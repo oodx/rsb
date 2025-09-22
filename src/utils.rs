@@ -25,11 +25,11 @@ pub fn should_print_level(level: &str) -> bool {
 /// If the visual feature is enabled, delegate to the new registry-based expander
 /// which supports extended tags (e.g., {bg:red}). Otherwise, return unchanged.
 pub fn expand_colors_unified(text: &str) -> String {
-    #[cfg(feature = "visual")]
+    #[cfg(feature = "colors-core")]
     {
-        return crate::visual::colors::colored(text);
+        return crate::colors::colored(text);
     }
-    #[cfg(not(feature = "visual"))]
+    #[cfg(not(feature = "colors-core"))]
     {
         // Strip inline color tags like {bold}, {cyan}, {reset}, etc. when visuals are disabled.
         // This keeps output clean and readable in plain mode.
@@ -92,9 +92,9 @@ pub fn stderrx(level: &str, message: &str) {
 
     // Decide color name for level via visual registry if available, otherwise fallback mapping
     let color_name = {
-        #[cfg(feature = "visual")]
+        #[cfg(feature = "colors-core")]
         {
-            if !crate::visual::colors::color(level).is_empty() {
+            if !crate::colors::color(level).is_empty() {
                 level
             } else {
                 match level {
@@ -108,7 +108,7 @@ pub fn stderrx(level: &str, message: &str) {
                 }
             }
         }
-        #[cfg(not(feature = "visual"))]
+        #[cfg(not(feature = "colors-core"))]
         {
             match level {
                 "info" => "cyan",

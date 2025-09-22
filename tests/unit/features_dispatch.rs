@@ -3,8 +3,8 @@
 //! Tests command dispatch, pre_dispatch, argument forwarding,
 //! and error handling for unknown commands.
 
-use rsb::prelude::*;
 use rsb::cli::{execute_pre_dispatch, CommandHandler};
+use rsb::prelude::*;
 
 #[cfg(test)]
 mod dispatch_tests {
@@ -38,12 +38,10 @@ mod dispatch_tests {
         // Test pre_dispatch with valid command
         let args = Args::new(&["myapp".to_string(), "hello".to_string(), "RSB".to_string()]);
 
-        let result = execute_pre_dispatch(&args, |command| {
-            match command {
-                "hello" => Some(cmd_hello),
-                "add" => Some(cmd_add),
-                _ => None,
-            }
+        let result = execute_pre_dispatch(&args, |command| match command {
+            "hello" => Some(cmd_hello),
+            "add" => Some(cmd_add),
+            _ => None,
         });
 
         assert!(result, "pre_dispatch should return true for found command");
@@ -54,15 +52,16 @@ mod dispatch_tests {
         // Test pre_dispatch with invalid command
         let args = Args::new(&["myapp".to_string(), "unknown".to_string()]);
 
-        let result = execute_pre_dispatch(&args, |command| {
-            match command {
-                "hello" => Some(cmd_hello),
-                "add" => Some(cmd_add),
-                _ => None,
-            }
+        let result = execute_pre_dispatch(&args, |command| match command {
+            "hello" => Some(cmd_hello),
+            "add" => Some(cmd_add),
+            _ => None,
         });
 
-        assert!(!result, "pre_dispatch should return false for unknown command");
+        assert!(
+            !result,
+            "pre_dispatch should return false for unknown command"
+        );
     }
 
     #[test]
@@ -73,14 +72,12 @@ mod dispatch_tests {
             "args-test".to_string(),
             "first".to_string(),
             "second".to_string(),
-            "third".to_string()
+            "third".to_string(),
         ]);
 
-        let result = execute_pre_dispatch(&args, |command| {
-            match command {
-                "args-test" => Some(cmd_args_test),
-                _ => None,
-            }
+        let result = execute_pre_dispatch(&args, |command| match command {
+            "args-test" => Some(cmd_args_test),
+            _ => None,
         });
 
         assert!(result, "pre_dispatch should handle args-test command");
@@ -99,7 +96,10 @@ mod dispatch_tests {
             }
         });
 
-        assert!(!result, "pre_dispatch should return false for empty command");
+        assert!(
+            !result,
+            "pre_dispatch should return false for empty command"
+        );
     }
 
     #[test]
@@ -116,7 +116,11 @@ mod dispatch_tests {
             let args_strings: Vec<String> = args_vec.into_iter().map(String::from).collect();
             let args = Args::new(&args_strings);
             let command = args.get_or(1, "");
-            assert_eq!(command, expected_cmd, "Command extraction failed for: {:?}", args_strings);
+            assert_eq!(
+                command, expected_cmd,
+                "Command extraction failed for: {:?}",
+                args_strings
+            );
         }
     }
 
@@ -128,12 +132,10 @@ mod dispatch_tests {
         for cmd in test_commands {
             let args = Args::new(&["myapp".to_string(), cmd.to_string()]);
 
-            let result = execute_pre_dispatch(&args, |command| {
-                match command {
-                    "hello" => Some(cmd_hello),
-                    "add" => Some(cmd_add),
-                    _ => None,
-                }
+            let result = execute_pre_dispatch(&args, |command| match command {
+                "hello" => Some(cmd_hello),
+                "add" => Some(cmd_add),
+                _ => None,
             });
 
             assert!(result, "Command '{}' should be found", cmd);
@@ -163,14 +165,16 @@ mod dispatch_integration_tests {
         // Test typical dispatch usage
         std::env::set_var("CARGO_TEST", "1");
 
-        let args = Args::new(&["myapp".to_string(), "hello".to_string(), "world".to_string()]);
+        let args = Args::new(&[
+            "myapp".to_string(),
+            "hello".to_string(),
+            "world".to_string(),
+        ]);
 
-        let result = execute_pre_dispatch(&args, |command| {
-            match command {
-                "hello" => Some(hello_handler),
-                "version" => Some(version_handler),
-                _ => None,
-            }
+        let result = execute_pre_dispatch(&args, |command| match command {
+            "hello" => Some(hello_handler),
+            "version" => Some(version_handler),
+            _ => None,
         });
 
         assert!(result);
@@ -182,12 +186,10 @@ mod dispatch_integration_tests {
 
         let args = Args::new(&["myapp".to_string(), "version".to_string()]);
 
-        let result = execute_pre_dispatch(&args, |command| {
-            match command {
-                "hello" => Some(hello_handler),
-                "version" => Some(version_handler),
-                _ => None,
-            }
+        let result = execute_pre_dispatch(&args, |command| match command {
+            "hello" => Some(hello_handler),
+            "version" => Some(version_handler),
+            _ => None,
         });
 
         assert!(result);
@@ -204,6 +206,9 @@ mod error_handling_tests {
 
         let result = execute_pre_dispatch(&args, |_command| None);
 
-        assert!(!result, "Unknown commands should return false from pre_dispatch");
+        assert!(
+            !result,
+            "Unknown commands should return false from pre_dispatch"
+        );
     }
 }

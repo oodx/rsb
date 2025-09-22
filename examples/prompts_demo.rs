@@ -18,7 +18,7 @@ fn main() {
         // Set up colors for better UX
         #[cfg(feature = "colors-simple")]
         {
-            use rsb::visual::colors::{color_enable_with, color_mode};
+            use rsb::colors::{color_enable_with, color_mode};
             color_mode("always");
             color_enable_with("simple");
         }
@@ -58,7 +58,7 @@ fn main() {
 
         #[cfg(feature = "colors-simple")]
         {
-            use rsb::visual::colors::colored;
+            use rsb::colors::colored;
             println!(
                 "\n{}",
                 colored("{green}🎉 RSB-004 Prompts MVP Complete!{reset}")

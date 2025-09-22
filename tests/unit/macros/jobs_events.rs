@@ -23,4 +23,3 @@ fn lock_macros_basic() {
     lock!(s.as_ref());
     unlock!(s.as_ref());
 }
-

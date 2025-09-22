@@ -7,4 +7,3 @@ fn test_param_macro_via_prelude_alias() {
     assert_eq!(param!("P"), "v");
     assert_eq!(param!("MISSING", default: "d"), "d");
 }
-

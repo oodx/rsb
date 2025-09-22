@@ -3,9 +3,7 @@ use rsb::prelude::*;
 #[test]
 fn stream_exec_macros() {
     // pipe + grep + to_string
-    let out = pipe!("a\nb\na")
-        .grep("a")
-        .to_string();
+    let out = pipe!("a\nb\na").grep("a").to_string();
     assert_eq!(out, "a\na");
 
     // run! with mocked command
