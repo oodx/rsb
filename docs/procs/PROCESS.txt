@@ -118,9 +118,10 @@
 ## Development Session Workflow
 1. Health check: `./bin/test.sh --rsb lint run sanity`
 2. Module focus: `cargo test --test sanity <module> -- --nocapture`
-3. Implementation following MODULE_SPEC patterns
-4. Targeted validation: `./bin/test.sh run sanity|uat|unit`
-5. Documentation updates in docs/tech/ as needed
+3. Documentation alignment: run `bin/feat.py <feature> --update-doc` before/after feature doc changes to refresh sentinel sections (see `README_FEATS.md`).
+4. Implementation following MODULE_SPEC patterns
+5. Targeted validation: `./bin/test.sh run sanity|uat|unit`
+6. Documentation updates in docs/tech/ as needed
 
 ## Milestone Transition Workflow
 1. Archive completed work to DONE.txt
