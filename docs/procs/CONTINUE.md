@@ -87,3 +87,4 @@ Repository quick references:
 - FS/hosts/parse/param tests adjusted for new semantics; keep an eye on warnings (unused helpers, deprecated bool shim removal).
 - Environment guard added for integration host paths; confirm expected TMP behavior (`XDG_TMP_HOME` seeded per test).
 - All suites currently green (`./bin/test.sh --rsb run sanity|smoke`, `cargo test --all --quiet`).
+- Feature docs now have machine-generated surface summaries. Run `bin/feat.py --list` to see available features and `bin/feat.py <feature> --update-doc` before/after doc edits to keep sentinel sections current. See `README_FEATS.md` for usage.
