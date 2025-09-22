@@ -80,6 +80,7 @@ Repository quick references:
    `docs/tech/reference/RSB_TESTSH_INTEGRATION.md`) to confirm terminology
    sticks.
 3. Draft the PR summary / changelog entry once the checks stay green.
+4. Rehydrate context from scratch by revisiting `START.txt` → `PROCESS.txt` → `CONTINUE.md` if returning after a gap; this ensures the self-hydrating workflow stays in sync.
 
 ## Latest Sync Update
 - Runner swapped to fx-testsh scaffold (`bin/test.sh`); review before landing.
