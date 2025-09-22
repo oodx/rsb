@@ -54,6 +54,14 @@ Running `--update-doc` replaces (or appends, if missing) the block with the late
 2. Run `python3 bin/feat.py <feature> --update-doc` to rebuild the sentinel block.
 3. Double-check that any other feature docs referencing the old path are updated.
 
+> Want this to work on non-RSB projects? Two easy strategies:
+> 1. **Convention-first** – assume `src/<feature>` exists, then use
+>    `FEATURE_MAP` only for exceptions (macros, adapters). This keeps the strict
+>    guarantees while reducing configuration.
+> 2. **Doc-driven** – parse the feature docs for `<!-- feat:* -->` markers and
+>    derive module paths from a repo-specific config. That lets each project own
+>    its mapping without editing the script.
+
 ## Best Practices
 
 1. Run `bin/feat.py <feature> --update-doc` before editing a doc so you start from a fresh surface list.
