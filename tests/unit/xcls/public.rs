@@ -3,7 +3,9 @@ use rsb::xcls::*;
 #[test]
 fn xgrep_and_xfilter_smoke() {
     let input = "a1\na2\nb1";
-    let res = xgrep(input).filter_lines(|l| l.starts_with('a')).to_string();
+    let res = xgrep(input)
+        .filter_lines(|l| l.starts_with('a'))
+        .to_string();
     assert_eq!(res, "a1\na2");
 
     let res2 = xfilter(input)

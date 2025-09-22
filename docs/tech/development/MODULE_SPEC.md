@@ -115,15 +115,16 @@ Feature Flags (Cargo.toml)
 default = []
 
 # Visual base and components
-visual = []
-colors-simple = ["visual"]
-colors-named  = ["visual", "colors-simple"]
-colors-status = ["visual"]
+colors-core = []
+visual = ["colors-core"]
+colors-simple = ["colors-core"]
+colors-named  = ["colors-core", "colors-simple"]
+colors-status = ["colors-core"]
 glyphs = ["visual"]
 prompts = ["visual", "colors-simple"]
 
 # Umbrellas and convenience
-colors  = ["visual", "colors-simple"]
+colors  = ["colors-core", "colors-simple"]
 visuals = ["visual", "colors-simple", "colors-named", "colors-status", "glyphs", "prompts"]
 
 # Options helpers

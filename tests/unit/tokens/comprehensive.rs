@@ -1,6 +1,6 @@
 //! Token module comprehensive feature tests
 
-use rsb::token::{tokenize_string, TokenError, utils};
+use rsb::token::{tokenize_string, utils, TokenError};
 
 #[test]
 fn test_comprehensive_validation_rules() {
@@ -9,16 +9,16 @@ fn test_comprehensive_validation_rules() {
     // ✅ ALLOWED patterns
     assert!(tokenize_string(r#"key="value";"#).is_ok());
     assert!(tokenize_string(r#"key1="value1"; key2="value2";"#).is_ok());
-    assert!(tokenize_string(r#"   key="value";"#).is_ok());  // leading spaces
+    assert!(tokenize_string(r#"   key="value";"#).is_ok()); // leading spaces
     assert!(tokenize_string(r#"key="value";    "#).is_ok()); // trailing spaces
     assert!(tokenize_string(r#"ns:key="value";"#).is_ok());
     assert!(tokenize_string(r#"ns.sub:key="value";"#).is_ok());
 
     // ❌ FORBIDDEN patterns
-    assert!(tokenize_string(r#"key ="value";"#).is_err());     // space before =
-    assert!(tokenize_string(r#"key= "value";"#).is_err());     // space after =
-    assert!(tokenize_string(r#"key="value" ;"#).is_err());     // space before ;
-    assert!(tokenize_string(r#"my key="value";"#).is_err());   // space in key
+    assert!(tokenize_string(r#"key ="value";"#).is_err()); // space before =
+    assert!(tokenize_string(r#"key= "value";"#).is_err()); // space after =
+    assert!(tokenize_string(r#"key="value" ;"#).is_err()); // space before ;
+    assert!(tokenize_string(r#"my key="value";"#).is_err()); // space in key
     assert!(tokenize_string(r#"my ns:key="value";"#).is_err()); // space in namespace
     assert!(tokenize_string(r#"ns:my key="value";"#).is_err()); // space in namespaced key
 }
@@ -71,13 +71,16 @@ fn test_edge_cases() {
 
 #[test]
 fn test_namespace_utilities() {
-    let tokens = tokenize_string(r#"
+    let tokens = tokenize_string(
+        r#"
         global="value";
         db:host="localhost";
         db:port="5432";
         auth:enabled="true";
         config.logging:level="debug";
-    "#).unwrap();
+    "#,
+    )
+    .unwrap();
 
     // Test namespace extraction
     let db_tokens = utils::extract_namespace_tokens(&tokens, Some("db"));
@@ -175,12 +178,14 @@ fn test_performance_edge_cases() {
 #[test]
 fn test_xstream_compatibility() {
     // Test formats that should work with XStream
-    let xstream_format = r#"host="localhost"; port="8080"; ns=database; user="admin"; pass="secret";"#;
+    let xstream_format =
+        r#"host="localhost"; port="8080"; ns=database; user="admin"; pass="secret";"#;
     let tokens = tokenize_string(xstream_format).unwrap();
     assert_eq!(tokens.len(), 5);
 
     // Test namespace switching pattern (ns= tokens)
-    let ns_switch = r#"item="value1"; ns=animals; dog="fido"; cat="fluffy"; ns=global; final="done";"#;
+    let ns_switch =
+        r#"item="value1"; ns=animals; dog="fido"; cat="fluffy"; ns=global; final="done";"#;
     let tokens = tokenize_string(ns_switch).unwrap();
     assert_eq!(tokens.len(), 6);
 

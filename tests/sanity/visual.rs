@@ -26,7 +26,7 @@ fn test_visual_module_feature_gating() {
 #[cfg(feature = "colors-simple")]
 fn test_colors_basic_functionality() {
     // Test basic color system functionality
-    use rsb::visual::colors::{color, color_mode, colorize};
+    use rsb::colors::{color, color_mode, colorize};
 
     // Test color configuration
     color_mode("never"); // Disable colors for predictable testing
@@ -57,7 +57,7 @@ fn test_colors_basic_functionality() {
 #[cfg(feature = "colors-simple")]
 fn test_colors_registry_functions() {
     // Test color registry access functions
-    use rsb::visual::colors::{bg, color_enable_with, colorize_bg, get_all_colors, get_color};
+    use rsb::colors::{bg, color_enable_with, colorize_bg, get_all_colors, get_color};
 
     // Enable colors first to populate registry
     color_enable_with("simple,bg");
@@ -92,7 +92,7 @@ fn test_colors_registry_functions() {
 #[cfg(feature = "colors-named")]
 fn test_colors_named_palette() {
     // Test extended named color palette
-    use rsb::visual::colors::{color_enable_with, get_all_colors, get_color};
+    use rsb::colors::{color_enable_with, get_all_colors, get_color};
 
     // Enable named colors first to populate registry
     color_enable_with("named");
@@ -123,7 +123,7 @@ fn test_colors_named_palette() {
 #[cfg(feature = "colors-status")]
 fn test_colors_status_palette() {
     // Test status-specific color functionality
-    use rsb::visual::colors::{color_enable_with, get_all_colors, get_color};
+    use rsb::colors::{color_enable_with, get_all_colors, get_color};
 
     // Enable status colors first to populate registry
     color_enable_with("status");
@@ -270,7 +270,7 @@ fn test_prompts_timeout_functionality() {
 #[cfg(all(feature = "colors-simple", feature = "glyphs"))]
 fn test_visual_integration() {
     // Test integration between visual components
-    use rsb::visual::colors::colorize;
+    use rsb::colors::colorize;
     use rsb::visual::glyphs::{glyph, glyph_enable};
 
     // Enable both systems
@@ -359,7 +359,7 @@ fn test_edge_cases() {
 
     #[cfg(feature = "colors-simple")]
     {
-        use rsb::visual::colors::{color, colorize};
+        use rsb::colors::{color, colorize};
 
         // Test with empty strings
         let empty_color = color("");

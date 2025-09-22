@@ -1,6 +1,6 @@
 #![cfg(feature = "prompts")]
 use rsb::prelude::*;
-use rsb::visual::prompts::{confirm, confirm_default, ask, select, default_from};
+use rsb::visual::prompts::{ask, confirm, confirm_default, default_from, select};
 
 fn setup_clean_context() {
     unset_var("opt_yes");

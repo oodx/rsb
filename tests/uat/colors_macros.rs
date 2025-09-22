@@ -1,6 +1,13 @@
+#![cfg(all(
+    feature = "visual",
+    feature = "colors-simple",
+    feature = "colors-status",
+    feature = "colors-named"
+))]
+
 // moved from tests/uat_colors_macros.rs
 use rsb::colored;
-use rsb::visual::colors::{color_enable_with, color_mode};
+use rsb::colors::{color_enable_with, color_mode};
 
 #[test]
 fn uat_colors_macros_inline_tags() {

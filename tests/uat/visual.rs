@@ -1,8 +1,12 @@
+#![cfg(all(
+    feature = "colors-simple",
+    feature = "colors-status",
+    feature = "colors-named"
+))]
+
 // moved from tests/uat_visual.rs
+use rsb::colors::{bg, color, color_enable_with, color_mode, colored, colorize, colorize_bg};
 use rsb::prelude::*;
-use rsb::visual::colors::{
-    bg, color, color_enable_with, color_mode, colored, colorize, colorize_bg,
-};
 #[cfg(feature = "glyphs")]
 use rsb::visual::glyphs::glyph_enable;
 

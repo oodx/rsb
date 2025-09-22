@@ -1,6 +1,6 @@
 # RSB Visual System (MODERN + COMPREHENSIVE)
 
-Updated: 2025-09-16
+Updated: 2025-09-21
 
 ## Purpose
 Provide a complete, feature-gated visual enhancement ecosystem for RSB applications. The visual system offers composable components—colors, glyphs, prompts, and progress indicators—through hierarchical Cargo feature flags that maintain build-time flexibility while providing runtime configurability.
@@ -27,16 +27,17 @@ The RSB visual system follows these principles:
 
 #### Base Layer
 ```toml
-visual = []  # Required foundation for all visual features
+colors-core = []                             # Standalone colors registry and runtime toggles
+visual = ["colors-core"]                    # Visual macros/prompts wiring (imports colors-core)
 ```
 
 #### Color System (Hierarchical)
 ```toml
-colors-simple = ["visual"]                    # 8/16 colors + control codes
-colors-named = ["visual", "colors-simple"]    # Extended named palette
-colors-status = ["visual"]                    # Status-specific colors
-colors-all = ["visual", "colors-simple", "colors-named", "colors-status"]
-colors = ["visual", "colors-simple"]          # Baseline convenience alias
+colors-simple = ["colors-core"]             # 8/16 colors + control codes
+colors-named = ["colors-core", "colors-simple"]
+colors-status = ["colors-core"]
+colors-all = ["colors-core", "colors-simple", "colors-named", "colors-status"]
+colors = ["colors-core", "colors-simple"]  # Baseline convenience alias
 ```
 
 #### Visual Components
@@ -68,7 +69,7 @@ default = ["visual", "colors-simple", "colors-named", "colors-status", "glyphs",
 
 ## Component Overview
 
-### 1. Colors System (`rsb::visual::colors`)
+### 1. Colors System (`rsb::colors`)
 
 **Purpose**: Runtime-configurable color system with string-first API
 
@@ -79,7 +80,7 @@ default = ["visual", "colors-simple", "colors-named", "colors-status", "glyphs",
 
 **Runtime Model**:
 ```rust
-use rsb::visual::colors::{color_mode, color_enable_with, color, colorize};
+use rsb::colors::{color_mode, color_enable_with, color, colorize};
 
 // Configure color behavior
 color_mode("auto");  // "auto" | "always" | "never"
@@ -180,7 +181,7 @@ task.complete("All files processed successfully");
 
 ### Colors API
 ```rust
-use rsb::visual::colors::{
+use rsb::colors::{
     // Configuration
     color_mode, color_enable, color_enable_with,
 
@@ -257,7 +258,7 @@ use rsb::progress::{
 
 ### 1. Full Visual Integration
 ```rust
-use rsb::visual::colors::{color_enable_with, colorize};
+use rsb::colors::{color_enable_with, colorize};
 use rsb::visual::glyphs::{glyph_enable, glyph};
 use rsb::visual::prompts::confirm;
 use rsb::progress::{ProgressManager, ProgressStyle};
@@ -281,7 +282,7 @@ if confirm("Ready to proceed?") {
 ```rust
 // Only enable colors and prompts
 #[cfg(feature = "colors-simple")]
-use rsb::visual::colors::{color_enable, colorize};
+use rsb::colors::{color_enable, colorize};
 
 #[cfg(feature = "prompts")]
 use rsb::visual::prompts::confirm;
@@ -299,7 +300,7 @@ fn colored_output(msg: &str) -> String {
 
 ### 3. Runtime Configuration
 ```rust
-use rsb::visual::colors::{color_mode, color_enable_with};
+use rsb::colors::{color_mode, color_enable_with};
 use rsb::visual::glyphs::{set_glyphs_enabled};
 
 // Configure based on environment or user preferences
@@ -324,7 +325,7 @@ Tests are organized to respect feature boundaries:
 ```rust
 #[cfg(feature = "colors-simple")]
 mod color_tests {
-    use rsb::visual::colors::*;
+    use rsb::colors::*;
 
     #[test]
     fn test_basic_colors() {
@@ -360,7 +361,7 @@ mod glyph_tests {
 // Test graceful degradation when features disabled
 #[test]
 fn test_color_fallback() {
-    use rsb::visual::colors::colorize;
+    use rsb::colors::colorize;
 
     // Should return original text when colors disabled
     let result = colorize("test", "red");
@@ -401,7 +402,7 @@ This document **replaces** the outdated FEATURES_COLORS.md. Key improvements:
 6. **Runtime configuration**: Environment and programmatic control
 
 ### Migration Path
-- Replace imports: `use rsb::visual::colors::*` (still works)
+- Replace imports: `use rsb::colors::*` (still works)
 - New umbrella feature: Use `visuals` for complete visual package
 - Progress indicators: New `rsb::progress` namespace
 - Enhanced glyphs: More symbols and better integration

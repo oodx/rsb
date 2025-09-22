@@ -102,11 +102,11 @@ fn test_pattern_case_transforms_first_match() {
 fn test_options_integration_with_comprehensive_params() {
     let test_args = vec![
         "program".to_string(),
-        "command".to_string(), 
+        "command".to_string(),
         "--verbose".to_string(),
         "--config=test.conf".to_string(),
         "-d".to_string(),
-        "--layout=k1=v1,k2=v2".to_string()
+        "--layout=k1=v1,k2=v2".to_string(),
     ];
 
     let args = rsb::cli::Args::new(&test_args);

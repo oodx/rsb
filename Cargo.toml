@@ -9,17 +9,20 @@ edition = "2021"
 [features]
 default = ["visual", "colors-simple", "colors-named", "colors-status", "glyphs", "prompts"]
 
-# Visual enhancements package
-visual = []
+# Core color registry (shared by all visual packages)
+colors-core = []
+
+# Visual orchestration (macros, prompts wiring)
+visual = ["colors-core"]
 
 # Color packages (hierarchical dependencies)
-colors-simple = ["visual"]
-colors-named = ["visual", "colors-simple"]
-colors-status = ["visual"]
-colors-all = ["visual", "colors-simple", "colors-named", "colors-status"]
+colors-simple = ["colors-core"]
+colors-named = ["colors-core", "colors-simple"]
+colors-status = ["colors-core"]
+colors-all = ["colors-core", "colors-simple", "colors-named", "colors-status"]
 
 # Convenience umbrella for baseline colors
-colors = ["visual", "colors-simple"]
+colors = ["colors-core", "colors-simple"]
 
 # Everything visual in one go (colors + glyphs + prompts)
 visuals = [

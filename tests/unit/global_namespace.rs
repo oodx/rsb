@@ -23,4 +23,3 @@ fn global_ns_dunder_and_colon() {
     assert_eq!(m, 1);
     assert_eq!(rsb::global::ns_get("app2", "key"), "val");
 }
-

@@ -1,7 +1,7 @@
 #![cfg(feature = "prompts")]
-use rsb::prelude::*;
-use rsb::visual::prompts::{confirm, ask, select};
 use lazy_static::lazy_static;
+use rsb::prelude::*;
+use rsb::visual::prompts::{ask, confirm, select};
 use std::sync::Mutex;
 
 lazy_static! {
@@ -83,7 +83,7 @@ fn test_color_integration() {
     // Enable colors to test prompt rendering with color codes
     #[cfg(feature = "colors-simple")]
     {
-        use rsb::visual::colors::{color_mode, color_enable_with};
+        use rsb::colors::{color_enable_with, color_mode};
         color_mode("always");
         color_enable_with("simple");
 

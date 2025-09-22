@@ -1,11 +1,12 @@
 //! RSB Visual Package - Optional visual enhancements
 //!
-//! This module provides optional color systems, glyphs, and interactive prompts
-//! through Cargo feature flags. Components are organized into focused packages
-//! to allow selective inclusion based on application needs.
+//! This module provides optional glyphs, prompts, and visual macros through
+//! Cargo feature flags. Components are organized into focused packages to allow
+//! selective inclusion based on application needs. The standalone color system
+//! now lives under [`crate::colors`].
 //!
 //! ## Feature Flags:
-//! - `visual`: Base feature required for all visual components
+//! - `visual`: Base feature for glyphs, prompts, and macros (enables colors-core)
 //! - `colors-simple`: Basic 8-16 colors (red, green, blue, etc.)
 //! - `colors-named`: Extended named colors (crimson, azure, emerald) - includes simple
 //! - `colors-status`: Status-specific colors (magic, trace, note, silly, error, success)
@@ -22,15 +23,12 @@
 //!
 //! ```rust
 //! // Explicit import - not included in prelude
-//! use rsb::visual::colors::colorize;
+//! use rsb::colors::colorize;
 //! use rsb::visual::prompts::*;
 //!
 //! let colored_text = colorize("Hello", "red");
 //! let response = confirm("Continue?");
 //! ```
-
-#[cfg(feature = "visual")]
-pub mod colors;
 
 #[cfg(feature = "glyphs")]
 pub mod glyphs;
@@ -45,15 +43,6 @@ pub mod utils;
 pub mod macros;
 
 // Re-export commonly used items when features are enabled
-#[cfg(feature = "colors-simple")]
-pub use colors::simple::*;
-
-#[cfg(feature = "colors-named")]
-pub use colors::named::*;
-
-#[cfg(feature = "colors-status")]
-pub use colors::status::*;
-
 #[cfg(feature = "glyphs")]
 pub use glyphs::*;
 
@@ -72,3 +61,7 @@ pub use crate::{
     ask, ask_timeout, confirm, confirm_default, confirm_timeout, prompt, prompt_timeout, select,
     select_timeout,
 };
+
+#[cfg(feature = "colors-core")]
+#[deprecated(note = "use `rsb::colors` directly")]
+pub use crate::colors;

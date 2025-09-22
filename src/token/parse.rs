@@ -4,10 +4,7 @@
 //! quote stripping, and comprehensive error handling.
 
 use super::helpers::{
-    strip_quotes_internal,
-    validate_key_parts,
-    validate_no_trailing_spaces,
-    validate_token_format,
+    strip_quotes_internal, validate_key_parts, validate_no_trailing_spaces, validate_token_format,
 };
 use super::types::{Token, TokenError, TokenResult, TokenStreamable};
 

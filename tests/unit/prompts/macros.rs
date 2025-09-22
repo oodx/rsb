@@ -1,6 +1,6 @@
 #![cfg(feature = "prompts")]
 use rsb::prelude::*;
-use rsb::{confirm, confirm_default, ask, select};
+use rsb::{ask, confirm, confirm_default, select};
 
 fn setup_test_context() {
     // Ensure clean state

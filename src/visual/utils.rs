@@ -27,7 +27,7 @@ pub use crate::visual::prompts::utils::{
 
 // Future: Other visual utils can be added here
 // #[cfg(feature = "colors")]
-// pub use crate::visual::colors::utils::*;
+// pub use crate::colors::utils::*;
 
 // #[cfg(feature = "glyphs")]
 // pub use crate::visual::glyphs::utils::*;

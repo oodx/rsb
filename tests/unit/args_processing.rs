@@ -6,4 +6,3 @@ fn args_processing_stub() {
     let args = Args::new(&raw);
     assert_eq!(args.get(1), "--flag");
 }
-

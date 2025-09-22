@@ -4,11 +4,11 @@ Status: Completed
 Date: 2025-09-15
 
 Docs: docs/tech/features/FEATURES_COLORS.md
-Modules: src/visual/colors/{mod.rs, registry.rs, simple.rs, status.rs}
+Modules: src/colors/{mod.rs, registry.rs, simple.rs, status.rs}
 Tests: tests/features/colors/{sanity.rs, runtime.rs}; UAT under tests/uat/colors*.rs and tests/uat/visual.rs
 
 Gaps/Findings
-- Feature-gated; ensure no leakage via prelude; require explicit `use rsb::visual::colors::*`.
+- Feature-gated; ensure no leakage via prelude; require explicit `use rsb::colors::*`.
 - Enabling `--features visuals` used to fail due to macro redefinitions (`error!` existed in both the visual bundle and `macros/stderr.rs`). Issue resolved by relocating the visual macros to `src/visual/macros.rs` and gating the core fallbacks behind `#[cfg(not(feature = "visual"))]`.
 - Verify runtime toggles and glyph integration behind features.
 

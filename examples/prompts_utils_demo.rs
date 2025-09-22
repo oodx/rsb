@@ -94,7 +94,7 @@ fn main() {
 
         #[cfg(feature = "colors-simple")]
         {
-            use rsb::visual::colors::colored;
+            use rsb::colors::colored;
             println!(
                 "\n{}",
                 colored("{green}🎯 MODULE_SPEC Compliant Architecture Complete!{reset}")

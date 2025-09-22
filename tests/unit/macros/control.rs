@@ -18,7 +18,7 @@ fn control_and_validation_macros() {
     assert!(matched);
 
     // for_in over array
-    set_array("ARR", &["x","y","z"]);
+    set_array("ARR", &["x", "y", "z"]);
     let mut acc = String::new();
     for_in!(val in "ARR" => { acc.push_str(&get_var("val")); });
     assert_eq!(acc, "xyz");

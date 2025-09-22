@@ -1,8 +1,13 @@
-#![cfg(feature = "visual")]
+#![cfg(all(
+    feature = "colors-simple",
+    feature = "colors-status",
+    feature = "colors-named"
+))]
 // moved from tests/sanity-colors-runtime.rs
-use rsb::visual::colors::{color_mode, color_enable_with, color, bg};
-use rsb::visual::colors::get_all_colors;
+#[cfg(feature = "visual")]
 use rsb::colored;
+use rsb::colors::get_all_colors;
+use rsb::colors::{bg, color, color_enable_with, color_mode};
 
 #[test]
 fn bg_disabled_by_default() {
@@ -32,6 +37,7 @@ fn color_mode_never_disables_output() {
     color_mode("always");
 }
 
+#[cfg(feature = "visual")]
 #[test]
 fn glyph_tag_kept_when_not_enabled() {
     let s = colored!("pre {g:pass} post");
@@ -52,4 +58,3 @@ fn registry_count_when_enabled() {
     let all = get_all_colors();
     assert!(all.len() >= 90);
 }
-

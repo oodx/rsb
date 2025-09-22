@@ -2,7 +2,10 @@ use rsb::prelude::*;
 
 #[test]
 fn test_string_case_helpers() {
-    assert_eq!(rsb::string::to_snake_case("HTTP server ID"), "http_server_id");
+    assert_eq!(
+        rsb::string::to_snake_case("HTTP server ID"),
+        "http_server_id"
+    );
     assert_eq!(rsb::string::to_kebab_case("User Name 42"), "user-name-42");
     assert_eq!(rsb::string::to_dot_case("Log File Name"), "log.file.name");
     assert_eq!(rsb::string::to_space_case("My File NAME"), "my file name");

@@ -28,6 +28,10 @@ pub mod hosts;
 // EZ prelude for rapid prototyping
 pub mod prelude_ez;
 
+// Standalone colors package - behind feature flags
+#[cfg(feature = "colors-core")]
+pub mod colors;
+
 // Optional visual package - behind feature flags
 #[cfg(feature = "visual")]
 pub mod visual;

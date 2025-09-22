@@ -58,7 +58,7 @@ EVERY NEW MAJOR FEATURE NEEDS a `FEATURES_<NAME>.md` under `docs/tech/features/`
 ## 2.2: Progressive Enhancement Pattern
 - Prefer a small, stable macro/API surface with internal helpers organized for staged evolution.
 - Example: `param!` macro uses `rsb::param::basic` helpers under the hood; `param::advanced` holds future tracing/features.
-- Example: `visual::colors` exposes a runtime registry; named colors stay in a global HashMap (no enum) by stakeholder direction.
+- Example: `colors` exposes a runtime registry; named colors stay in a global HashMap (no enum) by stakeholder direction.
 
 ## 2.3: Module‑Owned Macros and Orchestrators
 - **New policy**: each domain module owns its macros under `<module>/macros.rs` and exposes functions via `<module>/helpers.rs`.
