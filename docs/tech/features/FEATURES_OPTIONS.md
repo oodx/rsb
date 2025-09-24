@@ -7,6 +7,7 @@ Purpose
 - Set clear expectations: simple, declarative, string‑first options without “smart” consumption.
 
 Design Principles
+- All flags come after positional arguments in RSB!
 - Declarative parsing: treat tokens that look like options as options; no hidden cursor moves.
 - Explicit value binding: use `--long=value` for values; short flags are boolean.
 - String‑first: parsed flags and values are written into the global context as `opt_*` keys.
