@@ -106,23 +106,30 @@
   - Documented all integration patterns and usage
 
 **Phase 4: Testing** [5 SP]
-- [ ] REPL-09: Sanity Tests [2 SP]
-  - Test Args::from_line() tokenization
-  - Test pattern preservation (tokens, lists, streams)
-  - Test global storage (repl_arg_*)
-  - Test built-in commands
-  - Test ReplParser trait
-- [ ] REPL-10: UAT Tests [3 SP]
-  - Test full REPL loop
-  - Test dynamic prompts
-  - Test error handling
-  - Test integration with dispatch!
+- [x] REPL-09: Sanity Tests [2 SP] ✅ (Already complete)
+  - 35 sanity tests covering all features
+  - Args::from_line() tokenization tests
+  - Pattern preservation tests (tokens, lists, streams)
+  - Global storage tests (repl_arg_*)
+  - Built-in commands tests
+  - ReplParser trait tests
+  - Macro tests (repl_arg!, repl_argc!, etc.)
+- [x] REPL-10: UAT Tests [3 SP] ✅
+  - 7 UAT tests with visual demonstrations
+  - Pattern preservation demo
+  - REPL macros demo
+  - Built-in commands demo
+  - Dynamic prompts demo
+  - Error handling demo
+  - Global storage demo
 
 **Phase 5: Documentation** [3 SP]
-- [ ] REPL-11: Documentation [3 SP]
-  - Create docs/FEATURES_REPL.md
-  - Update docs/HOWTO.md with REPL patterns
-  - Module docs, macro usage, integration patterns
+- [x] REPL-11: Documentation [3 SP] ✅ (Already complete in REPL-08)
+  - Created docs/feats/FEATURES_REPL.md (comprehensive guide)
+  - Created examples/repl_demo.rs (full integration example)
+  - Module docs with examples
+  - Macro usage guide
+  - Integration patterns documented
 
 #### PRIORITY 2: OPPORTUNISTIC/BACKLOG
 
