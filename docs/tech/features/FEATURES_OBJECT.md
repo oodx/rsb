@@ -469,6 +469,54 @@ mod tests {
 - [FEATURES_STRINGS.md](FEATURES_STRINGS.md) - String manipulation utilities
 - [IDEAS_IMPLEMENTATION_PLAN.md](../proposals/IDEAS_IMPLEMENTATION_PLAN.md) - Implementation proposal
 
+## Code Inventory
+
+Once the Object module is implemented, run:
+```bash
+python3 bin/feat.py object --update-doc
+```
+
+This will populate the code inventory below with actual exports from `src/object/`.
+
+**Note**: After implementation, update `FEATURE_MAP` in `bin/feat.py` to include:
+```python
+'object': ['src/object', 'src/macros/object.rs'],
+```
+
+<!-- feat:object -->
+_Module not yet implemented. This section will be auto-populated by bin/feat.py once src/object/ exists._
+
+### Planned Exports
+
+Based on the design, the module will export:
+
+**Core Types**
+- `struct Object<T>` - Generic object with phantom type
+- `type AnyObject = Object<()>` - Untyped object alias
+- `type HubConfig = Object<HubShape>` - Hub configuration type
+- `type InfConfig = Object<InfShape>` - Inf configuration type
+- `type RsbConfig = Object<RsbShape>` - RSB configuration type
+
+**Marker Types**
+- `struct HubShape` - Phantom type for hub config
+- `struct InfShape` - Phantom type for inf config
+- `struct RsbShape` - Phantom type for rsb config
+
+**Functions**
+- `fn get_object<T>(namespace: &str) -> Object<T>` - Create object from namespace
+- `fn get_hub() -> Object<HubShape>` - Get hub configuration object
+- `fn get_inf() -> Object<InfShape>` - Get inf configuration object
+- `fn get_rsb() -> Object<RsbShape>` - Get rsb configuration object
+
+**Macros**
+- `hub_config!` - Get value from hub namespace
+- `inf_config!` - Get value from inf namespace
+- `rsb_config!` - Get value from rsb namespace
+- `get_hub!` - Get hub Object
+- `get_inf!` - Get inf Object
+- `get_rsb!` - Get rsb Object
+<!-- /feat:object -->
+
 ---
 
 *Generated for RSB v2.0 - Object Feature*
