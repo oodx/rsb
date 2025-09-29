@@ -5,20 +5,19 @@
 - ✅ **RSB Test Modernization**: ALL 10 modules now have modern sanity tests
 - ✅ **API Modernization**: Fixed all compilation errors, 61+ working tests
 - ✅ **Test Infrastructure**: Complete orchestrator system functional
+
+#### RSB v2.0 Enhancement Suite Phase 1 ✅ COMPLETE
 - ✅ **Object<T> Module**: Generic configuration object with Index trait [10 SP]
 - ✅ **Clear Globals**: Global store cleanup with protected keys [5 SP]
 - ✅ **CLI Args to Global**: Bootstrap integration with 1-based indexing [5 SP]
+- ✅ **Options Cleanup**: OptionsStrategy enum with Default/Sort/Remove strategies [10 SP]
+  - ✅ Create OptionsStrategy enum (Default/Sort/Remove) [2 SP]
+  - ✅ Implement apply_options_strategy() method [3 SP]
+  - ✅ Add flag boundary validation [2 SP]
+  - ✅ Load strategy from RSB config (RSB_OPTIONS_MODE/rsb_options_mode) [2 SP]
+  - ✅ Maintain backward compatibility [1 SP]
 
-### IN PROGRESS - RSB v2.0 Enhancement Suite 🔄
-
-#### PRIORITY 1: FOUNDATION REMAINING WORK (Phase 1 wrap-up)
-
-**TASK 1.4: Options Cleanup** [10 SP] 🚩 IN PROGRESS
-- [ ] Create OptionsStrategy enum (Default/Sort/Remove) [2 SP]
-- [ ] Implement apply_options_strategy() method [3 SP]
-- [ ] Add flag boundary validation [2 SP]
-- [ ] Load strategy from RSB config (via TOML) [2 SP]
-- [ ] Maintain backward compatibility [1 SP]
+### IN PROGRESS - RSB v2.0 Enhancement Suite Phase 2 🔄
 
 #### PRIORITY 2: UPCOMING STAKEHOLDER FEATURES (Phase 2 / 3)
 
