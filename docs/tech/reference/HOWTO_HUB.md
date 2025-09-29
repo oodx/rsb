@@ -1,4 +1,4 @@
-# HOWTO: Hub Integration Guide
+# HOWTO: Hub Integration Guide v2
 
 ## Overview
 Hub is a centralized dependency management system for the oodx/RSB ecosystem that uses feature flags to provide modular, conflict-free dependency management with clean namespace separation between internal and external dependencies.
@@ -316,6 +316,300 @@ features = ["tokio-full", "clap-full"]
 # Transitive deps: More dependencies but maximum capability
 # Perfect for: production services needing full feature sets
 ```
+
+## Shaped Export Modules
+
+Hub provides **shaped export modules** for high-usage dependencies that need feature-gated access or convenience enhancements. These are dedicated source files that curate how packages are exported.
+
+### What Are Shaped Exports?
+
+Instead of simple passthrough re-exports (`pub use serde;`), shaped modules create a dedicated file like `src/serde.rs` that:
+- Re-exports the entire crate with `pub use crate::*`
+- Explicitly re-exports key items for better IDE support
+- Provides feature-gated access to optional functionality
+- Adds convenience type aliases and helpers
+- Combines related packages (like error handling)
+
+### Philosophy: Simple vs Shaped
+
+**Traditional re-exports** are simple (`pub use serde;`) but limited - no customization, no convenience items.
+
+**Shaped exports** provide a curated layer that:
+- ✅ Improves IDE autocomplete with explicit re-exports
+- ✅ Adds type aliases and helpers for common patterns
+- ✅ Gates optional features (derive macros, lite/full variants)
+- ✅ Documents hub-specific usage patterns
+- ✅ Still provides full crate access
+
+### When Hub Shapes a Module
+
+Not every dependency gets shaped. Hub uses these criteria:
+
+✅ **Good candidates:**
+- High usage (5+ projects in ecosystem)
+- Complex features (lite/full variants, derive macros)
+- Common patterns benefit from type aliases
+- Related packages work better combined (anyhow + thiserror)
+
+❌ **Remains simple re-export:**
+- Low usage (1-2 projects)
+- Simple passthrough with no features
+- No convenience patterns needed
+
+### Current Shaped Modules
+
+| Module | Usage | Why Shaped |
+|--------|-------|------------|
+| `serde` | 10 projects | High usage + derive feature gating |
+| `serde_json` | 7 projects | High usage + type aliases (Value, Map) |
+| `chrono` | 7 projects | Common types + convenience prelude |
+| `regex` | 5 projects | Common patterns + Result type alias |
+| `thiserror` | 5 projects | Part of combined error module |
+| `tokio` | 4 projects | Lite/full variants + common utilities |
+| `clap` | 4 projects | Lite/full variants + derive feature gating |
+| `error` | Combined | Merges anyhow + thiserror for unified error handling |
+| `colors` | Internal | Hub's own RSB color system |
+
+### Available Shaped Modules
+
+#### `hub::serde` - Serialization Framework
+```toml
+# Cargo.toml - Feature options
+features = ["serde"]           # Base traits only
+features = ["serde-derive"]    # With Serialize/Deserialize macros
+features = ["serde-full"]      # All serde features
+```
+
+```rust
+// Usage with derive macros
+use hub::serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize)]
+struct Config {
+    name: String,
+}
+```
+
+**Why Shaped**: Projects need granular control over derive macros without forcing them on everyone.
+
+#### `hub::serde_json` - JSON Serialization
+```toml
+features = ["serde-json"]      # JSON support
+features = ["json"]            # Convenience: serde-derive + serde-json
+```
+
+```rust
+// Convenience type aliases
+use hub::serde_json::{Value, Map};
+
+let mut data: Map = Map::new();
+data.insert("key".to_string(), Value::String("value".to_string()));
+
+// Explicit re-exports for IDE support
+use hub::serde_json::{from_str, to_string, from_value, to_value};
+```
+
+**Why Shaped**: Provides type aliases like `Map<K=String, V=Value>` for cleaner code and better IDE autocomplete.
+
+#### `hub::error` - Combined Error Handling
+```toml
+features = ["error"]           # Base error module
+features = ["anyhow"]          # Flexible error handling
+features = ["thiserror"]       # Error derive macros
+features = ["error-ext"]       # Convenience: anyhow + thiserror
+```
+
+```rust
+// Unified error handling with both anyhow and thiserror
+use hub::error::{Result, anyhow, thiserror};
+
+#[derive(thiserror::Error, Debug)]
+enum MyError {
+    #[error("IO error: {0}")]
+    Io(#[from] std::io::Error),
+}
+
+fn example() -> Result<()> {
+    anyhow::bail!("something went wrong");
+}
+
+// Convenience type aliases
+type Result<T> = hub::error::Result<T>;  // anyhow::Result
+type Error = hub::error::Error;          // anyhow::Error
+```
+
+**Why Shaped**: Combines anyhow (flexible errors) and thiserror (derive macros) since they're always used together.
+
+#### `hub::chrono` - Date/Time Handling
+```toml
+features = ["chrono"]           # Base date/time (lite variant)
+features = ["chrono-full"]      # With serialization support
+```
+
+```rust
+// Common types with explicit re-exports
+use hub::chrono::{DateTime, Utc, Local, Duration, NaiveDateTime};
+
+let now: DateTime<Utc> = Utc::now();
+let duration = Duration::hours(2);
+
+// Or use the prelude for everything
+use hub::chrono::prelude::*;
+```
+
+**Why Shaped**: Provides explicit common types for better IDE support and convenience prelude module.
+
+#### `hub::regex` - Regular Expressions
+```toml
+features = ["regex"]            # Pattern matching
+```
+
+```rust
+// Common types and Result alias
+use hub::regex::{Regex, RegexBuilder, Captures};
+use hub::regex::Result;  // Instead of Result<T, regex::Error>
+
+fn parse(input: &str) -> Result<Vec<String>> {
+    let re = Regex::new(r"\d+")?;
+    Ok(re.find_iter(input).map(|m| m.as_str().to_string()).collect())
+}
+```
+
+**Why Shaped**: Provides common pattern types and Result alias for cleaner error handling.
+
+#### `hub::tokio` - Async Runtime
+```toml
+features = ["tokio"]            # Basic async runtime (lite variant)
+features = ["tokio-lite"]       # Explicit lite: rt, macros
+features = ["tokio-full"]       # Full: networking, filesystem, etc.
+```
+
+```rust
+// Common utilities (lite)
+use hub::tokio;
+
+#[tokio::main]
+async fn main() {
+    tokio::spawn(async { /* ... */ }).await;
+}
+
+// Full variant includes networking, filesystem, etc.
+// Requires tokio-full feature:
+// use hub::tokio::net::TcpListener;
+// use hub::tokio::fs;
+```
+
+**Why Shaped**: Provides lite/full variants for performance control with common runtime utilities.
+
+#### `hub::clap` - CLI Argument Parsing
+```toml
+features = ["clap"]             # Builder API (lite variant)
+features = ["clap-lite"]        # Explicit lite: builder API only
+features = ["clap-full"]        # Full: derive macros, env support
+```
+
+```rust
+// Lite: Builder API
+use hub::clap::{Command, Arg};
+
+let app = Command::new("myapp")
+    .arg(Arg::new("input").short('i'));
+
+// Full: Derive API (requires clap-full)
+use hub::clap::Parser;
+
+#[derive(Parser)]
+struct Cli {
+    #[arg(short, long)]
+    input: String,
+}
+```
+
+**Why Shaped**: Provides lite/full variants to avoid heavy derive compilation when not needed.
+
+### Shaped vs Simple Re-exports
+
+| Feature | Simple Re-export | Shaped Export |
+|---------|------------------|---------------|
+| Implementation | `pub use serde;` | Dedicated `src/serde.rs` file |
+| Feature gating | No granular control | Feature-specific items |
+| Type aliases | Not possible | Convenience aliases provided |
+| IDE support | Basic | Enhanced with explicit re-exports |
+| Customization | None | Can add hub-specific helpers |
+
+### Using Shaped Modules
+
+Shaped modules work like any other hub export:
+
+```rust
+// Top-level access
+use hub::serde::{Serialize, Deserialize};
+use hub::serde_json::{Value, Map};
+use hub::error::{Result, anyhow};
+use hub::chrono::{DateTime, Utc};
+use hub::regex::{Regex, Captures};
+use hub::tokio;
+use hub::clap::{Command, Arg};
+
+// Domain module access
+use hub::data_ext::serde;
+use hub::data_ext::serde_json;
+use hub::error_ext::error;
+use hub::time_ext::chrono;
+use hub::text_ext::regex;
+use hub::async_ext::tokio;
+use hub::cli_ext::clap;
+```
+
+### Feature Forwarding Pattern
+
+Shaped modules use **feature forwarding** where hub features map to underlying crate features:
+
+```toml
+# Hub feature flags forward to crate features
+serde = ["dep:serde"]
+serde-derive = ["serde", "serde/derive"]
+serde-json = ["serde", "dep:serde_json"]
+json = ["serde-derive", "serde-json"]
+
+# Gives you granular control
+features = ["serde"]           # Just traits
+features = ["serde-derive"]    # Traits + macros
+features = ["json"]            # Full JSON stack
+```
+
+### When to Use Shaped Modules
+
+✅ **Use shaped modules for:**
+- High-usage dependencies (5+ projects)
+- Packages with complex feature sets
+- Common patterns that benefit from type aliases
+- Combined functionality (error handling)
+
+❌ **Simple re-exports for:**
+- Low-usage dependencies (1-2 projects)
+- Simple passthrough with no features
+- No convenience needed
+
+### Implementation Guidelines
+
+Shaped modules follow hub's standardized pattern:
+
+1. **Module file**: Create `src/package_name.rs` with full re-export (`pub use package::*;`)
+2. **Feature gates**: Use `#[cfg(feature = "...")]` for optional items
+3. **Type aliases**: Add common type aliases for cleaner code
+4. **Explicit re-exports**: Improve IDE support with commonly used items
+5. **Documentation**: Document features and common usage patterns
+
+### Learn More
+
+For complete documentation on the shaping paradigm, including:
+- Detailed philosophy and decision trees
+- Implementation patterns and guidelines
+- Real-world examples and testing strategies
+- Maintenance schedule and quality criteria
+
+See **[docs/SHAPING_PARADIGM.md](../SHAPING_PARADIGM.md)** - comprehensive guide to hub's shaped export system.
 
 ## Benefits
 
@@ -704,6 +998,8 @@ Hub embodies a **controlled integration** approach to dependency management with
 - **Lean by Default**: Lite variants provide fast builds and small binaries as the starting point
 - **Power When Needed**: Full variants available for advanced functionality without compromise
 - **Project Control**: Teams can compose exactly the feature set they need
+- **Shaped Exports**: High-usage dependencies get curated convenience layers with feature gating and type aliases
+- **Simple Passthrough**: Low-usage dependencies remain direct re-exports without overhead
 
 ### The Lite/Full Balance
 
@@ -714,4 +1010,14 @@ Hub's philosophy balances efficiency with capability:
 - **Compose Flexibly**: Mix lite and full variants based on actual project needs, not theoretical maximums
 - **Optimize Continuously**: Regular profiling of build times and binary sizes guides optimal feature selection
 
-Hub: *One crate to rule them all, one crate to find them, one crate to bring them all, and in the ecosystem bind them - but with clear separation between internal and external, and intelligent defaults that scale from lean to powerful.* 📦✨⚡
+### The Shaped Export Philosophy
+
+Hub shapes exports strategically based on usage and value:
+
+- **High-Value Shaping**: Packages with 5+ project usage get curated convenience layers
+- **Feature Gating**: Optional functionality (derive macros, lite/full variants) controlled at hub level
+- **Convenience Without Opinions**: Type aliases and explicit re-exports improve developer experience
+- **Combined Modules**: Related packages (anyhow + thiserror) unified when always used together
+- **Simple When Sufficient**: Low-usage dependencies remain direct re-exports without overhead
+
+Hub: *One crate to rule them all, one crate to find them, one crate to bring them all, and in the ecosystem bind them - but with clear separation between internal and external, intelligent defaults that scale from lean to powerful, and curated convenience layers where they matter most.* 📦✨⚡

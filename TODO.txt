@@ -1,4 +1,0 @@
-
-- either auto sort flags so they go after positional arguments in the Args array or remove them after theyve been processed.
-
-- support REPL, add clear global store (maybe with filters)
