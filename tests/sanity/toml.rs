@@ -29,6 +29,60 @@ fn sanity_default_namespaces() {
 
 #[test]
 #[serial]
+fn sanity_re_snooping_removes_stale_keys() {
+    use rsb::global::{get_var, has_var};
+
+    // First pass: array with 3 elements
+    let test_toml_v1 = r#"
+[package]
+name = "test"
+version = "0.1.0"
+
+[package.metadata.hub]
+features = ["auth", "cache", "metrics"]
+api_url = "https://api.example.com"
+"#;
+
+    let test_dir = setup_test_toml(test_toml_v1);
+    let original_dir = env::current_dir().unwrap();
+    env::set_current_dir(&test_dir).unwrap();
+
+    enable_toml_snooping();
+
+    // Verify first pass
+    assert_eq!(get_var("hub_features_LENGTH"), "3");
+    assert_eq!(get_var("hub_features_0"), "auth");
+    assert_eq!(get_var("hub_features_1"), "cache");
+    assert_eq!(get_var("hub_features_2"), "metrics");
+    assert_eq!(get_var("hub_api_url"), "https://api.example.com");
+
+    // Second pass: array shrinks to 1 element, api_url removed
+    let test_toml_v2 = r#"
+[package]
+name = "test"
+version = "0.1.0"
+
+[package.metadata.hub]
+features = ["auth"]
+"#;
+
+    fs::write(test_dir.join("Cargo.toml"), test_toml_v2).unwrap();
+    enable_toml_snooping();
+
+    // Verify stale keys are removed
+    assert_eq!(get_var("hub_features_LENGTH"), "1");
+    assert_eq!(get_var("hub_features_0"), "auth");
+    assert!(!has_var("hub_features_1")); // Stale index removed
+    assert!(!has_var("hub_features_2")); // Stale index removed
+    assert!(!has_var("hub_api_url"));    // Removed key
+
+    // Cleanup
+    env::set_current_dir(&original_dir).unwrap();
+    cleanup_test_dir(&test_dir);
+}
+
+#[test]
+#[serial]
 fn sanity_enable_toml_snooping() {
     // Create test environment
     let test_toml = r#"

@@ -3,10 +3,11 @@
 //! This module contains the core implementation for extracting metadata
 //! from Cargo.toml files. All implementation logic lives here.
 
+use std::collections::HashSet;
 use std::path::PathBuf;
 use toml::Value;
 
-use crate::global::set_var;
+use crate::global::{set_var, unset_var};
 use crate::string::to_snake_case;
 
 /// TOML Snooper for extracting metadata sections from Cargo.toml
@@ -14,6 +15,8 @@ use crate::string::to_snake_case;
 pub struct TomlSnooper {
     pub(crate) enabled: bool,
     pub(crate) namespaces: Vec<String>,
+    // Track keys written per namespace to enable cleanup on re-snooping
+    written_keys: HashSet<String>,
 }
 
 impl TomlSnooper {
@@ -22,13 +25,24 @@ impl TomlSnooper {
         Self {
             enabled: false,
             namespaces: vec!["hub".into(), "inf".into(), "rsb".into()],
+            written_keys: HashSet::new(),
         }
     }
 
     /// Enable snooping and extract metadata from Cargo.toml
     pub fn enable(&mut self) {
         self.enabled = true;
+        // Clear previously written keys before re-snooping
+        self.clear_previous_keys();
         self.snoop_cargo_toml();
+    }
+
+    /// Clear all keys that were written in previous snooping operations
+    fn clear_previous_keys(&mut self) {
+        for key in &self.written_keys {
+            unset_var(key);
+        }
+        self.written_keys.clear();
     }
 
     /// Add a custom namespace to snoop
@@ -39,7 +53,7 @@ impl TomlSnooper {
     }
 
     /// Main snooping logic - find and parse Cargo.toml
-    fn snoop_cargo_toml(&self) {
+    fn snoop_cargo_toml(&mut self) {
         match find_cargo_toml() {
             Ok(cargo_path) => {
                 if let Ok(content) = std::fs::read_to_string(&cargo_path) {
@@ -56,8 +70,8 @@ impl TomlSnooper {
     }
 
     /// Extract metadata sections from parsed TOML
-    fn extract_metadata(&self, toml: &Value) {
-        for namespace in &self.namespaces {
+    fn extract_metadata(&mut self, toml: &Value) {
+        for namespace in &self.namespaces.clone() {
             if let Some(metadata) = toml
                 .get("package")
                 .and_then(|p| p.get("metadata"))
@@ -69,7 +83,7 @@ impl TomlSnooper {
     }
 
     /// Store namespace values in global store with snake_case conversion
-    fn store_namespace_values(&self, namespace: &str, values: &Value) {
+    fn store_namespace_values(&mut self, namespace: &str, values: &Value) {
         if let Value::Table(table) = values {
             for (key, value) in table {
                 // Convert key to snake_case
@@ -78,13 +92,28 @@ impl TomlSnooper {
 
                 // Store based on value type
                 match value {
-                    Value::String(s) => set_var(&global_key, s),
-                    Value::Integer(i) => set_var(&global_key, &i.to_string()),
-                    Value::Boolean(b) => set_var(&global_key, if *b { "true" } else { "false" }),
-                    Value::Float(f) => set_var(&global_key, &f.to_string()),
+                    Value::String(s) => {
+                        set_var(&global_key, s);
+                        self.written_keys.insert(global_key.clone());
+                    }
+                    Value::Integer(i) => {
+                        set_var(&global_key, &i.to_string());
+                        self.written_keys.insert(global_key.clone());
+                    }
+                    Value::Boolean(b) => {
+                        set_var(&global_key, if *b { "true" } else { "false" });
+                        self.written_keys.insert(global_key.clone());
+                    }
+                    Value::Float(f) => {
+                        set_var(&global_key, &f.to_string());
+                        self.written_keys.insert(global_key.clone());
+                    }
                     Value::Array(arr) => {
                         // Store array using RSB convention: LENGTH + indexed
-                        set_var(&format!("{}_LENGTH", global_key), &arr.len().to_string());
+                        let length_key = format!("{}_LENGTH", global_key);
+                        set_var(&length_key, &arr.len().to_string());
+                        self.written_keys.insert(length_key);
+
                         for (i, item) in arr.iter().enumerate() {
                             let item_value = match item {
                                 Value::String(s) => s.clone(),
@@ -99,7 +128,9 @@ impl TomlSnooper {
                                 Value::Float(f) => f.to_string(),
                                 _ => continue, // Skip complex nested types
                             };
-                            set_var(&format!("{}_{}", global_key, i), &item_value);
+                            let indexed_key = format!("{}_{}", global_key, i);
+                            set_var(&indexed_key, &item_value);
+                            self.written_keys.insert(indexed_key);
                         }
                     }
                     _ => {

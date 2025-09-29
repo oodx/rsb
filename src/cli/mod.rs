@@ -21,5 +21,8 @@ pub use bootstrap::*;
 mod options;
 pub use options::*;
 
+mod flags;
+pub use flags::*;
+
 // Keep module-owned macros compiled/included.
 pub mod macros;

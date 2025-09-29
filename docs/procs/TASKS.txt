@@ -21,20 +21,23 @@
 
 #### PRIORITY 1: ACTIVE IMPLEMENTATION
 
-**TASK 2.2: TOML Snooping** [15 SP] 🔥 CURRENT PRIORITY
-- [ ] Create src/toml/mod.rs module with TomlSnooper [3 SP]
-- [ ] Extract [package.metadata.rsb/hub/inf] sections [4 SP]
-- [ ] Store namespace values with snake_case conversion [3 SP]
-- [ ] Handle arrays using RSB convention (LENGTH + indexed) [2 SP]
-- [ ] Integrate with bootstrap! macro variants [3 SP]
-
-#### PRIORITY 2: UPCOMING STAKEHOLDER FEATURES (Phase 2 / 3)
-
-**TASK 2.1: Flag Commands** [10 SP]
+**TASK 2.1: Flag Commands** [10 SP] 🔥 CURRENT PRIORITY
 - [ ] Create FlagCommand struct and registry [3 SP]
 - [ ] Implement execute_flag_commands() [3 SP]
 - [ ] Add default --version and --help handlers [2 SP]
 - [ ] Integrate with dispatch! macro [2 SP]
+
+#### RECENTLY COMPLETED ✅
+
+**TASK 2.2: TOML Snooping** [15 SP] ✅ COMPLETE
+- ✅ Create src/toml/mod.rs module with TomlSnooper [3 SP]
+- ✅ Extract [package.metadata.rsb/hub/inf] sections [4 SP]
+- ✅ Store namespace values with snake_case conversion [3 SP]
+- ✅ Handle arrays using RSB convention (LENGTH + indexed) [2 SP]
+- ✅ Integrate with bootstrap! macro variants [3 SP]
+- ✅ Fix stale global values bug (key tracking cleanup) [BONUS]
+
+#### PRIORITY 2: UPCOMING STAKEHOLDER FEATURES (Phase 3)
 
 **TASK 3.1: REPL Support** [20 SP]
 - [ ] Create src/repl/mod.rs module [3 SP]
@@ -146,7 +149,36 @@
   - Document deps.rs bridge pattern
   - Add migration guide for RSB consumers
 
+**Enhanced Bootstrap Features** [NEW]
+- [ ] BOOTSTRAP-01: Config file loading in bootstrap macro [5 SP]
+  - Add bootstrap!(config: "path") variant
+  - Support multiple sources: bootstrap!(toml, config: "app.conf")
+  - Order matters: later sources override earlier
+  - Integration with existing load_config_file() in global::config
+- [ ] BOOTSTRAP-02: Default --config flag support [3 SP]
+  - Add standard --config=path flag handling
+  - Auto-load config file during bootstrap if flag present
+  - Document interaction with bootstrap!(config:) macro
+  - Precedence: CLI flags > config file > TOML > env
+
 **Enhanced Dispatch Features**
+
+**Help Router/Dispatcher System** [NEW]
+- [ ] HELP-01: Create help router module [8 SP]
+  - Create src/help/router.rs with routing logic
+  - Support multiple help sources (constants, lang strings, external docs)
+  - Route help requests: help <topic> → appropriate source
+  - Integration with flag commands (prog topic --help routing)
+- [ ] HELP-02: Help sources system [5 SP]
+  - Constants-based help (HELP_BUILD, HELP_CONFIG, etc.)
+  - External docs loading (markdown, text files)
+  - Lang string support for i18n
+  - Fallback hierarchy: specific → generic → "no help available"
+- [ ] HELP-03: Help formatters [3 SP]
+  - Plain text output (default)
+  - JSON format (--format=json for API docs)
+  - Markdown rendering option
+  - Color/glyph support for terminal output
 
 **Developer Experience**
 - [ ] Init Functions: init_with_checks!, init_or_exit! macros [8 SP]

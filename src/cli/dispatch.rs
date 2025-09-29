@@ -12,6 +12,7 @@ pub type CommandHandler = fn(Args) -> i32;
 /// Internal helper for dispatch macro - handles all dispatch logic.
 ///
 /// This function contains all the business logic that was previously in the macro:
+/// - Flag command checking (--help, --version) - NEW in v2.0
 /// - Command extraction and argument processing
 /// - Handler registration for introspection
 /// - Built-in command handling (help, inspect, stack)
@@ -21,6 +22,10 @@ pub fn execute_dispatch<F>(args: &Args, handler_lookup: F)
 where
     F: Fn(&str) -> Option<CommandHandler>,
 {
+    // NEW: Check flag commands first (--help, --version)
+    if let Some(exit_code) = crate::cli::check_flag_commands(args) {
+        std::process::exit(exit_code);
+    }
     let command = args.get_or(1, "help");
     let mut cmd_args = args.clone();
     cmd_args.has_pop(&command);
