@@ -16,6 +16,9 @@ mod core;
 #[path = "sanity/global_adapter.rs"]
 mod global_adapter;
 
+#[path = "sanity/global_clear.rs"]
+mod global_clear;
+
 #[path = "sanity/host_env.rs"]
 mod host_env;
 
@@ -76,6 +79,11 @@ mod math;
 #[path = "sanity/global.rs"]
 mod global;
 
+// Colors module sanity tests (visual primitives without ceremony)
+#[cfg(feature = "colors-core")]
+#[path = "sanity/colors.rs"]
+mod colors;
+
 // Progress module sanity tests
 #[path = "sanity/progress.rs"]
 mod progress;
@@ -91,6 +99,10 @@ mod gx;
 // CLI module sanity tests (MODERN - comprehensive Args and bootstrap functionality)
 #[path = "sanity/cli.rs"]
 mod cli;
+
+// CLI args to global tests (v0.7.0+)
+#[path = "sanity/cli_args.rs"]
+mod cli_args;
 
 // Param module sanity tests (MODERN - parameter expansion and context operations)
 #[path = "sanity/param.rs"]

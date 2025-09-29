@@ -374,11 +374,216 @@ proptest! {
 - Don't parse values repeatedly (cache parsed values)
 - Don't rely on phantom types for runtime behavior
 
-## Future Enhancements
+## Planned Enhancements (QOL Tasks)
 
-### Potential Features
+### Core Improvements
+1. **Key Normalization Fix** (QOL-01) - Proper CamelCase → snake_case conversion
+   - Current: "CamelCase" → "camelcase" (incorrect)
+   - Fixed: "CamelCase" → "camel_case" (proper snake_case)
+
+2. **Macro Exports** (QOL-02) - Export Object macros in prelude
+   - `hub_config!`, `inf_config!`, `rsb_config!`
+   - `hub_object!`, `inf_object!`, `rsb_object!`
+
+3. **Additional Shape Types** (QOL-03) - More phantom types for common patterns
+   - `GenericShape` - for general-purpose property bags
+   - `JSONShape` - for JSON-style data structures
+   - `MeteorShape` - for Meteor data type representations
+   - Fix: `RsbShape` → `RSBShape` (proper capitalization)
+   - Type aliases: `GenericObject`, `JSONObject`, `MeteorObject`
+
+### API Extensions
+4. **Object Merging** (QOL-04) - `Object::merge()` for combining Objects
+   - Merge two Objects, with second overwriting conflicts
+   - Useful for layered configuration (defaults + overrides)
+
+5. **HashMap Constructor** (QOL-05) - `Object::from_map(HashMap)`
+   - Direct construction from existing HashMaps
+   - Enables easy conversion from other data structures
+
+6. **Iteration Helpers** (QOL-07)
+   - `iter()` - iterator over (key, value) pairs
+   - `filter_prefix(prefix)` - get subset with key prefix
+   - `to_vec()` - sorted key-value pairs for deterministic output
+
+7. **Display/Debug Enhancements** (QOL-08)
+   - Implement Display trait for pretty printing
+   - Format: `Object<namespace> { key1: "value1", key2: "value2" }`
+   - `dump()` method for enhanced debug output
+
+8. **Validation Helpers** (QOL-09)
+   - `require(key) -> Result<&str, Error>` - fail on missing keys
+   - `require_all(&[keys]) -> Result<(), Error>` - batch validation
+   - `is_empty()` and `len()` methods
+
+### ObjectLike Trait System (QOL-11)
+The most powerful enhancement - a trait system for polymorphic object patterns:
+
+```rust
+pub trait ObjectLike {
+    fn get(&self, key: &str) -> &str;
+    fn set(&mut self, key: impl Into<String>, value: impl Into<String>);
+    fn has(&self, key: &str) -> bool;
+    fn keys(&self) -> Vec<&str>;
+    fn namespace(&self) -> &str;
+
+    // Translation layer
+    fn to_object(&self) -> Object;
+    fn from_object(obj: &Object) -> Self;
+}
+```
+
+#### Benefits
+- **Universal Translation Layer** - Like `to_string()`/`from_str()` for configs
+- **Polymorphic APIs** - `fn process(cfg: &impl ObjectLike)`
+- **Testing** - Mock implementations for unit tests
+- **Adapters** - Bridge to HashMap, BTreeMap, JSON, TOML, etc.
+- **Dynamic Dispatch** - `Box<dyn ObjectLike>` for heterogeneous collections
+
+#### Translation Patterns
+```rust
+// Any config → Object
+let obj = external_config.to_object();
+
+// Object → Any format
+let map = HashMap::from_object(&obj);
+
+// Chain translations
+config.to_object()
+    .sync_to_global()
+    .to_object()
+    .to_json();
+```
+
+### Naming Consistency (QOL-10)
+- Decision needed: `InfShape` vs `INFShape`
+- Should match `RSBShape` pattern or stay as-is?
+- Document final convention
+
+### Meteor-Object Integration (QOL-12)
+**The Power Pattern: Object as frontend, Meteor as backend**
+
+Meteor is RSB's powerful object compression and storage engine that evolved from the original token module. It provides hierarchical key-value storage with string serialization, making it a perfect complement to Object.
+
+#### What is Meteor?
+Meteor compresses objects into strings using the pattern: `context:namespace:key=value`
+
+Example transformations:
+```rust
+// Object representation
+let mut obj = Object::new("app");
+obj.set("ui.button", "click");
+obj.set("ui.theme", "dark");
+
+// Meteor compression
+"app:ui:button=click;theme=dark"
+
+// Or with folding (stateful parsing)
+"button=click;ns=ui;theme=dark"
+```
+
+#### Integration Architecture
+```
+Object (API) ↔ Meteor (Compression) ↔ MeteorEngine (Storage)
+```
+
+1. **Object**: User-friendly API with ergonomic methods
+2. **Meteor**: String compression format for transport/serialization
+3. **MeteorEngine**: Stateful storage engine with cursor navigation
+
+#### Key Integration Points
+
+**Object → Meteor Conversion**
+```rust
+impl Object {
+    // Compress Object to Meteor TokenStream
+    pub fn to_meteor(&self) -> String {
+        // Convert Object entries to meteor format
+        // "namespace:key=value;key2=value2"
+    }
+
+    // Compress with explicit addressing
+    pub fn to_meteor_explicit(&self) -> String {
+        // "context:namespace:key=value :;: context:namespace:key2=value2"
+    }
+}
+```
+
+**Meteor → Object Parsing**
+```rust
+impl Object {
+    // Parse Meteor stream into Object
+    pub fn from_meteor(stream: &str) -> Result<Self, Error> {
+        // Parse "app:ui:button=click" into Object
+    }
+}
+```
+
+**MeteorEngine as ObjectLike Backend**
+```rust
+impl ObjectLike for MeteorEngine {
+    fn get(&self, key: &str) -> &str {
+        self.storage.get(&self.current_context, &self.current_namespace, key)
+    }
+
+    fn to_object(&self) -> Object {
+        // Export current namespace as Object
+    }
+}
+```
+
+#### Use Cases
+
+1. **Network Transport**: Compress Objects to Meteor strings for efficient transmission
+2. **Persistent Storage**: Use MeteorEngine as database backend for Objects
+3. **Document Virtualization**: Store entire documents/scripts through Object API
+4. **Configuration Management**: Unified config storage across contexts
+
+#### Document Storage Example
+```rust
+// Store document sections in Object
+let mut doc = Object::<DocShape>::new("doc");
+doc.set("guides.install[intro]", intro_content);
+doc.set("guides.install[setup]", setup_content);
+
+// Meteor handles hierarchical storage
+// Internally stored as:
+// doc:guides.install:sections[intro]=content
+// doc:guides.install:sections[setup]=content
+
+// Export to filesystem
+// guides/
+//   install/
+//     intro.md
+//     setup.md
+```
+
+#### Stream Processing Modes
+
+**TokenStream (with folding)**
+- Stateful parsing with control tokens
+- `ns=ui` changes namespace for subsequent tokens
+- `ctx=user` changes context
+- More compact for related data
+
+**MeteorStream (explicit only)**
+- Every item fully qualified
+- No state between tokens
+- Better for heterogeneous data
+- Delimiter `:;:` between meteors
+
+#### Benefits of Integration
+- **Unified Data Model**: Objects and Meteors share string-biased philosophy
+- **Flexible Storage**: Memory (Object) → Compressed (Meteor) → Persistent (MeteorEngine)
+- **Document Management**: Virtual filesystem in MeteorEngine, accessed via Object API
+- **Cross-System Bridge**: Objects can serialize to Meteor for external systems
+- **Audit Trail**: MeteorEngine tracks command history for all mutations
+
+## Future Considerations
+
+### Potential Features (Not Yet Planned)
 1. **Serialization**: Add serde support for JSON/YAML
-2. **Validation**: Schema validation for Objects
+2. **Schema Validation**: Runtime validation against schemas
 3. **Observers**: Change notification system
 4. **Computed Properties**: Lazy evaluation of derived values
 5. **Nested Objects**: Support for true nested structures
@@ -528,6 +733,7 @@ _Generated by bin/feat.py --update-doc._
   - fn get_rsb (line 21)
 
 <!-- /feat:object -->
+
 
 
 

@@ -4,7 +4,7 @@
 
 📅 **Roadmap Period**: 2025-Q3/Q4 Post-Epic 4 Evolution
 🎯 **Vision**: Advanced Rust string manipulation framework with comprehensive bash integration
-📈 **Current Milestone**: Meta Process v2 Implementation (September 2025)
+📈 **Current Milestone**: RSB v2.0 Enhancement Suite – Phase 1 (Q4 2025)
 
 ====
  🏆 COMPLETED MILESTONES
@@ -21,27 +21,40 @@
 **Impact**: RSB transformed from development framework to production-ready system
 **Story Points Delivered**: 290+ across 4+ months of systematic execution
 
+## Meta Process v2: Self-Hydrating Workflow System ✅ (September 2025)
+**Achievement**: Five-minute onboarding with zero manual context reconstruction
+- ✅ **Process Foundations**: START/PROCESS/CONTINUE/SPRINT/QUICK_REF live and linked
+- ✅ **Automation Hooks**: bin/test.sh docs hub, CONTINUE enforcement, hydration playbooks
+- ✅ **Historical Consolidation**: 43 files distilled via China/Tina analysis
+- ✅ **Validation Path**: Fresh agent walkthrough exercised the handoff pipeline
+
+**Impact**: Enables reliable multi-agent collaboration and preserves institutional knowledge
+**Story Points Delivered**: 40 (Phase 1-6 complete)
+
 ====
  🔄 CURRENT MILESTONE
 ====
 
-## Meta Process v2: Self-Hydrating Workflow System (September 2025)
-**Goal**: Transform RSB into 5-minute agent onboarding with zero context reconstruction
-**Progress**: 80% complete (Phase 5-6 remaining)
+## Phase 1: RSB v2.0 Enhancement Suite – Foundation Features (Q4 2025)
+**Goal**: Deliver the baseline ergonomics required for the v2.0 feature set
+**Progress**: 67% complete (20 / 30 SP)
 
-### Achievements This Milestone:
-- ✅ **Foundation**: Directory structure, documentation reorganization
-- ✅ **Core Documents**: START.txt, PROCESS.txt, QUICK_REF.txt, SPRINT.txt
-- ✅ **Historical Consolidation**: Processed 43 files of wisdom and context
-- ✅ **Agent Analysis**: China/Tina comprehensive project assessment
+### Completed This Phase:
+- ✅ **Generic Object<T> Type** (10 SP): flexible string-biased container with phantom typing
+- ✅ **Clear Globals** (5 SP): selective clearing APIs with protected keys and reset guard
+- ✅ **CLI Args to Global** (5 SP): automatic CLI capture with macros (`cli_arg!`, `cli_argc!`, etc.)
 
 ### Remaining Work:
-- 🔄 **Validation Infrastructure**: bin/validate-docs.sh implementation
-- 🔄 **Testing Protocol**: Fresh agent onboarding validation
-- 🔄 **System Refinement**: Final workflow path testing
+- 🔄 **Options Cleanup Strategy** (10 SP): default/sort/remove behaviors with boundary validation
+- 🔄 **Macro & Docs Alignment**: update OPTIONS feature docs once strategy lands
+- 🔄 **UAT Coverage**: add examples demonstrating new strategy selection
 
-**Expected Completion**: September 2025
-**Story Points**: 40 total (32 completed, 8 remaining)
+**Success Criteria**:
+- Options cleanup feature shipped behind opt-in strategy selection
+- All Phase 1 docs/tests updated (`FEATURES_OPTIONS.md`, sanity/uat coverage)
+- No regressions in bootstrap or dispatch workflows
+
+**Story Points**: 30 total (20 completed, 10 remaining)
 
 ====
  🎯 UPCOMING MILESTONES (Q4 2025 - Q1 2026)
@@ -53,10 +66,10 @@
 
 ### Phase 1: Foundation Features (Q4 2025)
 **Story Points**: 30
-- **Generic Object<T> Type** [10 SP]: JavaScript-like object with phantom types
-- **Clear Globals** [5 SP]: Selective clearing with protected keys
-- **CLI Args to Global** [5 SP]: Store CLI args as cli_arg_1, cli_arg_2, etc.
-- **Options Cleanup** [10 SP]: Three strategies (default/sort/remove)
+- ✅ **Generic Object<T> Type** [10 SP]: JavaScript-like object with phantom types
+- ✅ **Clear Globals** [5 SP]: Selective clearing with protected keys
+- ✅ **CLI Args to Global** [5 SP]: Store CLI args as cli_arg_1, cli_arg_2, etc.
+- 🔄 **Options Cleanup** [10 SP]: Strategy-driven flag handling (default/sort/remove)
 
 ### Phase 2: Enhanced Dispatch (Q1 2026)
 **Story Points**: 25

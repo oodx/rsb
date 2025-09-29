@@ -5,69 +5,160 @@
 - ✅ **RSB Test Modernization**: ALL 10 modules now have modern sanity tests
 - ✅ **API Modernization**: Fixed all compilation errors, 61+ working tests
 - ✅ **Test Infrastructure**: Complete orchestrator system functional
+- ✅ **Object<T> Module**: Generic configuration object with Index trait [10 SP]
+- ✅ **Clear Globals**: Global store cleanup with protected keys [5 SP]
+- ✅ **CLI Args to Global**: Bootstrap integration with 1-based indexing [5 SP]
 
 ### IN PROGRESS - RSB v2.0 Enhancement Suite 🔄
 
-#### Phase 1: Foundation Features [30 SP Total]
+#### PRIORITY 1: STAKEHOLDER REQUIRED FEATURES (from IDEAS_IMPLEMENTATION_PLAN.md)
 
-**TASK 1.1: Generic Object<T> Type** [10 SP]
-- [ ] Create src/object/mod.rs module structure [2 SP]
-- [ ] Implement Object<T> with PhantomData [3 SP]
-- [ ] Add Index trait for bracket notation [2 SP]
-- [ ] Create helper macros (get_hub!, hub_config!, etc.) [2 SP]
-- [ ] Add comprehensive unit tests [1 SP]
+**TASK 1.4: TOML Snooping** [15 SP] ⏳ HIGHEST PRIORITY - UNLOCKS CONFIG
+- [ ] Create src/toml/mod.rs module with TomlSnooper [3 SP]
+- [ ] Extract [package.metadata.rsb/hub/inf] sections [4 SP]
+- [ ] Store namespace values with snake_case conversion [3 SP]
+- [ ] Handle arrays using RSB convention (LENGTH + indexed) [2 SP]
+- [ ] Integrate with bootstrap! macro variants [3 SP]
 
-**TASK 1.2: Clear Globals** [5 SP]
-- [ ] Extend src/global/store.rs with clear methods [2 SP]
-- [ ] Implement protected keys from Cargo.toml [1 SP]
-- [ ] Add RSB_GLOBAL_RESET flag requirement [1 SP]
-- [ ] Test with various filter patterns [1 SP]
-
-**TASK 1.3: CLI Args to Global** [5 SP]
-- [ ] Create cli_to_global() function [2 SP]
-- [ ] Store args with 1-based indexing [1 SP]
-- [ ] Implement helper macros (cli_arg!, cli_argc!, etc.) [1 SP]
-- [ ] Add semicolon-joined cli_args storage [1 SP]
-
-**TASK 1.4: Options Cleanup** [10 SP]
-- [ ] Create OptionsStrategy enum (default/sort/remove) [2 SP]
-- [ ] Implement apply_options_strategy() [3 SP]
+**TASK 1.5: Options Cleanup** [10 SP] ⏳ NEXT
+- [ ] Create OptionsStrategy enum (Default/Sort/Remove) [2 SP]
+- [ ] Implement apply_options_strategy() method [3 SP]
 - [ ] Add flag boundary validation [2 SP]
-- [ ] Update options! macro with strategy parameter [2 SP]
-- [ ] Test backward compatibility [1 SP]
+- [ ] Load strategy from RSB config (via TOML) [2 SP]
+- [ ] Maintain backward compatibility [1 SP]
 
-#### Phase 2: Enhanced Dispatch [25 SP Total]
-
-**TASK 2.1: Flag Commands** [10 SP]
-- [ ] Create FlagCommand struct and registry [3 SP]
-- [ ] Implement execute_flag_commands() [3 SP]
-- [ ] Add default --version and --help handlers [2 SP]
-- [ ] Integrate with dispatch! macro [2 SP]
-
-**TASK 2.2: TOML Snooping** [15 SP]
-- [ ] Create src/toml/mod.rs module [2 SP]
-- [ ] Implement TomlSnooper with namespace support [5 SP]
-- [ ] Add rsb, hub, inf section extraction [3 SP]
-- [ ] Handle arrays and case conversion [3 SP]
-- [ ] Update bootstrap! macro variants [2 SP]
-
-#### Phase 3: Advanced Features [30 SP Total]
-
-**TASK 3.1: REPL Support** [20 SP]
+**TASK 1.6: REPL Support** [20 SP] ⏳ STAKEHOLDER CRITICAL
 - [ ] Create src/repl/mod.rs module [3 SP]
 - [ ] Implement Repl struct with command processing [5 SP]
 - [ ] Add cmd_to_global() for REPL context [3 SP]
 - [ ] Create repl_dispatch! macro [4 SP]
 - [ ] Implement built-in commands (exit, clear, history) [3 SP]
-- [ ] Add REPL-specific arg macros [2 SP]
+- [ ] Add REPL-specific arg macros (cmd_arg!, cmd_argc!) [2 SP]
 
-**TASK 3.2: Integration & Testing** [10 SP]
-- [ ] Cross-feature integration tests [3 SP]
-- [ ] Performance benchmarking [2 SP]
-- [ ] Documentation updates [3 SP]
-- [ ] Example projects [2 SP]
+**TASK 1.7: Flag Commands** [10 SP] ⏳ COMPLETES DISPATCH
+- [ ] Create FlagCommand struct and registry [3 SP]
+- [ ] Implement execute_flag_commands() [3 SP]
+- [ ] Add default --version and --help handlers [2 SP]
+- [ ] Integrate with dispatch! macro [2 SP]
+
+#### PRIORITY 2: OPPORTUNISTIC/BACKLOG
+
+**Object Module QOL Improvements** [NEW]
+- [ ] QOL-01: Fix key normalization - CamelCase should convert to snake_case [3 SP]
+  - Currently: "CamelCase" → "camelcase" (wrong!)
+  - Should be: "CamelCase" → "camel_case" (proper snake_case)
+- [ ] QOL-02: Export Object macros in prelude::macros [1 SP]
+  - hub_config!, inf_config!, rsb_config! macros not re-exported
+  - hub_object!, inf_object!, rsb_object! macros not re-exported
+- [ ] QOL-03: Add additional Shape phantom types & fix RSB capitalization [2 SP]
+  - Fix: Rename `RsbShape` → `RSBShape` (proper capitalization)
+  - Fix: Update `RsbConfig` → `RSBConfig` type alias
+  - Add `pub struct GenericShape;` for general-purpose Objects
+  - Add `pub struct JSONShape;` for JSON-style data structures
+  - Add `pub struct MeteorShape;` for Meteor data type representations
+  - Add type aliases:
+    - `GenericObject = Object<GenericShape>`
+    - `JSONObject = Object<JSONShape>`
+    - `MeteorObject = Object<MeteorShape>`
+- [ ] QOL-04: Add Object::merge() for combining Objects [3 SP]
+- [ ] QOL-05: Add Object::from_map() constructor [2 SP]
+- [ ] QOL-06: Document Shape pattern philosophy in FEATURES_OBJECT.md [1 SP]
+  - Clarify that Shapes are phantom types for compile-time hints only
+  - Add examples showing type documentation without runtime cost
+- [ ] QOL-07: Add Object iteration helpers [3 SP]
+  - Add `iter()` method returning iterator over (key, value) pairs
+  - Add `filter_prefix(prefix)` to get subset of keys with prefix
+  - Add `to_vec()` for sorted key-value pairs
+- [ ] QOL-08: Add Object display/debug improvements [2 SP]
+  - Implement Display trait for pretty printing
+  - Format: `ObjectNamespace { key1: "value1", key2: "value2" }`
+  - Add `dump()` method for debug output with namespace info
+- [ ] QOL-09: Add Object validation helpers [3 SP]
+  - Add `require(key)` that returns Result instead of empty string
+  - Add `require_all(&[keys])` for batch validation
+  - Add `is_empty()` and `len()` methods
+- [ ] QOL-10: Fix InfShape capitalization consistency [1 SP]
+  - Consider: Should `InfShape` be `INFShape` for consistency with RSBShape?
+  - Or keep as InfShape since "Inf" is short for "Infrastructure"?
+  - Document the naming convention decision
+- [ ] QOL-11: Add ObjectLike trait with translation layer [6 SP]
+  - Define trait with core Object methods (get, set, has, keys, namespace)
+  - Add translation methods:
+    - `to_object(&self) -> Object` - convert any ObjectLike to Object
+    - `from_object(obj: &Object) -> Self` - construct from Object
+  - Implement for Object<T> and common types
+  - Enable powerful patterns:
+    - Mock objects for testing
+    - Adapters for HashMap, BTreeMap, serde_json::Value
+    - Blanket impls for conversions (From/Into)
+    - Dynamic dispatch via Box<dyn ObjectLike>
+  - Translation layer examples:
+    - `config.to_object()` - any config type → Object
+    - `HashMap::from_object(&obj)` - Object → HashMap
+    - Chain translations: `json_value.to_object().to_hashmap()`
+  - Bridge patterns:
+    - TOML → ObjectLike → Object → Global store
+    - Object → ObjectLike → JSON/YAML/INI output
+    - External configs ↔ RSB Objects seamlessly
+- [ ] QOL-12: Meteor-Object Integration Layer [8 SP]
+  - Implement `Object::to_meteor()` → TokenStream conversion
+  - Implement `Object::from_meteor(stream)` parser
+  - Add `MeteorBackend` implementation of ObjectLike trait
+  - Enable MeteorEngine as storage backend for Objects
+  - Support patterns:
+    - Object → Meteor compression for transport/storage
+    - Meteor → Object expansion for manipulation
+    - Hierarchical keys: `doc.guides.install[intro]` → `doc:guides.install:sections[intro]`
+  - Use cases:
+    - Compress Objects to Meteor strings for network transport
+    - Store Objects in MeteorEngine for persistence
+    - Document virtualization through Object API
+    - Bridge RSB Objects with Meteor's stateful engine
+
+**Token Module Deprecation** [NEW]
+- [ ] DEPRECATE-01: Remove RSB token module in favor of Meteor [5 SP]
+  - Remove src/token/ directory entirely
+  - Remove token tests from tests/
+  - Remove FEATURES_TOKEN.md documentation
+  - Update any remaining references to use Meteor
+  - Update prelude exports
+  - Note: Meteor evolved from token module and supersedes it completely
+
+**Hub Integration Strategy** [UPDATED]
+- [ ] HUB-01: Migrate RSB to use Hub for shared dependencies [5 SP]
+  - RSB is used by 13 projects (highest in ecosystem!)
+  - Most RSB deps already in Hub (serde, chrono, regex, etc.)
+  - Update Cargo.toml to use: `hub = { git = "https://github.com/oodx/hub.git", features = ["core-ext"] }`
+  - Keep deps.rs as compatibility bridge re-exporting from Hub
+- [ ] HUB-02: Add RSB to Hub as shared dependency [3 SP]
+  - RSB qualifies per 5+ usage rule (used by 13 projects!)
+  - Hub should re-export RSB for ecosystem-wide use
+  - Coordinate with blade tool for auto-inclusion
+- [ ] HUB-03: Update RSB's deps.rs to bridge pattern [2 SP]
+  - Phase 1: deps.rs re-exports from Hub for external deps
+  - Phase 2: Keep RSB-specific additions in deps.rs
+  - Pattern: Hub (shared) → RSB deps.rs (bridge) → consumers
+- [ ] HUB-04: Document RSB-Hub integration [2 SP]
+  - Update HOWTO_HUB.md with RSB migration example
+  - Document deps.rs bridge pattern
+  - Add migration guide for RSB consumers
+
+**Enhanced Dispatch Features**
+
+**Developer Experience**
+- [ ] Init Functions: init_with_checks!, init_or_exit! macros [8 SP]
+- [ ] Progress Bars: Unified progress system [15 SP]
+- [ ] Generators Module: Template and scaffolding [20 SP]
+
+**Testing & Documentation**
+- [ ] Testing Framework: Enhanced assertion macros [25 SP]
+- [ ] Integration Tests: Cross-feature validation [5 SP]
+- [ ] Documentation Updates: API docs and examples [5 SP]
 
 ### FUTURE DEVELOPMENT
 - OsString types introduction (M2)
 - UAT test expansion (M3)
 - Performance optimization (M4)
+
+### BUGS & QOL 📌
+- [ ] **Fix standalone global clear wrappers** — running `cargo test --test sanity_global_clear` fails because the wrapper re-imports the entire `sanity` suite. Trim the wrapper so only the intended module is compiled, restoring the subprocess probe path.

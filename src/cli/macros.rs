@@ -93,3 +93,67 @@ macro_rules! pre_dispatch {
     (@maybe_register_desc $name:expr) => { () };
     (@maybe_register_desc $name:expr, $d:expr) => {{ $crate::global::register_function($name, $d); }};
 }
+
+
+// --- CLI Args Access Macros (v0.7.0+) ---
+// Provides convenient access to CLI arguments stored in global
+
+/// Get CLI argument by position (1-based indexing, bash convention)
+/// Returns empty string if argument doesn't exist
+#[macro_export]
+macro_rules! cli_arg {
+    ($n:expr) => {{
+        $crate::global::get_var(&format!("cli_arg_{}", $n))
+    }};
+}
+
+/// Get total count of CLI arguments (excluding program name)
+/// Returns 0 if cli_argc is not set or cannot be parsed as usize
+#[macro_export]
+macro_rules! cli_argc {
+    () => {{
+        let argc_str = $crate::global::get_var("cli_argc");
+        if argc_str.is_empty() {
+            0
+        } else {
+            argc_str.parse::<usize>().unwrap_or(0)
+        }
+    }};
+}
+
+/// Get all CLI arguments as semicolon-separated string (excluding program name)
+#[macro_export]
+macro_rules! cli_args {
+    () => {{
+        $crate::global::get_var("cli_args")
+    }};
+}
+
+/// Get all CLI arguments as a Vec<String> (excluding program name)
+#[macro_export]
+macro_rules! cli_argv {
+    () => {{
+        let args_str = $crate::global::get_var("cli_args");
+        if args_str.is_empty() {
+            Vec::new()
+        } else {
+            args_str.split(';').map(String::from).collect::<Vec<String>>()
+        }
+    }};
+}
+
+/// Get the program name (argv[0])
+#[macro_export]
+macro_rules! cli_prog {
+    () => {{
+        $crate::global::get_var("cli_prog")
+    }};
+}
+
+/// Check if a CLI argument exists at position n (1-based)
+#[macro_export]
+macro_rules! cli_has_arg {
+    ($n:expr) => {{
+        $crate::global::has_var(&format!("cli_arg_{}", $n))
+    }};
+}

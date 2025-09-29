@@ -587,8 +587,8 @@ declare -A TESTS=(
     ["uat-bash"]="uat_bash"                      # Bash UAT wrapper
 
     # Visual colors
-    ["colors"]="features_colors"                  # Rust tests for color registry/API (wrapper)
-    ["colors-runtime"]="features_colors"          # Runtime toggles and backgrounds gating (wrapper)
+    ["colors"]="sanity_colors"                   # Feature-gated colors sanity suite (wrapper)
+    ["colors-runtime"]="sanity_colors"           # Runtime toggles and backgrounds gating (wrapper)
     
     # Integration tests  
     ["bootstrap"]="bootstrap-lifecycle"          # Full bootstrap → options → dispatch flow
@@ -1091,10 +1091,10 @@ run_test() {
             export RSB_COLORS="simple,status,named"
             if [[ "$VERBOSE_MODE" == "true" ]]; then
                 echo "🦀 Running color sanity tests with verbose output..."
-                ctest test --features visuals --test features_colors -- --nocapture
+                ctest test --features visuals --test sanity_colors -- --nocapture
             else
                 echo "🦀 Running color sanity tests..."
-                ctest test --features visuals --test features_colors
+                ctest test --features visuals --test sanity_colors
             fi
             ;;
         "colors-runtime")
@@ -1102,10 +1102,10 @@ run_test() {
             export RSB_COLOR="always"
             if [[ "$VERBOSE_MODE" == "true" ]]; then
                 echo "🦀 Running color runtime tests with verbose output..."
-                ctest test --features visuals --test features_colors -- --nocapture
+                ctest test --features visuals --test sanity_colors -- --nocapture
             else
                 echo "🦀 Running color runtime tests..."
-                ctest test --features visuals --test features_colors
+                ctest test --features visuals --test sanity_colors
             fi
             ;;
         "stdopts")

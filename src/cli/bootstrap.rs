@@ -1,9 +1,63 @@
 // CLI Bootstrap and Script Awareness
 
+use crate::prelude::*;
+use crate::global::get_all_vars;
+
+/// Store CLI arguments in global store with 1-based indexing (bash convention)
+/// Sets: cli_argc, cli_args (semicolon-joined), cli_arg_1, cli_arg_2, etc.
+///
+/// Note: Acquires global lock multiple times for atomic operations.
+/// Each set_var/unset_var call locks and unlocks the global mutex.
+pub fn cli_to_global(args: &[String]) {
+    // Clear any existing cli_arg_* variables first to prevent stale data
+    // This is important when cli_to_global is called multiple times
+    // Note: get_all_vars() acquires a lock, clones the HashMap, then releases
+    let all_vars = get_all_vars();
+    for key in all_vars.keys() {
+        if key.starts_with("cli_arg_") {
+            unset_var(key); // Each unset_var acquires and releases lock
+        }
+    }
+
+    // Store argument count (excluding program name)
+    let argc = args.len().saturating_sub(1);
+    set_var("cli_argc", argc.to_string());
+
+    // Store program name separately (argv[0])
+    if let Some(prog) = args.first() {
+        set_var("cli_argv_0", prog);
+        set_var("cli_prog", prog);
+    }
+
+    // Store individual arguments with 1-based indexing (bash convention)
+    // Skip first element (program name) for positional args
+    for (i, arg) in args.iter().skip(1).enumerate() {
+        let key = format!("cli_arg_{}", i + 1);  // 1-based
+        set_var(&key, arg);
+    }
+
+    // Store all args (excluding program) as semicolon-joined string
+    if args.len() > 1 {
+        let joined = args[1..].join(";");
+        set_var("cli_args", &joined);
+    } else {
+        set_var("cli_args", "");
+    }
+
+    // Store raw argv for completeness (all args including program)
+    let all_joined = args.join(";");
+    set_var("cli_argv", &all_joined);
+}
+
 /// CLI bootstrap sequences host bootstrap and prepares CLI context.
+/// Now includes storing CLI args in global by default.
 pub fn cli_bootstrap(args: &[String]) {
     // Leverage host bootstrap (env, XDG/RSB, dirs, modes, script, args)
     crate::hosts::bootstrap(args);
+
+    // Store CLI args in global store (new in v0.7.0+)
+    cli_to_global(args);
+
     // CLI‑specific extensions could go here (help registry, interactive checks, etc.)
 }
 

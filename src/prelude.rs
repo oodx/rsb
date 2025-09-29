@@ -10,6 +10,7 @@ pub use crate::cli::Args;
 // Global surfaces (store/expansion/config/helpers)
 pub use crate::fs::*;
 pub use crate::global::{
+    clear_all, clear_pattern, clear_prefix, clear_suffix,
     expand_vars, export_vars, get_var, has_var, is_false, is_token_stream, is_true,
     load_config_file, parse_config_content, save_config_file, set_var, unset_var,
 };
@@ -64,6 +65,12 @@ pub use crate::{
     backup,
     benchmark,
     bootstrap,
+    cli_arg,
+    cli_argc,
+    cli_args,
+    cli_argv,
+    cli_has_arg,
+    cli_prog,
     camel,
     camel_var,
     cap_stream,

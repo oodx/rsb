@@ -7,6 +7,9 @@ mod bash;
 #[path = "uat/cli.rs"]
 mod cli;
 
+#[path = "uat/cli_args.rs"]
+mod cli_args;
+
 #[path = "uat/fs.rs"]
 mod fs;
 
@@ -21,6 +24,9 @@ mod com;
 
 #[path = "uat/global.rs"]
 mod global;
+
+#[path = "uat/global_clear.rs"]
+mod global_clear;
 
 #[path = "uat/glyphs.rs"]
 mod glyphs;
