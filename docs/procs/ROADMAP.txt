@@ -44,10 +44,37 @@
 **Story Points**: 40 total (32 completed, 8 remaining)
 
 ====
- 🎯 UPCOMING MILESTONES (Q4 2025)
+ 🎯 UPCOMING MILESTONES (Q4 2025 - Q1 2026)
 ====
 
-## Milestone M1: OsString Integration & Type Safety (October 2025)
+## Milestone M1: RSB v2.0 Enhancement Suite (Q4 2025 - Q1 2026)
+**Goal**: Major ergonomic improvements for CLI, configuration, and developer experience
+**Story Points**: 85 total (Phase 1: 30, Phase 2: 25, Phase 3: 30)
+
+### Phase 1: Foundation Features (Q4 2025)
+**Story Points**: 30
+- **Generic Object<T> Type** [10 SP]: JavaScript-like object with phantom types
+- **Clear Globals** [5 SP]: Selective clearing with protected keys
+- **CLI Args to Global** [5 SP]: Store CLI args as cli_arg_1, cli_arg_2, etc.
+- **Options Cleanup** [10 SP]: Three strategies (default/sort/remove)
+
+### Phase 2: Enhanced Dispatch (Q1 2026)
+**Story Points**: 25
+- **Flag Commands** [10 SP]: Pre-dispatch via flags (--version, --help)
+- **TOML Snooping** [15 SP]: Load Cargo.toml metadata sections
+
+### Phase 3: Advanced Features (Q1 2026)
+**Story Points**: 30
+- **REPL Support** [20 SP]: Interactive command mode with cmd_arg context
+- **Integration & Testing** [10 SP]: Cross-feature validation
+
+### Success Criteria:
+- Zero breaking changes (all features opt-in)
+- <1ms bootstrap overhead with all features
+- >90% test coverage on new code
+- Complete documentation with examples
+
+## Milestone M2: OsString Integration & Type Safety (Q1 2026)
 **Goal**: Enhance RSB with modern Rust type system patterns
 **Story Points**: 25 estimated
 
@@ -63,7 +90,7 @@
 - Backward compatibility with existing RSB APIs
 - Performance benchmarks meet/exceed current implementation
 
-## Milestone M2: UAT & Integration Testing Expansion (November 2025)
+## Milestone M3: UAT & Integration Testing Expansion (Q2 2026)
 **Goal**: Comprehensive testing coverage for production readiness
 **Story Points**: 20 estimated
 
@@ -79,7 +106,7 @@
 - Zero regressions in existing functionality
 - Comprehensive error scenario coverage
 
-## Milestone M3: Performance Optimization & Production Hardening (December 2025)
+## Milestone M4: Performance Optimization & Production Hardening (Q2 2026)
 **Goal**: Production-grade performance and reliability
 **Story Points**: 30 estimated
 

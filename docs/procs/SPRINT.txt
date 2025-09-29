@@ -1,109 +1,155 @@
 ====
- 🚀 RSB SPRINT: Meta Process v2 Implementation
+ 🚀 RSB SPRINT: v2.0 Phase 1 - Foundation Features
 ====
 
-📅 **Sprint Duration**: 2025-09-20 (Current Meta Process Implementation)
-🎯 **Sprint Goal**: Complete Meta Process v2 self-hydrating workflow system
-📊 **Progress**: 80% complete (Phase 5-6 remaining)
+📅 **Sprint Duration**: 2024-12-28 to 2025-01-11 (2 weeks)
+🎯 **Sprint Goal**: Implement foundation features for RSB v2.0 Enhancement Suite
+📊 **Progress**: 0% complete (Just started)
 
 ====
  🔄 ACTIVE TASKS (IN PROGRESS)
 ====
 
-## PHASE 5: Automation & Validation Infrastructure
-**Story Points**: 8
+## Sprint 1: Foundation Implementation
+**Story Points**: 30 Total
 
-### TASK 5.1: Create Documentation Validator [4 SP]
-- [ ] Implement bin/validate-docs.sh script
-- [ ] File structure integrity checks (all required docs exist)
-- [ ] Internal reference validation (no broken links)
-- [ ] Staleness detection (critical docs >1 week, others >1 month)
-- [ ] Clean output (only show problems, silent success)
+### TASK 1.1: Generic Object<T> Type [10 SP]
+**Priority**: HIGH - Foundation for other features
+**Owner**: TBD
 
-### TASK 5.2: Session Handoff Requirements [2 SP]
-- [x] Standardize CONTINUE.md format (COMPLETED)
-- [ ] Document mandatory session update requirements
-- [ ] Create handoff validation checklist
+- [ ] Create src/object/mod.rs module structure [2 SP]
+- [ ] Implement Object<T> with PhantomData [3 SP]
+  - [ ] Basic struct with HashMap<String, String>
+  - [ ] PhantomData for type parameter
+  - [ ] new() and from_global() constructors
+  - [ ] get(), get_or(), has(), set() methods
+- [ ] Add Index trait for bracket notation [2 SP]
+  - [ ] Implement std::ops::Index
+  - [ ] Support nested access with dot notation
+- [ ] Create helper macros (get_hub!, hub_config!, etc.) [2 SP]
+  - [ ] hub_config!, inf_config!, rsb_config! for values
+  - [ ] get_hub!, get_inf!, get_rsb! for Objects
+- [ ] Add comprehensive unit tests [1 SP]
 
-### TASK 5.3: Multi-Speed Onboarding Testing [2 SP]
-- [x] Complete onboarding (5 minutes): PROCESS.txt workflow (COMPLETED)
-- [x] Quick onboarding (30 seconds): QUICK_REF.txt (COMPLETED)
-- [ ] Health check: validate-docs.sh integration
+### TASK 1.2: Clear Globals [5 SP]
+**Priority**: HIGH - Can be parallel with Object
+**Owner**: TBD
+
+- [ ] Extend src/global/store.rs with clear methods [2 SP]
+  - [ ] clear_all(), clear_prefix(), clear_suffix()
+  - [ ] clear_pattern() with regex support
+- [ ] Implement protected keys from Cargo.toml [1 SP]
+  - [ ] Load from rsb.protected_keys
+  - [ ] Default fallback keys
+- [ ] Add RSB_GLOBAL_RESET flag requirement [1 SP]
+- [ ] Test with various filter patterns [1 SP]
+
+### TASK 1.3: CLI Args to Global [5 SP]
+**Priority**: MEDIUM - Quick win
+**Owner**: TBD
+
+- [ ] Create cli_to_global() function [2 SP]
+  - [ ] Add to src/cli/bootstrap.rs
+  - [ ] Call from cli_bootstrap()
+- [ ] Store args with 1-based indexing [1 SP]
+  - [ ] cli_arg_1, cli_arg_2, etc.
+  - [ ] cli_argc for count
+- [ ] Implement helper macros [1 SP]
+  - [ ] cli_arg!, cli_argc!
+  - [ ] cli_args!, cli_argv!
+- [ ] Add semicolon-joined cli_args storage [1 SP]
+
+### TASK 1.4: Options Cleanup [10 SP]
+**Priority**: MEDIUM - Improves UX
+**Owner**: TBD
+
+- [ ] Create OptionsStrategy enum (default/sort/remove) [2 SP]
+- [ ] Implement apply_options_strategy() [3 SP]
+  - [ ] Sort: move flags to end
+  - [ ] Remove: delete processed flags
+  - [ ] Default: no change
+- [ ] Add flag boundary validation [2 SP]
+  - [ ] Detect problematic --flag value patterns
+  - [ ] Warn on potential issues
+- [ ] Update options! macro with strategy parameter [2 SP]
+  - [ ] options!(&args) - use config
+  - [ ] options!(&args, strategy: "remove") - explicit
+- [ ] Test backward compatibility [1 SP]
 
 ====
- 🎯 PHASE 6: Testing & Refinement
+ 📋 SPRINT BACKLOG (Next Sprint)
 ====
 
-## TASK 6.1: Agent Testing Protocol [3 SP]
-- [ ] Test fresh agent onboarding with START.txt
-- [ ] Verify agent follows workflow: PROCESS.txt → CONTINUE.md → SPRINT.txt
-- [ ] Validate agent demonstrates understanding within 5 minutes
-- [ ] Ensure no questions about basic project setup
+## Phase 2: Enhanced Dispatch [25 SP]
+- Flag Commands [10 SP]
+- TOML Snooping [15 SP]
 
-## TASK 6.2: System Validation [2 SP]
-- [ ] Run comprehensive validation checks
-- [ ] Test all workflow paths (onboarding, handoffs, transitions)
-- [ ] Verify documentation integrity
-
-## TASK 6.3: System Maintenance Setup [1 SP]
-- [ ] Document regular maintenance tasks
-- [ ] Create update procedures for QUICK_REF.txt
-- [ ] Establish archive procedures for DONE.txt
+## Phase 3: Advanced Features [30 SP]
+- REPL Support [20 SP]
+- Integration & Testing [10 SP]
 
 ====
- ✅ COMPLETED TASKS (THIS SPRINT)
+ 🚨 DEPENDENCIES & RISKS
 ====
 
-## PHASE 1-2: Foundation & Structure ✅
-- [x] Project assessment and discovery
-- [x] Create docs/procs/ directory structure
-- [x] Reorganize root files to proper locations
-- [x] Process historical .session/ and .docs/archive/ data
-- [x] Create admin/meta-process branch
+**Dependencies**:
+- Object type is foundation for TOML snooping and REPL
+- Bootstrap changes affect multiple features
+- options! macro changes need careful testing
 
-## PHASE 3: Core Document Creation ✅
-- [x] Create START.txt single entry point
-- [x] Create PROCESS.txt master workflow guide
-- [x] Create QUICK_REF.txt for 30-second context
-- [x] Create SPRINT.txt (this document)
-- [x] Initialize CONTINUE.md in docs/procs/
-
-## PHASE 4: Agent Analysis Consolidation ✅
-- [x] China analysis: Documentation categorization and wisdom extraction
-- [x] Tina analysis: Technical debt identification and quality assessment
-- [x] Move analysis results to .analysis/ directory
-- [x] Consolidate 35 archived eggs and 8 session files
-
-====
- 🚨 BLOCKERS & DEPENDENCIES
-====
-
-**No current blockers** - All dependencies resolved
+**Risks**:
+- Performance impact of Object with many keys
+- Backward compatibility of options changes
+- Global store modifications affecting existing code
 
 ====
  📈 SPRINT METRICS
 ====
 
-- **Completed Story Points**: 32/40 (80%)
-- **Remaining Story Points**: 8 (Phase 5-6)
-- **On Track**: YES
-- **Quality Gate**: All tests passing, zero cargo warnings
+- **Planned Story Points**: 30
+- **Completed Story Points**: 0/30 (0%)
+- **On Track**: YES (just started)
+- **Quality Gate**: All tests must pass, zero cargo warnings
 
 ====
  🎯 DEFINITION OF DONE
 ====
 
-For Meta Process v2 Sprint completion, ALL must be true:
-- [x] START.txt provides clear single entry point
-- [x] PROCESS.txt contains comprehensive workflow guidance
-- [x] QUICK_REF.txt enables 30-second context access
-- [x] Directory structure matches Meta Process v2 template
-- [x] Historical data consolidated and archived properly
-- [ ] bin/validate-docs.sh script functional
-- [ ] Fresh agent testing validates 5-minute onboarding
-- [ ] All documentation references accurate and current
-- [ ] System ready for merge to main branch
+For each task completion, ALL must be true:
+- [ ] Code implemented and compiles without warnings
+- [ ] Unit tests written and passing
+- [ ] Integration tests where applicable
+- [ ] Documentation updated (inline and module docs)
+- [ ] Feature documented in appropriate FEATURES_*.md
+- [ ] No performance regression
+- [ ] Backward compatibility maintained
+- [ ] Code reviewed (if team available)
+
+For Sprint completion:
+- [ ] All 30 story points completed
+- [ ] FEATURES_OBJECT.md finalized
+- [ ] Updated FEATURES_GLOBAL.md with clear functions
+- [ ] Updated FEATURES_CLI.md with cli_to_global
+- [ ] Updated FEATURES_OPTIONS.md with strategies
+- [ ] All tests green
+- [ ] Ready for Phase 2
 
 ====
-Next Sprint: Post-Meta Process v2 - OsString Types & UAT Expansion
+ 📝 NOTES
+====
+
+**Implementation Order**:
+1. Start with Object<T> (most complex, foundation)
+2. Clear globals in parallel (independent)
+3. CLI args to global (quick win)
+4. Options cleanup (needs careful testing)
+
+**Documentation Created**:
+- ✅ FEATURES_OBJECT.md (already created)
+- ✅ IDEAS_IMPLEMENTATION_PLAN.md (technical design)
+- ✅ Updated ROADMAP.txt with v2.0 milestones
+- ✅ Updated TASKS.txt with detailed breakdown
+
+====
+Next Sprint: v2.0 Phase 2 - Enhanced Dispatch (Flag Commands + TOML)
 ====

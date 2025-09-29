@@ -6,8 +6,68 @@
 - ✅ **API Modernization**: Fixed all compilation errors, 61+ working tests
 - ✅ **Test Infrastructure**: Complete orchestrator system functional
 
+### IN PROGRESS - RSB v2.0 Enhancement Suite 🔄
+
+#### Phase 1: Foundation Features [30 SP Total]
+
+**TASK 1.1: Generic Object<T> Type** [10 SP]
+- [ ] Create src/object/mod.rs module structure [2 SP]
+- [ ] Implement Object<T> with PhantomData [3 SP]
+- [ ] Add Index trait for bracket notation [2 SP]
+- [ ] Create helper macros (get_hub!, hub_config!, etc.) [2 SP]
+- [ ] Add comprehensive unit tests [1 SP]
+
+**TASK 1.2: Clear Globals** [5 SP]
+- [ ] Extend src/global/store.rs with clear methods [2 SP]
+- [ ] Implement protected keys from Cargo.toml [1 SP]
+- [ ] Add RSB_GLOBAL_RESET flag requirement [1 SP]
+- [ ] Test with various filter patterns [1 SP]
+
+**TASK 1.3: CLI Args to Global** [5 SP]
+- [ ] Create cli_to_global() function [2 SP]
+- [ ] Store args with 1-based indexing [1 SP]
+- [ ] Implement helper macros (cli_arg!, cli_argc!, etc.) [1 SP]
+- [ ] Add semicolon-joined cli_args storage [1 SP]
+
+**TASK 1.4: Options Cleanup** [10 SP]
+- [ ] Create OptionsStrategy enum (default/sort/remove) [2 SP]
+- [ ] Implement apply_options_strategy() [3 SP]
+- [ ] Add flag boundary validation [2 SP]
+- [ ] Update options! macro with strategy parameter [2 SP]
+- [ ] Test backward compatibility [1 SP]
+
+#### Phase 2: Enhanced Dispatch [25 SP Total]
+
+**TASK 2.1: Flag Commands** [10 SP]
+- [ ] Create FlagCommand struct and registry [3 SP]
+- [ ] Implement execute_flag_commands() [3 SP]
+- [ ] Add default --version and --help handlers [2 SP]
+- [ ] Integrate with dispatch! macro [2 SP]
+
+**TASK 2.2: TOML Snooping** [15 SP]
+- [ ] Create src/toml/mod.rs module [2 SP]
+- [ ] Implement TomlSnooper with namespace support [5 SP]
+- [ ] Add rsb, hub, inf section extraction [3 SP]
+- [ ] Handle arrays and case conversion [3 SP]
+- [ ] Update bootstrap! macro variants [2 SP]
+
+#### Phase 3: Advanced Features [30 SP Total]
+
+**TASK 3.1: REPL Support** [20 SP]
+- [ ] Create src/repl/mod.rs module [3 SP]
+- [ ] Implement Repl struct with command processing [5 SP]
+- [ ] Add cmd_to_global() for REPL context [3 SP]
+- [ ] Create repl_dispatch! macro [4 SP]
+- [ ] Implement built-in commands (exit, clear, history) [3 SP]
+- [ ] Add REPL-specific arg macros [2 SP]
+
+**TASK 3.2: Integration & Testing** [10 SP]
+- [ ] Cross-feature integration tests [3 SP]
+- [ ] Performance benchmarking [2 SP]
+- [ ] Documentation updates [3 SP]
+- [ ] Example projects [2 SP]
+
 ### FUTURE DEVELOPMENT
-- Need to introduce OsString types
-- Consider UAT test expansion
-- Integration testing enhancement
-- Performance optimization
+- OsString types introduction (M2)
+- UAT test expansion (M3)
+- Performance optimization (M4)
