@@ -138,3 +138,7 @@ mod token;
 // TOML module sanity tests (v2.0+ - Cargo.toml metadata extraction)
 #[path = "sanity/toml.rs"]
 mod toml;
+
+// Flags module sanity tests (v2.0+ - Flag commands --help, --version)
+#[path = "sanity/flags.rs"]
+mod flags;

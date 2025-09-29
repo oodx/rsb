@@ -79,3 +79,7 @@ mod parse;
 // TOML module UAT tests (v2.0+ - Cargo.toml metadata extraction demos)
 #[path = "uat/toml.rs"]
 mod toml;
+
+// Flags module UAT tests (v2.0+ - Flag commands --help, --version demos)
+#[path = "uat/flags.rs"]
+mod flags;

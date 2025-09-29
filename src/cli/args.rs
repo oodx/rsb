@@ -17,6 +17,14 @@ impl Args {
         }
     }
 
+    /// Create Args from &str slices (convenience for tests and simple cases)
+    pub fn from_strs(args: &[&str]) -> Self {
+        Args {
+            args: args.iter().map(|s| s.to_string()).collect(),
+            processed: HashSet::new(),
+        }
+    }
+
     fn is_program_index(&self, index: usize) -> bool {
         if self.args.is_empty() || index != 0 {
             return false;

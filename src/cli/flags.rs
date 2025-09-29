@@ -26,7 +26,7 @@ fn rsb_handle_help_flag(args: &Args) -> Option<i32> {
         // Try cmd_help handler
         if global::has_var("fn_cmd_help") {
             // Handler exists, construct minimal args
-            let help_args = Args::new(&[args.get(0)]);
+            let _help_args = Args::new(&[args.get(0)]);
             // Call via global registry would require function pointer storage
             // For now, fall through to show_help
             // TODO: Store function pointers in registry for dynamic dispatch
