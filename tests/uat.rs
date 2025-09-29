@@ -76,6 +76,6 @@ mod gx;
 #[path = "uat/parse.rs"]
 mod parse;
 
-// TOML Snooping module UAT tests (v2.0+ - Cargo.toml metadata extraction demos)
-#[path = "uat/toml_snooping.rs"]
-mod toml_snooping;
+// TOML module UAT tests (v2.0+ - Cargo.toml metadata extraction demos)
+#[path = "uat/toml.rs"]
+mod toml;

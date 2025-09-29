@@ -135,6 +135,6 @@ mod hosts;
 #[path = "sanity/token.rs"]
 mod token;
 
-// TOML Snooping module sanity tests (v2.0+ - Cargo.toml metadata extraction)
-#[path = "sanity/toml_snooping.rs"]
-mod toml_snooping;
+// TOML module sanity tests (v2.0+ - Cargo.toml metadata extraction)
+#[path = "sanity/toml.rs"]
+mod toml;
