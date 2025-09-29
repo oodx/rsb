@@ -9,6 +9,7 @@
 use rsb::repl::{ReplParser, SimpleParser, store_repl_args_global, Repl};
 use rsb::cli::Args;
 use rsb::global::{get_var, set_var};
+use rsb::{repl_arg, repl_argc, repl_args, repl_argv};
 use serial_test::serial;
 
 #[test]
@@ -339,5 +340,62 @@ fn sanity_builtin_empty_line() {
     }
 }
 
-// TODO: Add more tests as features are implemented
-// - REPL-05: repl_arg! macros
+// REPL-05: REPL argument macro tests
+#[test]
+#[serial]
+fn sanity_repl_arg_macro() {
+    use rsb::repl::store_repl_args_global;
+    let args = rsb::cli::Args::from_line("cmd arg1 arg2");
+    store_repl_args_global(&args);
+
+    assert_eq!(repl_arg!(0), "cmd");
+    assert_eq!(repl_arg!(1), "arg1");
+    assert_eq!(repl_arg!(2), "arg2");
+}
+
+#[test]
+#[serial]
+fn sanity_repl_argc_macro() {
+    use rsb::repl::store_repl_args_global;
+    let args = rsb::cli::Args::from_line("cmd arg1 arg2");
+    store_repl_args_global(&args);
+
+    assert_eq!(repl_argc!(), 3);
+}
+
+#[test]
+#[serial]
+fn sanity_repl_args_macro() {
+    use rsb::repl::store_repl_args_global;
+    let args = rsb::cli::Args::from_line("cmd arg1 arg2");
+    store_repl_args_global(&args);
+
+    assert_eq!(repl_args!(), "cmd;arg1;arg2");
+}
+
+#[test]
+#[serial]
+fn sanity_repl_argv_macro() {
+    use rsb::repl::store_repl_args_global;
+    let args = rsb::cli::Args::from_line("cmd arg1 arg2");
+    store_repl_args_global(&args);
+
+    let argv = repl_argv!();
+    assert_eq!(argv.len(), 3);
+    assert_eq!(argv[0], "cmd");
+    assert_eq!(argv[1], "arg1");
+    assert_eq!(argv[2], "arg2");
+}
+
+#[test]
+#[serial]
+fn sanity_repl_macros_empty() {
+    use rsb::global::set_var;
+    // Clear REPL globals
+    set_var("repl_argc", "");
+    set_var("repl_args", "");
+
+    assert_eq!(repl_argc!(), 0);
+    assert_eq!(repl_args!(), "");
+    assert_eq!(repl_argv!().len(), 0);
+}
