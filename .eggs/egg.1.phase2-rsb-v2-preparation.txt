@@ -1,0 +1,224 @@
+================================================================================
+🐔 CHINA'S PHASE 2 RSB V2.0 PREPARATION EGG #1 🥚
+================================================================================
+
+🎯 EXECUTIVE SUMMARY
+====================
+RSB v2.0 Enhancement Suite Phase 2 introduces two major features:
+- **Flag Commands** [10 SP]: Pre-dispatch system for --version/-v, --help/-h flags
+- **TOML Snooping** [15 SP]: Extract Cargo.toml metadata sections into global store
+
+Both features integrate with existing Object<T> system and maintain RSB's string-biased philosophy.
+
+🔍 KEY DISCOVERIES & INSIGHTS
+=============================
+
+✨ AWESOME DISCOVERY: OBJECT<T> FOUNDATION IS READY!
+----------------------------------------------------
+Phase 1 delivered the Object<T> generic type which is the FOUNDATION for both Phase 2 features:
+- TOML Snooping will populate Object<T> containers from Cargo.toml sections
+- Object<T> provides JavaScript-like bracket notation: config["api_url"]
+- Already supports hub/inf/rsb namespaces with phantom types
+
+🚩 CRITICAL DISCOVERY: FLAG COMMANDS ARCHITECTURE DEFINED
+----------------------------------------------------------
+Complete implementation design exists in docs/proposals/IDEAS_IMPLEMENTATION_PLAN.md:
+
+```rust
+// FlagCommand struct pattern
+pub struct FlagCommand {
+    long: &'static str,        // "--version"
+    short: Option<char>,       // Some('v')
+    handler: fn() -> i32,      // version_handler
+    pre_dispatch: bool,        // Execute before regular dispatch
+}
+
+// Integration with dispatch! macro
+dispatch!(&args, {
+    // Flag commands execute FIRST, then exit if matched
+    // Regular commands only run if no flag matched
+    "build" => do_build,
+    "test" => do_test
+});
+```
+
+⚡ POWER PATTERN: TOML TO OBJECT<T> FLOW
+----------------------------------------
+TOML Snooping creates seamless config flow:
+1. Extract [package.metadata.hub/inf/rsb] from Cargo.toml
+2. Store as hub_api_url, inf_team, rsb_options_mode global variables
+3. Load via Object<T>::from_global() for type-safe access
+4. Arrays become RSB indexed format: features_LENGTH=3, features_0="auth"
+
+📋 PHASE 2 IMPLEMENTATION DETAILS
+==================================
+
+🎯 TASK 2.1: FLAG COMMANDS [10 SP]
+----------------------------------
+**Location**: src/cli/dispatch.rs (new module)
+**Integration**: Extends existing dispatch! macro
+
+**Components**:
+- [ ] Create FlagCommand struct and registry [3 SP]
+  * Static registry with lazy initialization
+  * Support long/short flag variants
+  * Handler function with exit code return
+
+- [ ] Implement execute_flag_commands() [3 SP]
+  * Check args for registered flag patterns
+  * Execute handler if matched, return exit code
+  * Skip regular dispatch if flag handled
+
+- [ ] Add default --version and --help handlers [2 SP]
+  * version_handler(): Read from Cargo.toml or env
+  * help_handler(): Generate usage from dispatch patterns
+
+- [ ] Integrate with dispatch! macro [2 SP]
+  * Add flag checking at start of dispatch
+  * Exit early if flag command handled
+  * Maintain backward compatibility
+
+📁 TASK 2.2: TOML SNOOPING [15 SP]
+----------------------------------
+**Location**: src/toml/mod.rs (new module)
+**Integration**: Works with bootstrap! macro variants
+
+**Components**:
+- [ ] Create src/toml/mod.rs module with TomlSnooper [3 SP]
+  * TomlSnooper struct with enable/disable state
+  * Namespace registration system
+  * Global lazy static instance
+
+- [ ] Extract [package.metadata.rsb/hub/inf] sections [4 SP]
+  * Parse Cargo.toml in project root
+  * Extract package.metadata.* sections
+  * Handle nested TOML structures
+
+- [ ] Store namespace values with snake_case conversion [3 SP]
+  * Convert camelCase/kebab-case → snake_case
+  * Store as global variables with namespace prefix
+  * Example: hub.apiUrl → hub_api_url
+
+- [ ] Handle arrays using RSB convention (LENGTH + indexed) [2 SP]
+  * Convert TOML arrays to RSB indexed format
+  * features = ["a", "b"] → features_LENGTH="2", features_0="a", features_1="b"
+
+- [ ] Integrate with bootstrap! macro variants [3 SP]
+  * Add bootstrap!(toml) variant
+  * Add bootstrap!(toml: "hub", "inf") for specific namespaces
+  * Call enable_toml_snooping() during bootstrap
+
+🏗️ RSB ARCHITECTURE PATTERNS TO FOLLOW
+=======================================
+
+🔧 STRING-BIASED PHILOSOPHY
+---------------------------
+- All config values stored as strings (Object<T> values are &str)
+- Parse when needed: config["timeout"].parse::<i32>().unwrap_or(30)
+- Maintain Unix "everything is a string" philosophy
+
+🔄 FUNCTION ORDINALITY
+----------------------
+- Public functions: pub fn do_*() - user fault error handling
+- Crate functions: fn _*() - app fault error handling
+- Private functions: fn __*() - system fault error handling
+
+🧪 TESTING REQUIREMENTS
+-----------------------
+Every new module MUST have:
+- tests/sanity/flag_commands.rs and tests/sanity/toml_snooping.rs
+- tests/uat/flag_commands.rs and tests/uat/toml_snooping.rs
+- Run via: ./bin/test.sh run sanity, ./bin/test.sh run uat
+
+📚 INTEGRATION WITH EXISTING SYSTEMS
+====================================
+
+🌐 GLOBAL STORE INTEGRATION
+---------------------------
+Both features integrate with RSB's global store:
+- Flag commands set globals: DEBUG="true", VERBOSE="true"
+- TOML snooping populates: hub_api_url, rsb_options_mode, etc.
+- Object<T> reads from globals: Object::<HubShape>::from_global("hub")
+
+🎭 BOOTSTRAP MACRO EVOLUTION
+----------------------------
+New bootstrap! variants needed:
+```rust
+let args = bootstrap!();              // Current - basic
+let args = bootstrap!(toml);          // New - with TOML snooping
+let args = bootstrap!(toml: "hub");   // New - specific namespaces
+```
+
+🔗 DISPATCH MACRO ENHANCEMENT
+-----------------------------
+Flag commands integrate seamlessly:
+```rust
+dispatch!(&args, {
+    // Flag commands execute FIRST (--help, --version)
+    // Then regular commands if no flags matched
+    "build" => do_build,
+    "deploy" => do_deploy
+});
+```
+
+💡 KEY TAKEAWAYS FOR IMPLEMENTATION
+===================================
+
+1. **Foundation Ready**: Object<T> system provides the infrastructure
+2. **Clear Specifications**: Complete implementation designs exist in docs
+3. **Zero Breaking Changes**: All features are opt-in and backward compatible
+4. **String-First Integration**: Maintains RSB's philosophy throughout
+5. **Test Requirements**: Must include sanity + UAT tests for both features
+6. **Performance Target**: <1ms bootstrap overhead with all features enabled
+
+🔍 QUESTIONS ANSWERED
+=====================
+
+**Q1: What Flag Commands are and how they should work in RSB?**
+A: Pre-dispatch system that checks for --version, --help flags before regular command routing. Uses FlagCommand struct registry with handler functions that exit early.
+
+**Q2: What TOML Snooping functionality is needed?**
+A: Extract [package.metadata.*] sections from Cargo.toml, convert to snake_case global variables, handle arrays as indexed format, integrate with Object<T> system.
+
+**Q3: Any existing RSB v2.0 planning documentation that covers Phase 2?**
+A: Complete specifications in docs/proposals/IDEAS_IMPLEMENTATION_PLAN.md, task breakdowns in docs/procs/TASKS.txt, and roadmap in docs/procs/ROADMAP.txt.
+
+**Q4: Current RSB framework architecture and patterns to follow?**
+A: String-biased philosophy, function ordinality (pub/fn/_/fn/__), structured testing (sanity+UAT required), integration with global store and Object<T> system.
+
+📖 REFERENCE DOCUMENTS
+======================
+- docs/tech/reference/RSB_V2.md - Core v2.0 overview
+- docs/tech/features/FEATURES_OBJECT.md - Object<T> implementation details
+- docs/proposals/IDEAS_IMPLEMENTATION_PLAN.md - Complete Phase 2 specifications
+- docs/procs/TASKS.txt - Current task breakdown and story points
+- docs/procs/ROADMAP.txt - Strategic milestones and timeline
+- docs/tech/reference/RSB_ARCH.md - Architecture patterns and principles
+
+⚠️ DISCLAIMER
+==============
+This summary reflects the status of documentation files reviewed on 2025-09-29.
+Additional source of truth confirmation may be needed from:
+- Current implementation state in src/ directory
+- Recent commits and changes not captured in docs
+- Runtime behavior vs. documented specifications
+- Integration testing with actual Cargo.toml files
+
+================================================================================
+📊 EGG METADATA
+================================================================================
+Created: 2025-09-29
+Agent: Claude (China the Summary Chicken 🐔)
+Target: RSB v2.0 Phase 2 preparation documentation
+Files Reviewed: 8 documentation files + git history
+Project: /home/xnull/repos/code/rust/oodx/projects/rsb
+================================================================================
+
+🐔 CHINA'S SIGN-OFF
+===================
+*"This egg contains everything you need to implement Flag Commands and TOML Snooping!
+The foundation is solid, the specifications are clear, and the patterns are established.
+Time to code like the wind and make RSB v2.0 Phase 2 a reality!"*
+
+🎉 Ready to hatch some amazing features! 🥚→🐣
+================================================================================

@@ -246,7 +246,80 @@ The ecosystem is remarkably cohesive:
 - blade maintains ecosystem health
 - RSB sits at the center, used by 13 projects
 
-Next steps should focus on completing the Object-Meteor integration, migrating to Hub, and documenting these powerful patterns for the broader community.
+## Critical Discovery: String Security Issue
+
+**MAJOR FINDING**: All strings in Rust binaries are exposed via `strings` command, including:
+- Developer paths (`/home/xnull/repos/...`)
+- Internal error messages
+- Debug information
+- Potentially sensitive data
+
+This affects **every RSB application** and requires immediate attention.
+
+### Solution: Two-Path String Architecture
+
+**Path 1: `string` module** - Simple embedded strings (current behavior)
+- Zero configuration, self-contained binaries
+- Perfect for CLI tools and development
+- Direct embedding with `str_replace()`, `println!()` etc.
+
+**Path 2: `lang` module** - External localized strings (new capability)
+- External files loaded at runtime (not in binary!)
+- i18n/l10n support with locale detection
+- Post-deployment updates without recompilation
+- Professional deployment structure:
+  ```
+  /usr/bin/myapp          # Clean binary (no exposed strings)
+  /usr/share/myapp/lang/  # External language files
+  ├── en.toml            # English (fallback)
+  ├── es.toml            # Spanish
+  └── de.toml            # German
+  ```
+
+### Benefits of External Strings
+- **Security**: 20-30% smaller binaries, zero path leakage
+- **Performance**: 2-5ms startup cost vs 500KB+ size reduction
+- **Flexibility**: Runtime language switching, user customization
+- **Professional**: Industry standard deployment pattern
+
+### Implementation Status
+- Comprehensive upgrade plan documented in `RSB_STRING_UPGRADE.md`
+- Two-path architecture maintains simplicity while enabling professional features
+- Positional argument support with bash-style `%1`, `%2`, `%3` patterns
+- Integration with RSB's Args infrastructure (pending Arg type investigation)
+
+Next steps should focus on completing the Object-Meteor integration, migrating to Hub, addressing the critical string security issue, and documenting these powerful patterns for the broader community.
+
+---
+
+## Appendix: Important Reference Documentation
+
+### Core Feature Documentation
+- `docs/tech/features/FEATURES_GLOBAL.md` - Global store, namespaces, clear operations
+- `docs/tech/features/FEATURES_OBJECT.md` - Object<T> module, Meteor integration
+- `docs/tech/features/FEATURES_CLI.md` - CLI macros, dispatch system, argument handling
+- `docs/tech/features/FEATURES_OPTIONS.md` - Options parsing, cleanup strategies
+- `docs/tech/features/FEATURES_STRINGS.md` - String utilities and transformations
+
+### String Security Research
+- `docs/ref/strings/STRING_SECURITY_PATTERNS.md` - Security patterns and anti-patterns
+- `docs/ref/strings/STRINGS_STRAT.md` - Strategic recommendations for production
+- `docs/ref/strings/STRING_LOADING_PERFORMANCE.md` - Performance analysis of loading methods
+- `RSB_STRING_UPGRADE.md` - Comprehensive upgrade plan for two-path architecture
+
+### Process Documentation
+- `docs/procs/TASKS.txt` - Active development tasks and QOL improvements
+- `docs/procs/SPRINT.txt` - Current sprint planning and progress
+
+### Testing and Documentation
+- **Generate documentation**: `./test.sh docs` - Rebuilds feature documentation with code references
+- **Run specific tests**: `./test.sh [test_name]` - Execute individual test suites
+- **Full test suite**: `cargo test` - Complete test coverage
+
+### Ecosystem Integration
+- **Hub compatibility**: RSB is used by 13 projects and should migrate to Hub
+- **blade analysis**: Use `blade` tool for ecosystem health monitoring
+- **Meteor integration**: Object-to-compressed-string translation layer
 
 ---
 *Generated during RSB exploration session - preserves key discoveries and context for future work*
