@@ -9,7 +9,7 @@
 use rsb::repl::{ReplParser, SimpleParser, store_repl_args_global, Repl};
 use rsb::cli::Args;
 use rsb::global::{get_var, set_var};
-use rsb::{repl_arg, repl_argc, repl_args, repl_argv};
+use rsb::{repl_arg, repl_argc, repl_args, repl_argv, repl_dispatch};
 use serial_test::serial;
 
 #[test]
@@ -398,4 +398,26 @@ fn sanity_repl_macros_empty() {
     assert_eq!(repl_argc!(), 0);
     assert_eq!(repl_args!(), "");
     assert_eq!(repl_argv!().len(), 0);
+}
+
+// REPL-06: repl_dispatch! macro tests
+#[test]
+fn sanity_repl_dispatch_macro_compiles() {
+    // Test that the macro compiles correctly
+    // This is a compile-time test - the macro must be syntactically valid
+
+    fn test_handler(_args: Args) -> Result<i32, String> {
+        Ok(0)
+    }
+
+    // Verify the macro syntax is valid (won't actually run without stdin)
+    let _compile_test = || {
+        let repl = Repl::new();
+        repl_dispatch!(repl, {
+            "test" => test_handler,
+        })
+    };
+
+    // If we get here, the macro compiled successfully
+    assert!(true);
 }

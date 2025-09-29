@@ -74,3 +74,73 @@ macro_rules! repl_argv {
         }
     }};
 }
+
+/// Interactive REPL loop with command routing
+///
+/// Creates a REPL loop that reads commands, dispatches to handlers, and manages state.
+///
+/// # Example
+/// ```rust,ignore
+/// use rsb::repl::Repl;
+///
+/// fn main() {
+///     let repl = Repl::new();
+///     repl_dispatch!(repl, {
+///         "status" => cmd_status,
+///         "config" => cmd_config,
+///     })
+/// }
+///
+/// fn cmd_status(args: Args) -> Result<i32, String> {
+///     println!("Status: OK");
+///     Ok(0)
+/// }
+/// ```
+#[macro_export]
+macro_rules! repl_dispatch {
+    ($repl:expr, { $($cmd:literal => $handler:expr),* $(,)? }) => {{
+        let mut repl = $repl;
+
+        loop {
+            match repl.read_line() {
+                Some(line) => {
+                    if line.is_empty() {
+                        continue;
+                    }
+
+                    repl.add_to_history(line.clone());
+
+                    let args = $crate::cli::Args::from_line(&line);
+                    $crate::repl::store_repl_args_global(&args);
+
+                    match repl.dispatch_builtin(&args) {
+                        $crate::repl::ReplResult::Exit => break,
+                        $crate::repl::ReplResult::Continue => continue,
+                        $crate::repl::ReplResult::Command(cmd_args) => {
+                            let cmd = cmd_args.all().get(0).map(|s| s.as_str()).unwrap_or("");
+                            match cmd {
+                                $($cmd => {
+                                    match $handler(cmd_args.clone()) {
+                                        Ok(_) => {},
+                                        Err(e) => eprintln!("Error: {}", e),
+                                    }
+                                },)*
+                                "" => continue,
+                                unknown => {
+                                    eprintln!("Unknown command: {}", unknown);
+                                    eprintln!("Type 'help' for available commands");
+                                }
+                            }
+                        },
+                        $crate::repl::ReplResult::Error(msg) => {
+                            eprintln!("Error: {}", msg);
+                        }
+                    }
+                }
+                None => break,  // EOF
+            }
+        }
+
+        0  // Exit code
+    }};
+}

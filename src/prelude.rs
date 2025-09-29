@@ -123,6 +123,7 @@ pub use crate::{
     repl_argc,
     repl_args,
     repl_argv,
+    repl_dispatch,
     rand_alnum,
     rand_alpha,
     rand_dict,

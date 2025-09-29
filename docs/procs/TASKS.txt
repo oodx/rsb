@@ -82,14 +82,17 @@
   - 7 sanity tests for built-in commands
 
 **Phase 2: Macro System** [4 SP]
-- [ ] REPL-05: REPL Argument Macros [2 SP]
+- [x] REPL-05: REPL Argument Macros [2 SP] ✅
   - Create src/repl/macros.rs
   - Implement repl_arg!($n), repl_argc!(), repl_args!(), repl_argv!()
   - Export in prelude
-- [ ] REPL-06: repl_dispatch! Macro [2 SP]
+  - 5 sanity tests for macros
+- [x] REPL-06: repl_dispatch! Macro [2 SP] ✅
   - Implement repl_dispatch! macro with command matching
   - Error handling integration
   - Built-in command detection
+  - Read loop with history tracking
+  - Unknown command handling
 
 **Phase 3: Integration & Error Handling** [4 SP]
 - [ ] REPL-07: ReplResult Enum & Error Handling [2 SP]
