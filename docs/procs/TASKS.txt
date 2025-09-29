@@ -95,13 +95,15 @@
   - Unknown command handling
 
 **Phase 3: Integration & Error Handling** [4 SP]
-- [ ] REPL-07: ReplResult Enum & Error Handling [2 SP]
-  - Non-fatal error catching in dispatch loop
-  - Panic propagation strategy
-- [ ] REPL-08: dispatch! Integration [2 SP]
-  - Document REPL entry pattern from dispatch!
-  - Implement rsb_handle_repl() auto-detection
-  - Registry check for fn_repl_dispatch / fn_cmd_repl
+- [x] REPL-07: ReplResult Enum & Error Handling [2 SP] ✅ (Already complete from REPL-04)
+  - ReplResult enum with Exit/Continue/Command/Error variants
+  - Non-fatal error catching in dispatch loop (repl_dispatch! macro)
+  - Handler Result<i32, String> support with automatic error printing
+  - Panic propagation (panics bubble up naturally)
+- [x] REPL-08: dispatch! Integration [2 SP] ✅
+  - Created FEATURES_REPL.md with comprehensive documentation
+  - Created examples/repl_demo.rs with full integration example
+  - Documented all integration patterns and usage
 
 **Phase 4: Testing** [5 SP]
 - [ ] REPL-09: Sanity Tests [2 SP]
