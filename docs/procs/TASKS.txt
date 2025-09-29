@@ -131,6 +131,44 @@
   - Macro usage guide
   - Integration patterns documented
 
+### BUGS & REGRESSIONS 🐛
+
+**BUG-01: Test Isolation Issues in REPL Tests** [CRITICAL]
+- **Status**: Identified during post-REPL regression testing
+- **Symptom**: Random test failures in sanity_cli_args suite when run in parallel
+  - test_cli_args_overwrite (intermittent failure)
+  - test_cli_arg_macros (intermittent failure)
+- **Root Cause**: REPL tests modify global state (repl_arg_*, repl_argc, repl_args) without proper cleanup
+- **Evidence**: Tests pass when run serially (--test-threads=1), fail in parallel
+- **Impact**: Flaky test suite, unreliable CI/CD
+- **Affected Tests**:
+  - tests/sanity/repl.rs (35 tests)
+  - tests/uat/repl.rs (7 tests)
+  - tests/sanity_cli_args.rs (9 tests) - victims of pollution
+- **Priority**: HIGH - Breaks test reliability
+- **Estimate**: 2 SP
+- **Fix Strategy**:
+  - Add proper cleanup in REPL test teardown
+  - Use RSB_GLOBAL_RESET pattern for test cleanup
+  - Consider test fixtures for global state isolation
+
+**BUG-02: Unused Code Warnings in REPL Module** [LOW]
+- **Status**: Identified during compilation
+- **Warnings**:
+  1. Unused field `parser` in Repl struct (src/repl/mod.rs:89)
+  2. Unused functions in SimpleParser impl (src/repl/parser.rs:76):
+     - `is_comma_list()`
+     - `is_semicolon_stream()`
+     - `is_token_pattern()`
+- **Root Cause**: Pattern detection helpers defined but not used in v1
+- **Impact**: Code bloat, misleading for future maintainers
+- **Priority**: LOW - Cosmetic, no functional impact
+- **Estimate**: 1 SP
+- **Fix Strategy**:
+  - Option 1: Mark as #[allow(dead_code)] with TODO for future use
+  - Option 2: Remove unused code (preferred)
+  - Option 3: Integrate pattern detection into parser
+
 #### PRIORITY 2: OPPORTUNISTIC/BACKLOG
 
 **Object Module QOL Improvements** [NEW]
