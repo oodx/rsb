@@ -94,8 +94,8 @@ fn test_strategy_from_config() {
 
 #[test]
 fn test_options_macro_default() {
-    let mut args = Args::new(&vec_str(&["prog", "file1", "--debug", "file2"]));
-    rsb::options!(&mut args);
+    let args = Args::new(&vec_str(&["prog", "file1", "--debug", "file2"]));
+    rsb::options!(&args);
 
     // Options should be set
     assert_eq!(get_var("opt_debug"), "true");
@@ -104,7 +104,7 @@ fn test_options_macro_default() {
 #[test]
 fn test_options_macro_with_strategy() {
     let mut args = Args::new(&vec_str(&["prog", "file1", "--verbose", "file2"]));
-    rsb::options!(&mut args, strategy: "remove");
+    rsb::options!(mut args, strategy: "remove");
 
     // Options should be set
     assert_eq!(get_var("opt_verbose"), "true");

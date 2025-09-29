@@ -27,18 +27,22 @@ macro_rules! appref {
 // --- Options Parsing ---
 #[macro_export]
 macro_rules! options {
-    // Default form: uses strategy from config
+    // Backward compatible form: immutable args, no strategy
     ($args:expr) => {{
+        let _ = $crate::cli::options($args);
+    }};
+    // Enhanced form: mutable args with strategy from config
+    (mut $args:ident) => {{
         use $crate::cli::OptionsStrategy;
         let strategy = OptionsStrategy::from_config();
-        let context = $crate::cli::options($args);
+        let context = $crate::cli::options(&$args);
         $args.apply_options_strategy(strategy, &context);
     }};
-    // Explicit strategy form
-    ($args:expr, strategy: $strat:expr) => {{
+    // Explicit strategy form: mutable args with explicit strategy
+    (mut $args:ident, strategy: $strat:expr) => {{
         use $crate::cli::OptionsStrategy;
         let strategy = OptionsStrategy::from_str($strat);
-        let context = $crate::cli::options($args);
+        let context = $crate::cli::options(&$args);
         $args.apply_options_strategy(strategy, &context);
     }};
 }

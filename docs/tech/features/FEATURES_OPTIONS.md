@@ -35,9 +35,10 @@ Supporting API
   - `has_option(&Args, name)` — check if a parsed option flag is present (after running `options!`).
   - `get_option_value(&Args, name) -> Option<String>` — retrieve the last provided value for a flag.
 - Macros (`rsb::cli::macros`):
-  - `options!(&args)` — front door; automatically applies strategy from config.
-  - `options!(&args, strategy: "remove")` — explicit strategy override.
-  - `options_ex!(&args, OptionsStrategy::Sort)` — extended form with enum strategy.
+  - `options!(&args)` — backward compatible form; no strategy applied.
+  - `options!(mut args)` — enhanced form; applies strategy from config.
+  - `options!(mut args, strategy: "remove")` — explicit strategy override.
+  - `options_ex!(&mut args, OptionsStrategy::Sort)` — extended form with enum strategy.
   - `args!()` / `appref!()` — helper accessors for raw `std::env::args()` when writing minimal binaries.
   - `dispatch!({ ... })`, `pre_dispatch!({ ... })` — integrate options parsing with command routing.
 
@@ -52,11 +53,17 @@ Options Cleanup (v0.7.0+)
 - **Flag Boundary Validation**: Detect problematic `--flag value` patterns (warns about space-separated values)
 - **Usage**:
   ```rust
-  let mut args = bootstrap!();
-  options!(&mut args);  // Uses strategy from config
+  // Backward compatible (immutable args, no strategy)
+  let args = bootstrap!();
+  options!(&args);
 
-  // Explicit strategy
-  options!(&mut args, strategy: "remove");
+  // Enhanced with strategy from config (requires mutable args)
+  let mut args = bootstrap!();
+  options!(mut args);
+
+  // Explicit strategy (requires mutable args)
+  let mut args = bootstrap!();
+  options!(mut args, strategy: "remove");
   options_ex!(&mut args, OptionsStrategy::Sort);
 
   // Configuration via environment

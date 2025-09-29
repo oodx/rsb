@@ -63,70 +63,155 @@ SECRET_TOKEN_PREFIX_
 4. **No compile-time string stripping**
 5. **No integration with configuration systems**
 
-## Proposed Solution: StringManager
+## Proposed Solution: Two-Path Architecture
 
-### Core Design
+### Design Philosophy
+RSB provides **two distinct paths** for string management:
+
+1. **Path 1: `string` module** - Simple, embedded strings (current behavior)
+2. **Path 2: `lang` module** - External, localized strings (new capability)
+
+This gives developers **choice** - start simple, graduate to external when needed.
+
+### Path 1: string Module (Simple Use)
 ```rust
-// src/string/manager.rs
-pub struct StringManager {
+// src/string/ - Current API unchanged
+use rsb::string::*;
+
+// Direct embedding (development/simple tools)
+let result = str_replace("hello world", "world", "RSB", false);
+println!("Error: File not found");  // Embedded string
+```
+
+**Characteristics**:
+- ✅ Zero configuration
+- ✅ Self-contained binaries
+- ✅ Immediate availability
+- ✅ Perfect for CLI tools, utilities, development
+
+### Path 2: lang Module (Robust + i18n)
+```rust
+// src/lang/ - New external string management
+pub struct LangManager {
     // External strings loaded at runtime
-    external: Option<HashMap<String, String>>,
+    external: HashMap<String, HashMap<String, String>>,  // locale -> key -> value
 
     // Minimal fallback strings compiled in
     fallback: HashMap<&'static str, &'static str>,
 
-    // Language/locale support
+    // Current language/locale
     locale: String,
 
-    // Cache for frequently accessed strings
+    // Cache for performance
     cache: RefCell<LruCache<String, String>>,
 }
 
-impl StringManager {
-    /// Load strings from standard locations
-    pub fn load() -> Result<Self, StringError> {
-        let paths = [
+impl LangManager {
+    /// Load strings from standard locations with locale detection
+    pub fn load() -> Result<Self, LangError> {
+        let locale = Self::detect_locale();
+
+        let lang_dirs = [
             // 1. Relative to binary (portable)
-            std::env::current_exe()?.parent().join("strings.toml"),
+            std::env::current_exe()?.parent().join("lang"),
 
             // 2. User config (customization)
-            dirs::config_dir().join("rsb/strings.toml"),
+            dirs::config_dir().join("rsb/lang"),
 
             // 3. System-wide (package manager)
-            PathBuf::from("/usr/share/rsb/strings.toml"),
+            PathBuf::from("/usr/share/rsb/lang"),
         ];
 
-        for path in paths {
-            if path.exists() {
-                return Self::from_file(path);
+        for dir in lang_dirs {
+            if dir.exists() {
+                return Self::from_directory(dir, &locale);
             }
         }
 
         // Fall back to minimal embedded strings
-        Ok(Self::minimal())
+        Ok(Self::minimal(&locale))
     }
 
-    /// Get a string by key with fallback
+    /// Get localized string with fallback chain
     pub fn get(&self, key: &str) -> &str {
-        self.external
-            .as_ref()
-            .and_then(|ext| ext.get(key))
+        // 1. Try current locale
+        self.external.get(&self.locale)
+            .and_then(|lang| lang.get(key))
             .map(String::as_str)
-            .or_else(|| self.fallback.get(key).copied())
-            .unwrap_or(key) // Return key if not found
+        // 2. Try 'en' fallback
+        .or_else(|| self.external.get("en")
+            .and_then(|lang| lang.get(key))
+            .map(String::as_str))
+        // 3. Try embedded fallback
+        .or_else(|| self.fallback.get(key).copied())
+        // 4. Return key itself
+        .unwrap_or(key)
+    }
+
+    /// Switch language at runtime
+    pub fn set_locale(&mut self, locale: &str) -> Result<(), LangError> {
+        self.locale = locale.to_string();
+        // Trigger reload if needed
+        Ok(())
     }
 }
 
 // Global instance using once_cell
-static STRINGS: Lazy<StringManager> = Lazy::new(|| {
-    StringManager::load().unwrap_or_else(|_| StringManager::minimal())
+static LANG: Lazy<RwLock<LangManager>> = Lazy::new(|| {
+    RwLock::new(LangManager::load().unwrap_or_else(|_| LangManager::minimal("en")))
 });
 
-// Convenience macro
+    /// Format string with positional arguments using RSB's Args pattern
+    ///
+    /// **CAVEAT**: This implementation uses &[&str] for simplicity, but RSB has an internal
+    /// `Arg` type that may be more appropriate for cross-module compatibility. The `Arg` type
+    /// should be evaluated and potentially updated to support lang, cli, and incoming REPL
+    /// use cases generically. This may require:
+    ///
+    /// 1. Making `Arg` more generic to handle different context types
+    /// 2. Adding conversion traits between string slices and `Arg` instances
+    /// 3. Ensuring `Arg` can represent both positional values and key-value pairs
+    /// 4. Validating that `Arg` works consistently across lang/cli/REPL modules
+    ///
+    /// Future implementation may use:
+    /// ```rust
+    /// pub fn format(&self, key: &str, args: &[Arg]) -> String
+    /// ```
+    pub fn format(&self, key: &str, args: &[&str]) -> String {
+        let template = self.get(key);
+        self.substitute_positional(template, args)
+    }
+
+    /// Internal: Substitute %1, %2, %3... patterns (bash-style)
+    fn substitute_positional(&self, template: &str, args: &[&str]) -> String {
+        let mut result = template.to_string();
+
+        for (i, arg) in args.iter().enumerate() {
+            let placeholder = format!("%{}", i + 1);  // %1, %2, %3...
+            result = result.replace(&placeholder, arg);
+        }
+
+        result
+    }
+}
+
+// Convenience macros
 #[macro_export]
-macro_rules! s {
+macro_rules! lang {
     ($key:expr) => {
-        $crate::string::STRINGS.get($key)
+        $crate::lang::LANG.read().unwrap().get($key)
+    };
+}
+
+#[macro_export]
+macro_rules! lang_fmt {
+    // Simple case - just get the string
+    ($key:expr) => {
+        $crate::lang::LANG.read().unwrap().get($key)
+    };
+    // With positional arguments - bash-style %1, %2, %3...
+    ($key:expr, $($args:expr),+) => {
+        $crate::lang::LANG.read().unwrap().format($key, &[$($args),+])
     };
 }
 ```
@@ -135,20 +220,26 @@ macro_rules! s {
 ```
 /usr/bin/myapp                    # Clean binary (minimal strings)
 /usr/share/myapp/
-├── strings/
+├── lang/                         # Language files (Path 2)
 │   ├── en.toml                   # English (default)
 │   ├── es.toml                   # Spanish
 │   ├── de.toml                   # German
-│   └── zh.toml                   # Chinese
+│   ├── zh.toml                   # Chinese
+│   └── fr.toml                   # French
 ├── help/
 │   └── help.md                   # External help text
 └── themes/
     └── default.yml               # UI themes
 ```
 
-### String File Format (TOML)
+### Language File Format (TOML)
 ```toml
-# strings/en.toml
+# lang/en.toml
+[meta]
+name = "English"
+code = "en"
+direction = "ltr"
+
 [errors]
 file_not_found = "Error: File not found"
 invalid_input = "Error: Invalid input format"
@@ -158,19 +249,101 @@ permission_denied = "Error: Permission denied"
 welcome = "Welcome to {app_name}"
 version = "Version {version}"
 help_header = "USAGE:"
+language_changed = "Language switched to English"
 
 [messages]
 processing = "Processing..."
 complete = "Operation completed successfully"
+
+# Positional argument templates (bash-style %1, %2, %3...)
+[templates]
+syntax_error = "Syntax Error: %1 occurred at line %2"
+file_error = "Cannot read file '%1': %2"
+connection_failed = "Failed to connect to %1:%2 (timeout: %3s)"
+file_processed = "Processed %1 (%2 bytes) in %3ms"
+
+# Pluralization support
+[plurals]
+items_count = [
+    "No items",           # 0
+    "One item",           # 1
+    "%1 items"            # 2+ (with positional arg)
+]
 ```
+
+### Usage Examples
+
+#### Path 1: Simple (string module)
+```rust
+use rsb::string::*;
+
+fn main() {
+    // Direct embedding - perfect for simple tools
+    println!("Starting application...");
+
+    let input = str_replace(user_input, "bad", "good", true);
+
+    if error_occurred {
+        eprintln!("Error: Invalid input");  // Embedded
+    }
+}
+```
+
+#### Path 2: Localized (lang module)
+```rust
+use rsb::prelude::*;
+
+fn main() {
+    // External, localized - perfect for user apps
+    println!("{}", lang!("messages.starting"));
+
+    let input = str_replace(user_input, "bad", "good", true);
+
+    if error_occurred {
+        // Simple message
+        eprintln!("{}", lang!("errors.invalid_input"));
+
+        // With positional arguments (bash-style %1, %2...)
+        eprintln!("{}", lang_fmt!("templates.syntax_error", "Missing semicolon", "42"));
+        // → "Syntax Error: Missing semicolon occurred at line 42"
+
+        eprintln!("{}", lang_fmt!("templates.file_error", filename, error_msg));
+        // → "Cannot read file 'config.toml': Permission denied"
+    }
+
+    // Runtime language switching
+    lang::set_locale("es")?;
+    println!("{}", lang!("ui.language_changed"));
+}
+```
+
+#### Hybrid Approach
+```rust
+use rsb::prelude::*;
+
+fn main() {
+    // Try external first, fall back to embedded
+    let msg = lang!("welcome.user")
+        .unwrap_or("Welcome!");  // Embedded fallback
+
+    println!("{}", msg);
+}
 
 ## Implementation Plan
 
+### Phase 0: Arg Type Investigation (2 SP)
+- [ ] Analyze RSB's current `Arg` type implementation
+- [ ] Evaluate compatibility with lang/cli/REPL use cases
+- [ ] Design generic `Arg` interface if updates needed
+- [ ] Add conversion traits between `&str` and `Arg` types
+- [ ] Document cross-module Arg usage patterns
+
 ### Phase 1: Core Infrastructure (5 SP)
-- [ ] Create `string::manager` module
-- [ ] Implement `StringManager` with external loading
-- [ ] Add `s!()` macro for easy access
+- [ ] Create `lang::manager` module (using lang instead of string)
+- [ ] Implement `LangManager` with external loading
+- [ ] Add `lang!()` and `lang_fmt!()` macros for easy access
 - [ ] Create minimal fallback strings
+- [ ] Integrate with updated `Arg` type from Phase 0
 
 ### Phase 2: Security Features (3 SP)
 - [ ] Add `string::security` module
