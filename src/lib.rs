@@ -55,3 +55,7 @@ pub mod com;
 
 // Parse (sed-like stream/string transforms)
 pub mod parse;
+
+// Object type for flexible configuration and data structures
+#[cfg(feature = "object")]
+pub mod object;

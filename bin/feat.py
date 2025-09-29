@@ -61,6 +61,9 @@ FEATURE_MAP: Dict[str, Sequence[str]] = {
     "math": [
         "src/math",
     ],
+    "object": [
+        "src/object",
+    ],
     "options": [
         "src/cli/options.rs",
         "src/cli/macros.rs",

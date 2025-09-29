@@ -24,4 +24,8 @@
 🏗️ **RSB Architecture**: See docs/tech/ for comprehensive technical documentation
 🧪 **Testing**: Run ./bin/test.sh for development validation
 
+🆕 **Current Sprint**: RSB v2.0 Phase 1 - Foundation Features (30 SP)
+   - Object<T> type, Clear Globals, CLI Args to Global, Options Cleanup
+   - See SPRINT.txt for detailed task breakdown
+
 ====

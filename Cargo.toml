@@ -77,6 +77,9 @@ deps = ["deps-all"]
 # Standard options auto expansion
 stdopts = []
 
+# Object type for flexible configuration and data structures
+object = []
+
 [dependencies]
 lazy_static = "1.4.0"
 regex = "1.10.2"

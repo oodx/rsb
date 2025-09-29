@@ -98,6 +98,7 @@ Index of Feature Modules
 | **Bash** | Shell command execution and job control | [`FEATURES_BASH.md`](docs/tech/features/FEATURES_BASH.md) |
 | **Threads** | Threading utilities and background tasks | [`FEATURES_THREADS.md`](docs/tech/features/FEATURES_THREADS.md) |
 | **Tokens** | Token generation and parsing utilities | [`FEATURES_TOKENS.md`](docs/tech/features/FEATURES_TOKENS.md) |
+| **Object** | JavaScript-like generic object with global store integration | [`FEATURES_OBJECT.md`](docs/tech/features/FEATURES_OBJECT.md) |
 | **Options** | Configuration options and feature flags | [`FEATURES_OPTIONS.md`](docs/tech/features/FEATURES_OPTIONS.md) |
 | **Progress** | Modular progress indicators (spinner/bar/bytes) | [`FEATURES_PROGRESS.md`](docs/tech/features/FEATURES_PROGRESS.md) |
 | **FS** | File system operations and helpers | [`FEATURES_FS.md`](docs/tech/features/FEATURES_FS.md) |

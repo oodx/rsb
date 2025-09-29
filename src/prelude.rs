@@ -179,6 +179,17 @@ pub use crate::{
 // Global core surface (store/expansion/helpers)
 pub use crate::global::*;
 
+// Object type for flexible configuration
+#[cfg(feature = "object")]
+pub use crate::object::{
+    Object, AnyObject, HubConfig, InfConfig, RsbConfig,
+    HubShape, InfShape, RsbShape,
+    get_object, get_hub, get_inf, get_rsb,
+};
+
+// Object-related macros are already exported at crate level via #[macro_export]
+// They don't need to be re-exported here
+
 // Note: Visual macros (colored!, info!, etc.) are NOT re-exported in the prelude.
 // Visual and other optional packages are opt-in via explicit imports.
 
