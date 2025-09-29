@@ -193,6 +193,35 @@ pub fn to_camel_case(s: &str) -> String {
     })
 }
 
+/// ASCII-SAFE: yes
+/// Convert to PascalCase (UpperCamelCase) - first letter capitalized
+pub fn to_pascal_case(s: &str) -> String {
+    with_case_guard("to_pascal_case", s, |s| {
+        let norm = ascii_normalize_to_separators(s);
+        let words = split_words(&norm);
+        if words.is_empty() {
+            return String::new();
+        }
+        let mut out = String::new();
+        for w in words.into_iter() {
+            let mut c = w.chars();
+            if let Some(f) = c.next() {
+                out.push_str(&f.to_uppercase().collect::<String>());
+                out.push_str(&c.as_str().to_lowercase());
+            }
+        }
+        out
+    })
+}
+
+/// ASCII-SAFE: yes
+/// Convert to SCREAMING_SNAKE_CASE - all uppercase with underscores
+pub fn to_screaming_snake_case(s: &str) -> String {
+    with_case_guard("to_screaming_snake_case", s, |s| {
+        to_snake_case(s).to_uppercase()
+    })
+}
+
 // Try variants for size-guarded case conversions
 pub fn try_to_snake_case(s: &str) -> Result<String, crate::string::error::StringError> {
     match guard_size(s, CASE_MAX_LINE_BYTES) {
@@ -229,6 +258,20 @@ pub fn try_to_camel_case(s: &str) -> Result<String, crate::string::error::String
     }
 }
 
+pub fn try_to_pascal_case(s: &str) -> Result<String, crate::string::error::StringError> {
+    match guard_size(s, CASE_MAX_LINE_BYTES) {
+        Ok(()) => Ok(to_pascal_case(s)),
+        Err(e) => Err(e),
+    }
+}
+
+pub fn try_to_screaming_snake_case(s: &str) -> Result<String, crate::string::error::StringError> {
+    match guard_size(s, CASE_MAX_LINE_BYTES) {
+        Ok(()) => Ok(to_screaming_snake_case(s)),
+        Err(e) => Err(e),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -248,5 +291,9 @@ mod tests {
         assert_eq!(to_dot_case("Log File Name"), "log.file.name");
         assert_eq!(to_space_case("My File NAME"), "my file name");
         assert_eq!(to_camel_case("HTTP server id"), "httpServerId");
+        assert_eq!(to_pascal_case("user_name"), "UserName");
+        assert_eq!(to_pascal_case("http_server"), "HttpServer");
+        assert_eq!(to_screaming_snake_case("userName"), "USER_NAME");
+        assert_eq!(to_screaming_snake_case("HttpServer"), "HTTP_SERVER");
     }
 }

@@ -99,6 +99,7 @@ portable-pty = { version = "0.9", optional = true }
 assert_cmd = "2.0"
 predicates = "3.0"
 assert_fs = "1.0"
+serial_test = "3.0"
 
 [lib]
 name = "rsb"

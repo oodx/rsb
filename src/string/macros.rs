@@ -86,6 +86,18 @@ macro_rules! camel {
         $crate::string::to_camel_case(&$s.to_string())
     };
 }
+#[macro_export]
+macro_rules! pascal {
+    ($s:expr) => {
+        $crate::string::to_pascal_case(&$s.to_string())
+    };
+}
+#[macro_export]
+macro_rules! screaming {
+    ($s:expr) => {
+        $crate::string::to_screaming_snake_case(&$s.to_string())
+    };
+}
 
 // --- Case macros (context var forms) ---
 #[macro_export]
@@ -122,5 +134,17 @@ macro_rules! space_var {
 macro_rules! camel_var {
     ($name:expr) => {
         $crate::string::to_camel_case(&$crate::global::get_var($name))
+    };
+}
+#[macro_export]
+macro_rules! pascal_var {
+    ($name:expr) => {
+        $crate::string::to_pascal_case(&$crate::global::get_var($name))
+    };
+}
+#[macro_export]
+macro_rules! screaming_var {
+    ($name:expr) => {
+        $crate::string::to_screaming_snake_case(&$crate::global::get_var($name))
     };
 }

@@ -4,6 +4,7 @@ use rsb::toml::*;
 use rsb::global::get_var;
 use std::fs;
 use std::env;
+use serial_test::serial;
 
 // Helper to create test Cargo.toml in temp directory
 fn setup_test_toml(content: &str) -> std::path::PathBuf {
@@ -27,6 +28,7 @@ fn sanity_default_namespaces() {
 }
 
 #[test]
+#[serial]
 fn sanity_enable_toml_snooping() {
     // Create test environment
     let test_toml = r#"
@@ -54,6 +56,7 @@ test_key = "test_value"
 }
 
 #[test]
+#[serial]
 fn sanity_snoop_multiple_namespaces() {
     let test_toml = r#"
 [package]
@@ -86,6 +89,7 @@ mode = "production"
 }
 
 #[test]
+#[serial]
 fn sanity_snake_case_conversion() {
     let test_toml = r#"
 [package]
@@ -114,6 +118,7 @@ team-name = "test-team"
 }
 
 #[test]
+#[serial]
 fn sanity_array_storage() {
     let test_toml = r#"
 [package]
@@ -141,6 +146,7 @@ features = ["auth", "cache", "metrics"]
 }
 
 #[test]
+#[serial]
 fn sanity_value_types() {
     let test_toml = r#"
 [package]
@@ -171,6 +177,7 @@ float_val = 3.14
 }
 
 #[test]
+#[serial]
 fn sanity_custom_namespace() {
     let test_toml = r#"
 [package]
@@ -196,6 +203,7 @@ key = "custom_value"
 }
 
 #[test]
+#[serial]
 fn sanity_is_enabled() {
     let test_toml = r#"
 [package]
@@ -217,6 +225,7 @@ version = "0.1.0"
 }
 
 #[test]
+#[serial]
 fn sanity_has_namespace() {
     // Default namespaces should exist
     assert!(has_namespace("hub"));
@@ -233,6 +242,7 @@ fn sanity_has_namespace() {
 }
 
 #[test]
+#[serial]
 fn sanity_no_cargo_toml() {
     // Test graceful handling when Cargo.toml doesn't exist
     let temp_dir = env::temp_dir().join(format!("rsb_no_toml_{}", uuid::Uuid::new_v4()));

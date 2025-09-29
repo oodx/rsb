@@ -21,6 +21,8 @@ pub mod safety_registry {
             "string::to_dot_case",
             "string::to_space_case",
             "string::to_camel_case",
+            "string::to_pascal_case",
+            "string::to_screaming_snake_case",
         ]
     }
 

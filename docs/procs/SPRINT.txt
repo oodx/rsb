@@ -7,11 +7,11 @@
 📊 **Progress**: 67% complete (20/30 SP - Object<T>, Clear Globals, and CLI Args complete)
 
 ====
- 🔄 ACTIVE TASKS (IN PROGRESS)
+ ✅ COMPLETED SPRINT 1 - Foundation Implementation
 ====
 
-## Sprint 1: Foundation Implementation
-**Story Points**: 30 Total
+## Sprint 1: Foundation Implementation (Phase 1)
+**Story Points**: 30 Total - COMPLETE
 
 ### TASK 1.1: Generic Object<T> Type [10 SP] ✅
 **Priority**: HIGH - Foundation for other features
@@ -68,30 +68,62 @@
   - [x] 11 sanity tests passing
   - [x] 6 UAT tests with visual demonstrations
 
-### TASK 1.4: Options Cleanup [10 SP]
+### TASK 1.4: Options Cleanup [10 SP] ✅
 **Priority**: MEDIUM - Improves UX
-**Owner**: TBD
+**Owner**: Claude
+**Status**: COMPLETE
 
-- [ ] Create OptionsStrategy enum (default/sort/remove) [2 SP]
-- [ ] Implement apply_options_strategy() [3 SP]
-  - [ ] Sort: move flags to end
-  - [ ] Remove: delete processed flags
-  - [ ] Default: no change
-- [ ] Add flag boundary validation [2 SP]
-  - [ ] Detect problematic --flag value patterns
-  - [ ] Warn on potential issues
-- [ ] Update options! macro with strategy parameter [2 SP]
-  - [ ] options!(&args) - use config
-  - [ ] options!(&args, strategy: "remove") - explicit
-- [ ] Test backward compatibility [1 SP]
+- [x] Create OptionsStrategy enum (default/sort/remove) [2 SP]
+- [x] Implement apply_options_strategy() [3 SP]
+  - [x] Sort: move flags to end
+  - [x] Remove: delete processed flags
+  - [x] Default: no change
+- [x] Add flag boundary validation [2 SP]
+  - [x] Detect problematic --flag value patterns
+  - [x] Warn on potential issues
+- [x] Update options! macro with strategy parameter [2 SP]
+  - [x] options!(&args) - use config
+  - [x] options!(&args, strategy: "remove") - explicit
+- [x] Test backward compatibility [1 SP]
+
+====
+ 🔄 ACTIVE SPRINT 2 - Enhanced Dispatch (Phase 2)
+====
+
+## Sprint 2: Enhanced Dispatch Implementation
+**Story Points**: 25 Total
+**Progress**: 15/25 SP (60% complete)
+
+### TASK 2.2: TOML Snooping [15 SP] ✅ COMPLETE
+**Priority**: HIGH - Key dependency for other features
+**Owner**: Claude
+**Status**: COMPLETE
+
+- [x] Create src/toml/mod.rs module with TomlSnooper [3 SP]
+- [x] Extract [package.metadata.rsb/hub/inf] sections [4 SP]
+- [x] Store namespace values with snake_case conversion [3 SP]
+- [x] Handle arrays using RSB convention (LENGTH + indexed) [2 SP]
+- [x] Integrate with bootstrap! macro variants [3 SP]
+
+**Implementation Notes**:
+- Added serial_test crate for test isolation
+- All tests pass in parallel execution
+- Comprehensive FEATURES_TOML.md documentation
+- 19 tests total (3 unit + 10 sanity + 6 UAT)
+
+### TASK 2.1: Flag Commands [10 SP] - PENDING
+**Priority**: HIGH - Pre-dispatch system
+**Owner**: TBD
+**Status**: NOT STARTED
+
+- [ ] Create FlagCommand struct and registry [3 SP]
+- [ ] Implement execute_flag_commands() [3 SP]
+- [ ] Add default --version and --help handlers [2 SP]
+- [ ] Integrate with dispatch! macro [2 SP]
 
 ====
  📋 SPRINT BACKLOG (Next Sprint)
 ====
-
-## Phase 2: Enhanced Dispatch [25 SP]
-- Flag Commands [10 SP]
-- TOML Snooping [15 SP]
 
 ## Phase 3: Advanced Features [30 SP]
 - REPL Support [20 SP]
@@ -115,9 +147,16 @@
  📈 SPRINT METRICS
 ====
 
+## Sprint 1 (Phase 1) - COMPLETE ✅
 - **Planned Story Points**: 30
-- **Completed Story Points**: 20/30 (67%)
-- **On Track**: YES (Object, Clear Globals, and CLI Args complete)
+- **Completed Story Points**: 30/30 (100%)
+- **Quality Gate**: ✅ All tests pass, zero cargo warnings
+
+## Sprint 2 (Phase 2) - IN PROGRESS 🔄
+- **Planned Story Points**: 25
+- **Completed Story Points**: 15/25 (60%)
+- **Remaining**: Task 2.1 (Flag Commands) - 10 SP
+- **On Track**: YES
 - **Quality Gate**: All tests must pass, zero cargo warnings
 
 ====
@@ -134,14 +173,23 @@ For each task completion, ALL must be true:
 - [ ] Backward compatibility maintained
 - [ ] Code reviewed (if team available)
 
-For Sprint completion:
-- [ ] All 30 story points completed
-- [ ] FEATURES_OBJECT.md finalized
-- [ ] Updated FEATURES_GLOBAL.md with clear functions
-- [ ] Updated FEATURES_CLI.md with cli_to_global
-- [ ] Updated FEATURES_OPTIONS.md with strategies
+For Sprint 1 completion (Phase 1): ✅ COMPLETE
+- [x] All 30 story points completed
+- [x] FEATURES_OBJECT.md finalized
+- [x] Updated FEATURES_GLOBAL.md with clear functions
+- [x] Updated FEATURES_CLI.md with cli_to_global
+- [x] Updated FEATURES_OPTIONS.md with strategies
+- [x] All tests green
+- [x] Ready for Phase 2
+
+For Sprint 2 completion (Phase 2):
+- [x] TOML Snooping complete (15 SP)
+- [x] FEATURES_TOML.md created
+- [x] Test isolation fixed with serial_test
+- [ ] Flag Commands implementation (10 SP)
+- [ ] All 25 story points completed
 - [ ] All tests green
-- [ ] Ready for Phase 2
+- [ ] Ready for Phase 3
 
 ====
  📝 NOTES

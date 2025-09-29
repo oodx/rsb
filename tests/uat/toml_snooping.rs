@@ -4,6 +4,7 @@ use rsb::toml::*;
 use rsb::global::get_var;
 use std::fs;
 use std::env;
+use serial_test::serial;
 
 // Helper to create test Cargo.toml in temp directory
 fn setup_test_toml(content: &str) -> std::path::PathBuf {
@@ -19,6 +20,7 @@ fn cleanup_test_dir(dir: &std::path::Path) {
 }
 
 #[test]
+#[serial]
 fn uat_toml_snooping_basic_demo() {
     println!("\n=== TOML Snooping Basic Demo ===\n");
 
@@ -73,6 +75,7 @@ debug = true
 }
 
 #[test]
+#[serial]
 fn uat_toml_snake_case_conversion_demo() {
     println!("\n=== Snake Case Conversion Demo ===\n");
 
@@ -111,6 +114,7 @@ connectTimeout = "10"
 }
 
 #[test]
+#[serial]
 fn uat_toml_array_storage_demo() {
     println!("\n=== Array Storage Demo ===\n");
 
@@ -156,6 +160,7 @@ regions = ["us-east", "us-west", "eu-central"]
 }
 
 #[test]
+#[serial]
 fn uat_toml_value_types_demo() {
     println!("\n=== Value Types Demo ===\n");
 
@@ -197,6 +202,7 @@ threshold = 3.14
 }
 
 #[test]
+#[serial]
 fn uat_toml_custom_namespace_demo() {
     println!("\n=== Custom Namespace Demo ===\n");
 
@@ -236,6 +242,7 @@ api_key = "secret123"
 }
 
 #[test]
+#[serial]
 fn uat_toml_bootstrap_integration_demo() {
     println!("\n=== Bootstrap Integration Demo ===\n");
 
@@ -282,6 +289,7 @@ options_mode = "remove"
 
 #[cfg(feature = "object")]
 #[test]
+#[serial]
 fn uat_toml_object_integration_demo() {
     use rsb::object::*;
 
