@@ -59,3 +59,6 @@ pub mod parse;
 // Object type for flexible configuration and data structures
 #[cfg(feature = "object")]
 pub mod object;
+
+// TOML snooping module for extracting Cargo.toml metadata
+pub mod toml;

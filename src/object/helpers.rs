@@ -24,8 +24,8 @@ pub fn normalize_key(key: &str) -> String {
     // Replace dots and dashes with underscores
     let key = key.replace('.', "_").replace('-', "_");
 
-    // Convert to lowercase for case-insensitive access
-    key.to_lowercase()
+    // Use string module's to_snake_case for proper CamelCase handling
+    crate::string::to_snake_case(&key)
 }
 
 #[cfg(test)]
@@ -36,7 +36,7 @@ mod tests {
     fn test_normalize_key() {
         assert_eq!(normalize_key("dot.notation"), "dot_notation");
         assert_eq!(normalize_key("kebab-case"), "kebab_case");
-        assert_eq!(normalize_key("CamelCase"), "camelcase");
+        assert_eq!(normalize_key("CamelCase"), "camel_case");  // Fixed: properly splits CamelCase
         assert_eq!(normalize_key("mixed.dot-dash"), "mixed_dot_dash");
     }
 

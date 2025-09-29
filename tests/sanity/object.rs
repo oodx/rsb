@@ -43,10 +43,15 @@ mod object_sanity {
         let mut obj = Object::<()>::new("test");
         obj.set("dot.notation", "value1");
         obj.set("kebab-case", "value2");
+        obj.set("CamelCase", "value3");
 
-        // Keys are normalized
+        // Keys are normalized to snake_case
         assert_eq!(obj.get("dot_notation"), "value1");
         assert_eq!(obj.get("kebab_case"), "value2");
+        assert_eq!(obj.get("camel_case"), "value3");  // CamelCase → camel_case
+
+        // Can access with original key format too (gets normalized)
+        assert_eq!(obj.get("CamelCase"), "value3");
     }
 
     #[test]

@@ -3,9 +3,29 @@
 // --- Bootstrap & Args ---
 #[macro_export]
 macro_rules! bootstrap {
+    // Default bootstrap without TOML snooping
     () => {{
         let args: Vec<String> = std::env::args().collect();
         $crate::cli::cli_bootstrap(&args);
+        $crate::cli::Args::new(&args)
+    }};
+
+    // Bootstrap with TOML snooping enabled (all default namespaces: rsb, hub, inf)
+    (toml) => {{
+        let args: Vec<String> = std::env::args().collect();
+        $crate::cli::cli_bootstrap(&args);
+        $crate::toml::enable_toml_snooping();
+        $crate::cli::Args::new(&args)
+    }};
+
+    // Bootstrap with TOML snooping for specific namespaces
+    (toml: $($ns:literal),+ $(,)?) => {{
+        let args: Vec<String> = std::env::args().collect();
+        $crate::cli::cli_bootstrap(&args);
+        $(
+            $crate::toml::snoop_namespace($ns);
+        )+
+        $crate::toml::enable_toml_snooping();
         $crate::cli::Args::new(&args)
     }};
 }

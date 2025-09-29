@@ -19,6 +19,15 @@
 
 ### IN PROGRESS - RSB v2.0 Enhancement Suite Phase 2 🔄
 
+#### PRIORITY 1: ACTIVE IMPLEMENTATION
+
+**TASK 2.2: TOML Snooping** [15 SP] 🔥 CURRENT PRIORITY
+- [ ] Create src/toml/mod.rs module with TomlSnooper [3 SP]
+- [ ] Extract [package.metadata.rsb/hub/inf] sections [4 SP]
+- [ ] Store namespace values with snake_case conversion [3 SP]
+- [ ] Handle arrays using RSB convention (LENGTH + indexed) [2 SP]
+- [ ] Integrate with bootstrap! macro variants [3 SP]
+
 #### PRIORITY 2: UPCOMING STAKEHOLDER FEATURES (Phase 2 / 3)
 
 **TASK 2.1: Flag Commands** [10 SP]
@@ -26,13 +35,6 @@
 - [ ] Implement execute_flag_commands() [3 SP]
 - [ ] Add default --version and --help handlers [2 SP]
 - [ ] Integrate with dispatch! macro [2 SP]
-
-**TASK 2.2: TOML Snooping** [15 SP]
-- [ ] Create src/toml/mod.rs module with TomlSnooper [3 SP]
-- [ ] Extract [package.metadata.rsb/hub/inf] sections [4 SP]
-- [ ] Store namespace values with snake_case conversion [3 SP]
-- [ ] Handle arrays using RSB convention (LENGTH + indexed) [2 SP]
-- [ ] Integrate with bootstrap! macro variants [3 SP]
 
 **TASK 3.1: REPL Support** [20 SP]
 - [ ] Create src/repl/mod.rs module [3 SP]

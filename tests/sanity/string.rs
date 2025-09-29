@@ -235,3 +235,39 @@ fn test_edge_cases() {
     let mixed_snake = rsb::string::to_snake_case(mixed_input);
     assert_eq!(mixed_snake, "test_123_value"); // Numbers split from letters
 }
+
+#[test]
+fn test_case_conversion_edge_cases() {
+    // Acronyms - consecutive uppercase letters split before final cap + lowercase
+    assert_eq!(rsb::string::to_snake_case("HTTPSConnection"), "https_connection");
+    assert_eq!(rsb::string::to_snake_case("XMLParser"), "xml_parser");
+    assert_eq!(rsb::string::to_snake_case("XMLHTTPRequest"), "xmlhttp_request"); // All caps treated as one word
+    assert_eq!(rsb::string::to_snake_case("IOError"), "io_error");
+    assert_eq!(rsb::string::to_snake_case("HTTPServer"), "http_server"); // Splits before 'S'
+
+    // Mixed numbers with letters
+    assert_eq!(rsb::string::to_snake_case("Base64Encode"), "base_64_encode");
+    assert_eq!(rsb::string::to_snake_case("SHA256Hash"), "sha_256_hash");
+    assert_eq!(rsb::string::to_snake_case("UTF8String"), "utf_8_string");
+    assert_eq!(rsb::string::to_snake_case("v2Build"), "v_2_build");
+
+    // Single letter boundaries
+    assert_eq!(rsb::string::to_snake_case("aB"), "a_b");
+    assert_eq!(rsb::string::to_snake_case("ABc"), "a_bc");
+
+    // All caps with underscores already (should convert to lowercase)
+    assert_eq!(rsb::string::to_snake_case("CONSTANT_VALUE"), "constant_value");
+    assert_eq!(rsb::string::to_snake_case("MAX_SIZE"), "max_size");
+
+    // Pure CamelCase variations
+    assert_eq!(rsb::string::to_snake_case("CamelCase"), "camel_case");
+    assert_eq!(rsb::string::to_snake_case("simpleTest"), "simple_test");
+    assert_eq!(rsb::string::to_snake_case("getUserName"), "get_user_name");
+
+    // Already snake_case (should remain unchanged)
+    assert_eq!(rsb::string::to_snake_case("already_snake_case"), "already_snake_case");
+
+    // Mixed delimiters with CamelCase
+    assert_eq!(rsb::string::to_snake_case("get-userName"), "get_user_name");
+    assert_eq!(rsb::string::to_snake_case("API.BaseURL"), "api_base_url");
+}
