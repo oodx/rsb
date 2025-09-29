@@ -43,7 +43,23 @@ pub use helpers::store_repl_args_global;
 
 // Core imports
 use std::io::{self, Write};
-use crate::global::{get_var, has_var};
+use crate::global::{get_var, has_var, clear_prefix};
+use crate::cli::Args;
+
+/// Result of processing a REPL command
+///
+/// Determines control flow in the REPL loop
+#[derive(Debug, Clone)]
+pub enum ReplResult {
+    /// Exit the REPL loop
+    Exit,
+    /// Built-in command handled, continue loop
+    Continue,
+    /// User command to dispatch to handler
+    Command(Args),
+    /// Error occurred, print and continue
+    Error(String),
+}
 
 /// Core REPL struct for interactive command processing
 ///
@@ -177,6 +193,83 @@ impl Repl {
     /// Add command to history
     pub fn add_to_history(&mut self, line: String) {
         self.history.push(line);
+    }
+
+    /// Dispatch built-in REPL commands
+    ///
+    /// Handles standard commands like exit, quit, clear, history, help.
+    /// Returns ReplResult to control REPL flow.
+    ///
+    /// # Arguments
+    /// * `args` - Parsed command arguments
+    ///
+    /// # Returns
+    /// * `ReplResult::Exit` - for exit/quit commands
+    /// * `ReplResult::Continue` - for handled built-ins
+    /// * `ReplResult::Command(args)` - for user commands to dispatch
+    pub fn dispatch_builtin(&self, args: &Args) -> ReplResult {
+        let cmd = args.all().get(0).map(|s| s.as_str()).unwrap_or("");
+
+        match cmd {
+            "exit" | "quit" => ReplResult::Exit,
+
+            "clear" => {
+                // Temporarily enable RSB_GLOBAL_RESET for clear operation
+                crate::global::set_var("RSB_GLOBAL_RESET", "1");
+                let result = clear_prefix("repl_");
+                crate::global::set_var("RSB_GLOBAL_RESET", "0");
+
+                match result {
+                    Ok(count) => {
+                        if count > 0 {
+                            println!("REPL context cleared ({} variables)", count);
+                        } else {
+                            println!("REPL context already clear");
+                        }
+                    }
+                    Err(e) => println!("Error clearing context: {}", e),
+                }
+                ReplResult::Continue
+            }
+
+            "history" => {
+                self.show_history();
+                ReplResult::Continue
+            }
+
+            "help" => {
+                self.show_repl_help();
+                ReplResult::Continue
+            }
+
+            "" => ReplResult::Continue, // Empty line
+
+            _ => ReplResult::Command(args.clone()),
+        }
+    }
+
+    /// Show command history
+    fn show_history(&self) {
+        if self.history.is_empty() {
+            println!("No command history");
+            return;
+        }
+
+        println!("\nCommand History:");
+        for (i, cmd) in self.history.iter().enumerate() {
+            println!("  {}: {}", i + 1, cmd);
+        }
+        println!();
+    }
+
+    /// Show REPL help message
+    fn show_repl_help(&self) {
+        println!("\nREPL Built-in Commands:");
+        println!("  exit, quit  - Exit REPL mode");
+        println!("  clear       - Clear REPL context variables");
+        println!("  history     - Show command history");
+        println!("  help        - Show this help message");
+        println!();
     }
 }
 

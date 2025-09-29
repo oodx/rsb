@@ -63,20 +63,23 @@
   - Implement set_prompt() for dynamic updates
   - Add Repl to prelude exports
   - Add sanity tests for Repl struct
-- [ ] REPL-02: Command Tokenization & Parser Trait [4 SP]
+- [x] REPL-02: Command Tokenization & Parser Trait [4 SP] ✅
   - Create src/repl/parser.rs module
   - Define ReplParser trait (Send + Sync)
   - Implement SimpleParser: quote-aware, pattern detection (tokens, comma lists, semicolon streams)
   - Implement Args::from_line() using SimpleParser
   - Implement Repl::with_parser() for pluggable parsers
-- [ ] REPL-03: Global Storage Integration [2 SP]
+  - 22 comprehensive sanity tests
+  - China validation: 85% confidence
+- [x] REPL-03: Global Storage Integration [2 SP] ✅ (Already complete from REPL-00)
   - Implement store_repl_args_global() function
   - Store repl_arg_0..N, repl_argc, repl_args (0-indexed)
   - Integration with existing global store
-- [ ] REPL-04: Built-in Commands [2 SP]
+- [x] REPL-04: Built-in Commands [2 SP] ✅
   - Implement dispatch_builtin() method
   - exit/quit, clear, history, help commands
   - ReplResult enum (Exit, Continue, Command, Error)
+  - 7 sanity tests for built-in commands
 
 **Phase 2: Macro System** [4 SP]
 - [ ] REPL-05: REPL Argument Macros [2 SP]

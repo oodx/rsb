@@ -231,6 +231,113 @@ fn sanity_repl_with_parser() {
     assert_eq!(repl.history().len(), 0);
 }
 
+// REPL-04: Built-in command tests
+#[test]
+fn sanity_builtin_exit_command() {
+    use rsb::repl::{Repl, ReplResult};
+    let repl = Repl::new();
+    let args = rsb::cli::Args::from_line("exit");
+    let result = repl.dispatch_builtin(&args);
+
+    match result {
+        ReplResult::Exit => {}, // Success
+        _ => panic!("Expected Exit result"),
+    }
+}
+
+#[test]
+fn sanity_builtin_quit_command() {
+    use rsb::repl::{Repl, ReplResult};
+    let repl = Repl::new();
+    let args = rsb::cli::Args::from_line("quit");
+    let result = repl.dispatch_builtin(&args);
+
+    match result {
+        ReplResult::Exit => {}, // Success
+        _ => panic!("Expected Exit result"),
+    }
+}
+
+#[test]
+#[serial]
+fn sanity_builtin_clear_command() {
+    use rsb::repl::{Repl, ReplResult};
+    use rsb::global::{set_var, has_var};
+
+    // Set some REPL globals
+    set_var("repl_test", "value");
+    assert!(has_var("repl_test"));
+
+    let repl = Repl::new();
+    let args = rsb::cli::Args::from_line("clear");
+    let result = repl.dispatch_builtin(&args);
+
+    match result {
+        ReplResult::Continue => {
+            // clear_prefix should have removed repl_ vars
+            assert!(!has_var("repl_test"));
+        },
+        _ => panic!("Expected Continue result"),
+    }
+}
+
+#[test]
+fn sanity_builtin_history_command() {
+    use rsb::repl::{Repl, ReplResult};
+    let mut repl = Repl::new();
+    repl.add_to_history("cmd1".to_string());
+    repl.add_to_history("cmd2".to_string());
+
+    let args = rsb::cli::Args::from_line("history");
+    let result = repl.dispatch_builtin(&args);
+
+    match result {
+        ReplResult::Continue => {}, // Success
+        _ => panic!("Expected Continue result"),
+    }
+}
+
+#[test]
+fn sanity_builtin_help_command() {
+    use rsb::repl::{Repl, ReplResult};
+    let repl = Repl::new();
+    let args = rsb::cli::Args::from_line("help");
+    let result = repl.dispatch_builtin(&args);
+
+    match result {
+        ReplResult::Continue => {}, // Success
+        _ => panic!("Expected Continue result"),
+    }
+}
+
+#[test]
+fn sanity_builtin_user_command() {
+    use rsb::repl::{Repl, ReplResult};
+    let repl = Repl::new();
+    let args = rsb::cli::Args::from_line("build test");
+    let result = repl.dispatch_builtin(&args);
+
+    match result {
+        ReplResult::Command(cmd_args) => {
+            assert_eq!(cmd_args.all()[0], "build");
+            assert_eq!(cmd_args.get(1), "test");
+        },
+        _ => panic!("Expected Command result"),
+    }
+}
+
+#[test]
+fn sanity_builtin_empty_line() {
+    use rsb::repl::{Repl, ReplResult};
+    let repl = Repl::new();
+    let args = rsb::cli::Args::from_line("");
+    let result = repl.dispatch_builtin(&args);
+
+    match result {
+        ReplResult::Continue => {}, // Success
+        _ => panic!("Expected Continue result"),
+    }
+}
+
 // TODO: Add more tests as features are implemented
-// - REPL-04: Built-in commands
 // - REPL-05: repl_arg! macros
