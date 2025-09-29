@@ -133,24 +133,28 @@
 
 ### BUGS & REGRESSIONS 🐛
 
-**BUG-01: Test Isolation Issues in REPL Tests** [CRITICAL]
-- **Status**: Identified during post-REPL regression testing
-- **Symptom**: Random test failures in sanity_cli_args suite when run in parallel
-  - test_cli_args_overwrite (intermittent failure)
-  - test_cli_arg_macros (intermittent failure)
-- **Root Cause**: REPL tests modify global state (repl_arg_*, repl_argc, repl_args) without proper cleanup
-- **Evidence**: Tests pass when run serially (--test-threads=1), fail in parallel
-- **Impact**: Flaky test suite, unreliable CI/CD
-- **Affected Tests**:
-  - tests/sanity/repl.rs (35 tests)
-  - tests/uat/repl.rs (7 tests)
-  - tests/sanity_cli_args.rs (9 tests) - victims of pollution
-- **Priority**: HIGH - Breaks test reliability
-- **Estimate**: 2 SP
-- **Fix Strategy**:
-  - Add proper cleanup in REPL test teardown
-  - Use RSB_GLOBAL_RESET pattern for test cleanup
-  - Consider test fixtures for global state isolation
+**BUG-01: Test Isolation Issues in REPL Tests** [CRITICAL] ✅ FIXED
+- **Status**: FIXED - All test isolation issues resolved
+- **Symptom**: Deterministic test failures when sanity + sanity_cli_args run together
+- **Root Cause**: Tests modified global state (repl_*, cli_*) without proper cleanup
+- **Fix Applied**:
+  - Added cleanup_repl_globals() helper to tests/sanity/repl.rs
+  - Added cleanup_cli_globals() helper to tests/sanity/cli_args.rs
+  - Both helpers use RSB_GLOBAL_RESET + clear_prefix() pattern
+  - Added cleanup calls to all 9 tests in tests/sanity/repl.rs that modify global state
+  - Added cleanup calls to all 9 tests in tests/sanity/cli_args.rs
+  - Added cleanup call to uat_repl_global_storage_demo and uat_repl_macros
+  - Added #[serial] markers to all 9 cli_args tests (they share cli_* globals)
+- **Verification**:
+  - ✅ sanity + sanity_cli_args (--test-threads=4): 380 passed, 0 failed
+  - ✅ All UAT tests: 94 passed, 0 failed
+  - ✅ No more cross-contamination or order-dependent failures
+- **Files Modified**:
+  - tests/sanity/repl.rs: Added cleanup_repl_globals() + 9 cleanup calls
+  - tests/sanity/cli_args.rs: Added cleanup_cli_globals() + 9 cleanup calls + #[serial] markers
+  - tests/uat/repl.rs: Added cleanup_repl_globals() + 2 cleanup calls
+- **Story Points**: 2 SP (as estimated)
+- **Date Fixed**: 2025-09-29
 
 **BUG-02: Unused Code Warnings in REPL Module** [LOW]
 - **Status**: Identified during compilation

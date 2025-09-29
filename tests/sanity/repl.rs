@@ -8,9 +8,16 @@
 
 use rsb::repl::{ReplParser, SimpleParser, store_repl_args_global, Repl};
 use rsb::cli::Args;
-use rsb::global::{get_var, set_var};
+use rsb::global::{get_var, set_var, clear_prefix};
 use rsb::{repl_arg, repl_argc, repl_args, repl_argv, repl_dispatch};
 use serial_test::serial;
+
+/// Test cleanup helper - clears all repl_* globals
+fn cleanup_repl_globals() {
+    set_var("RSB_GLOBAL_RESET", "1");
+    let _ = clear_prefix("repl_");
+    set_var("RSB_GLOBAL_RESET", "0");
+}
 
 #[test]
 fn sanity_repl_module_exports() {
@@ -39,6 +46,8 @@ fn sanity_store_repl_args_global_basic() {
     assert_eq!(get_var("repl_argc"), "2");
     assert_eq!(get_var("repl_arg_0"), "status");
     assert_eq!(get_var("repl_arg_1"), "--verbose");
+
+    cleanup_repl_globals();
 }
 
 #[test]
@@ -48,6 +57,8 @@ fn sanity_store_repl_args_semicolon_joined() {
     store_repl_args_global(&args);
 
     assert_eq!(get_var("repl_args"), "cmd;arg1;arg2");
+
+    cleanup_repl_globals();
 }
 
 // REPL-01: Core Repl struct tests
@@ -93,6 +104,8 @@ fn sanity_repl_prompt_from_global() {
     let repl = Repl::new();
     // Prompt should be loaded from global
     drop(repl); // Use repl to avoid warning
+
+    cleanup_repl_globals();
 }
 
 #[test]
@@ -104,6 +117,8 @@ fn sanity_repl_prompt_from_env() {
     let repl = Repl::new();
     // Should use env var over default
     drop(repl);
+
+    cleanup_repl_globals();
 }
 
 // REPL-02: Parser and tokenization tests
@@ -351,6 +366,8 @@ fn sanity_repl_arg_macro() {
     assert_eq!(repl_arg!(0), "cmd");
     assert_eq!(repl_arg!(1), "arg1");
     assert_eq!(repl_arg!(2), "arg2");
+
+    cleanup_repl_globals();
 }
 
 #[test]
@@ -361,6 +378,8 @@ fn sanity_repl_argc_macro() {
     store_repl_args_global(&args);
 
     assert_eq!(repl_argc!(), 3);
+
+    cleanup_repl_globals();
 }
 
 #[test]
@@ -371,6 +390,8 @@ fn sanity_repl_args_macro() {
     store_repl_args_global(&args);
 
     assert_eq!(repl_args!(), "cmd;arg1;arg2");
+
+    cleanup_repl_globals();
 }
 
 #[test]
@@ -385,6 +406,8 @@ fn sanity_repl_argv_macro() {
     assert_eq!(argv[0], "cmd");
     assert_eq!(argv[1], "arg1");
     assert_eq!(argv[2], "arg2");
+
+    cleanup_repl_globals();
 }
 
 #[test]
@@ -398,6 +421,8 @@ fn sanity_repl_macros_empty() {
     assert_eq!(repl_argc!(), 0);
     assert_eq!(repl_args!(), "");
     assert_eq!(repl_argv!().len(), 0);
+
+    cleanup_repl_globals();
 }
 
 // REPL-06: repl_dispatch! macro tests

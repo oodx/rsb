@@ -5,9 +5,16 @@
 
 use rsb::repl::{ReplParser, SimpleParser, store_repl_args_global, Repl, ReplResult};
 use rsb::cli::Args;
-use rsb::global::get_var;
+use rsb::global::{get_var, set_var, clear_prefix};
 use rsb::{repl_arg, repl_argc, repl_args, repl_argv};
 use serial_test::serial;
+
+/// Test cleanup helper - clears all repl_* globals
+fn cleanup_repl_globals() {
+    set_var("RSB_GLOBAL_RESET", "1");
+    let _ = clear_prefix("repl_");
+    set_var("RSB_GLOBAL_RESET", "0");
+}
 
 #[test]
 #[serial]
@@ -44,6 +51,8 @@ fn uat_repl_global_storage_demo() {
     println!("  repl_args = {}", get_var("repl_args"));
 
     println!("\n✨ REPL arguments stored with 0-indexed pattern!");
+
+    cleanup_repl_globals();
 }
 
 #[test]
@@ -92,6 +101,8 @@ fn uat_repl_macros() {
     println!("  repl_argv!() = {:?}", repl_argv!());
 
     println!("\n✨ All REPL macros working correctly!");
+
+    cleanup_repl_globals();
 }
 
 #[test]

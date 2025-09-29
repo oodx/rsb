@@ -1,8 +1,17 @@
 //! Sanity tests for CLI args to global functionality (v0.7.0+)
 
 use rsb::prelude::*;
+use serial_test::serial;
+
+/// Test cleanup helper - clears all cli_* globals
+fn cleanup_cli_globals() {
+    set_var("RSB_GLOBAL_RESET", "1");
+    let _ = clear_prefix("cli_");
+    set_var("RSB_GLOBAL_RESET", "0");
+}
 
 #[test]
+#[serial]
 fn test_cli_to_global_basic() {
     // Simulate command line args
     let args = vec![
@@ -24,9 +33,12 @@ fn test_cli_to_global_basic() {
     assert_eq!(get_var("cli_arg_3"), "arg3");
     assert_eq!(get_var("cli_args"), "arg1;arg2;arg3");
     assert_eq!(get_var("cli_argv"), "myprogram;arg1;arg2;arg3");
+
+    cleanup_cli_globals();
 }
 
 #[test]
+#[serial]
 fn test_cli_to_global_no_args() {
     // Only program name
     let args = vec!["myprogram".to_string()];
@@ -38,9 +50,12 @@ fn test_cli_to_global_no_args() {
     assert_eq!(get_var("cli_args"), "");
     assert_eq!(get_var("cli_argv"), "myprogram");
     assert!(!has_var("cli_arg_1"));
+
+    cleanup_cli_globals();
 }
 
 #[test]
+#[serial]
 fn test_cli_arg_macros() {
     // Set up test data
     let args = vec![
@@ -75,9 +90,12 @@ fn test_cli_arg_macros() {
     assert_eq!(argv.len(), 2);
     assert_eq!(argv[0], "first");
     assert_eq!(argv[1], "second");
+
+    cleanup_cli_globals();
 }
 
 #[test]
+#[serial]
 fn test_cli_args_with_spaces() {
     let args = vec![
         "myapp".to_string(),
@@ -90,9 +108,12 @@ fn test_cli_args_with_spaces() {
     assert_eq!(get_var("cli_arg_1"), "hello world");
     assert_eq!(get_var("cli_arg_2"), "foo bar");
     assert_eq!(get_var("cli_args"), "hello world;foo bar");
+
+    cleanup_cli_globals();
 }
 
 #[test]
+#[serial]
 fn test_cli_args_with_special_chars() {
     let args = vec![
         "/usr/bin/app".to_string(),
@@ -105,9 +126,12 @@ fn test_cli_args_with_special_chars() {
     assert_eq!(get_var("cli_prog"), "/usr/bin/app");
     assert_eq!(get_var("cli_arg_1"), "--flag=value");
     assert_eq!(get_var("cli_arg_2"), "path/to/file.txt");
+
+    cleanup_cli_globals();
 }
 
 #[test]
+#[serial]
 fn test_cli_bootstrap_integration() {
     // Simulate args
     let args = vec![
@@ -122,9 +146,12 @@ fn test_cli_bootstrap_integration() {
     assert_eq!(get_var("cli_prog"), "bootstrap_test");
     assert_eq!(get_var("cli_arg_1"), "test_arg");
     assert_eq!(get_var("cli_argc"), "1");
+
+    cleanup_cli_globals();
 }
 
 #[test]
+#[serial]
 fn test_cli_argv_macro_empty() {
     // Set up with no args
     let args = vec!["program_only".to_string()];
@@ -132,9 +159,12 @@ fn test_cli_argv_macro_empty() {
 
     let argv = cli_argv!();
     assert!(argv.is_empty());
+
+    cleanup_cli_globals();
 }
 
 #[test]
+#[serial]
 fn test_cli_args_1_based_indexing() {
     // Test that indexing follows bash convention (1-based)
     let args = vec![
@@ -152,9 +182,12 @@ fn test_cli_args_1_based_indexing() {
     assert_eq!(cli_arg!(2), "one");   // Second positional arg
     assert_eq!(cli_arg!(3), "two");   // Third positional arg
     assert_eq!(cli_arg!(4), "");      // Non-existent returns empty
+
+    cleanup_cli_globals();
 }
 
 #[test]
+#[serial]
 fn test_cli_args_overwrite() {
     // First call
     let args1 = vec!["prog1".to_string(), "arg1".to_string()];
@@ -167,4 +200,6 @@ fn test_cli_args_overwrite() {
     rsb::cli::cli_to_global(&args2);
     assert_eq!(get_var("cli_prog"), "prog2");
     assert_eq!(get_var("cli_arg_1"), "newarg");
+
+    cleanup_cli_globals();
 }
