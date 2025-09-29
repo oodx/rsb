@@ -16,16 +16,15 @@
   - ✅ Add flag boundary validation [2 SP]
   - ✅ Load strategy from RSB config (RSB_OPTIONS_MODE/rsb_options_mode) [2 SP]
   - ✅ Maintain backward compatibility [1 SP]
+- ✅ **Flag Commands**: Flag command detection system with --version and --help handlers [10 SP]
+  - ✅ Create FlagCommand struct and registry [3 SP]
+  - ✅ Implement execute_flag_commands() [3 SP]
+  - ✅ Add default --version and --help handlers [2 SP]
+  - ✅ Integrate with dispatch! macro [2 SP]
 
 ### IN PROGRESS - RSB v2.0 Enhancement Suite Phase 2 🔄
 
 #### PRIORITY 1: ACTIVE IMPLEMENTATION
-
-**TASK 2.1: Flag Commands** [10 SP] 🔥 CURRENT PRIORITY
-- [ ] Create FlagCommand struct and registry [3 SP]
-- [ ] Implement execute_flag_commands() [3 SP]
-- [ ] Add default --version and --help handlers [2 SP]
-- [ ] Integrate with dispatch! macro [2 SP]
 
 #### RECENTLY COMPLETED ✅
 
@@ -39,13 +38,81 @@
 
 #### PRIORITY 2: UPCOMING STAKEHOLDER FEATURES (Phase 3)
 
-**TASK 3.1: REPL Support** [20 SP]
-- [ ] Create src/repl/mod.rs module [3 SP]
-- [ ] Implement Repl struct with command processing [5 SP]
-- [ ] Add cmd_to_global() for REPL context [3 SP]
-- [ ] Create repl_dispatch! macro [4 SP]
-- [ ] Implement built-in commands (exit, clear, history) [3 SP]
-- [ ] Add REPL-specific arg macros (cmd_arg!, cmd_argc!) [2 SP]
+**TASK 3.1: REPL Support** [29 SP] - See docs/proposals/REPL_STRATEGY.md
+
+**Phase 0: Module Setup** [1 SP]
+- [ ] REPL-00: Module Structure Setup [1 SP]
+  - Create src/repl/ directory with proper module structure
+  - Create src/repl/mod.rs (orchestrator and re-exports)
+  - Create src/repl/parser.rs stub (ReplParser trait)
+  - Create src/repl/macros.rs stub
+  - Create src/repl/helpers.rs stub (store_repl_args_global)
+  - Add repl module to src/lib.rs
+  - Add repl to prelude (repl_arg!, repl_dispatch! etc)
+  - Create tests/sanity/repl.rs orchestrator
+  - Create tests/uat/repl.rs orchestrator
+  - Follow MODULE_SPEC v3 (docs/tech/development/MODULE_SPEC.md)
+
+**Phase 1: Core Infrastructure** [12 SP]
+- [ ] REPL-01: Core Repl Struct and Read Loop [4 SP]
+  - Create src/repl/mod.rs module
+  - Implement Repl struct (prompt, history fields)
+  - Implement read_line() with stdin
+  - Implement new() and with_prompt() constructors
+  - Prompt configuration: rsb_repl_prompt → RSB_REPL_PROMPT → default "repl> "
+  - Implement set_prompt() for dynamic updates
+- [ ] REPL-02: Command Tokenization & Parser Trait [4 SP]
+  - Create src/repl/parser.rs module
+  - Define ReplParser trait (Send + Sync)
+  - Implement SimpleParser: quote-aware, pattern detection (tokens, comma lists, semicolon streams)
+  - Implement Args::from_line() using SimpleParser
+  - Implement Repl::with_parser() for pluggable parsers
+- [ ] REPL-03: Global Storage Integration [2 SP]
+  - Implement store_repl_args_global() function
+  - Store repl_arg_0..N, repl_argc, repl_args (0-indexed)
+  - Integration with existing global store
+- [ ] REPL-04: Built-in Commands [2 SP]
+  - Implement dispatch_builtin() method
+  - exit/quit, clear, history, help commands
+  - ReplResult enum (Exit, Continue, Command, Error)
+
+**Phase 2: Macro System** [4 SP]
+- [ ] REPL-05: REPL Argument Macros [2 SP]
+  - Create src/repl/macros.rs
+  - Implement repl_arg!($n), repl_argc!(), repl_args!(), repl_argv!()
+  - Export in prelude
+- [ ] REPL-06: repl_dispatch! Macro [2 SP]
+  - Implement repl_dispatch! macro with command matching
+  - Error handling integration
+  - Built-in command detection
+
+**Phase 3: Integration & Error Handling** [4 SP]
+- [ ] REPL-07: ReplResult Enum & Error Handling [2 SP]
+  - Non-fatal error catching in dispatch loop
+  - Panic propagation strategy
+- [ ] REPL-08: dispatch! Integration [2 SP]
+  - Document REPL entry pattern from dispatch!
+  - Implement rsb_handle_repl() auto-detection
+  - Registry check for fn_repl_dispatch / fn_cmd_repl
+
+**Phase 4: Testing** [5 SP]
+- [ ] REPL-09: Sanity Tests [2 SP]
+  - Test Args::from_line() tokenization
+  - Test pattern preservation (tokens, lists, streams)
+  - Test global storage (repl_arg_*)
+  - Test built-in commands
+  - Test ReplParser trait
+- [ ] REPL-10: UAT Tests [3 SP]
+  - Test full REPL loop
+  - Test dynamic prompts
+  - Test error handling
+  - Test integration with dispatch!
+
+**Phase 5: Documentation** [3 SP]
+- [ ] REPL-11: Documentation [3 SP]
+  - Create docs/FEATURES_REPL.md
+  - Update docs/HOWTO.md with REPL patterns
+  - Module docs, macro usage, integration patterns
 
 #### PRIORITY 2: OPPORTUNISTIC/BACKLOG
 

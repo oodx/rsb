@@ -83,3 +83,7 @@ mod toml;
 // Flags module UAT tests (v2.0+ - Flag commands --help, --version demos)
 #[path = "uat/flags.rs"]
 mod flags;
+
+// REPL module UAT tests (v2.0+ - Interactive REPL demos)
+#[path = "uat/repl.rs"]
+mod repl;

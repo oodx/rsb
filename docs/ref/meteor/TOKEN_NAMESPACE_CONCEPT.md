@@ -1,6 +1,7 @@
 # Token Namespace Concept
 
-⚠️ **CRITICAL AMENDMENT**: This document contains **architectural errors** discovered during implementation. See **[TOKEN_CONCEPT_AMENDMENT.md](./TOKEN_CONCEPT_AMENDMENT.md)** for critical corrections to the Token/Meteor/MeteorShower hierarchy before using this specification.
+This document captures the critical architectural insights around stream processing, storage formats, and the relationship between TokenBucket, StorageData, and MeteorShower.
+
 
 ## Overview
 

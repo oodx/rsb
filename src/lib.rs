@@ -62,3 +62,6 @@ pub mod object;
 
 // TOML snooping module for extracting Cargo.toml metadata
 pub mod toml;
+
+// REPL (Read-Eval-Print-Loop) support for interactive command processing
+pub mod repl;

@@ -142,3 +142,7 @@ mod toml;
 // Flags module sanity tests (v2.0+ - Flag commands --help, --version)
 #[path = "sanity/flags.rs"]
 mod flags;
+
+// REPL module sanity tests (v2.0+ - Interactive command processing)
+#[path = "sanity/repl.rs"]
+mod repl;
