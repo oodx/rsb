@@ -11,35 +11,37 @@
 
 ### IN PROGRESS - RSB v2.0 Enhancement Suite 🔄
 
-#### PRIORITY 1: STAKEHOLDER REQUIRED FEATURES (from IDEAS_IMPLEMENTATION_PLAN.md)
+#### PRIORITY 1: FOUNDATION REMAINING WORK (Phase 1 wrap-up)
 
-**TASK 1.4: TOML Snooping** [15 SP] ⏳ HIGHEST PRIORITY - UNLOCKS CONFIG
-- [ ] Create src/toml/mod.rs module with TomlSnooper [3 SP]
-- [ ] Extract [package.metadata.rsb/hub/inf] sections [4 SP]
-- [ ] Store namespace values with snake_case conversion [3 SP]
-- [ ] Handle arrays using RSB convention (LENGTH + indexed) [2 SP]
-- [ ] Integrate with bootstrap! macro variants [3 SP]
-
-**TASK 1.5: Options Cleanup** [10 SP] ⏳ NEXT
+**TASK 1.4: Options Cleanup** [10 SP] 🚩 IN PROGRESS
 - [ ] Create OptionsStrategy enum (Default/Sort/Remove) [2 SP]
 - [ ] Implement apply_options_strategy() method [3 SP]
 - [ ] Add flag boundary validation [2 SP]
 - [ ] Load strategy from RSB config (via TOML) [2 SP]
 - [ ] Maintain backward compatibility [1 SP]
 
-**TASK 1.6: REPL Support** [20 SP] ⏳ STAKEHOLDER CRITICAL
+#### PRIORITY 2: UPCOMING STAKEHOLDER FEATURES (Phase 2 / 3)
+
+**TASK 2.1: Flag Commands** [10 SP]
+- [ ] Create FlagCommand struct and registry [3 SP]
+- [ ] Implement execute_flag_commands() [3 SP]
+- [ ] Add default --version and --help handlers [2 SP]
+- [ ] Integrate with dispatch! macro [2 SP]
+
+**TASK 2.2: TOML Snooping** [15 SP]
+- [ ] Create src/toml/mod.rs module with TomlSnooper [3 SP]
+- [ ] Extract [package.metadata.rsb/hub/inf] sections [4 SP]
+- [ ] Store namespace values with snake_case conversion [3 SP]
+- [ ] Handle arrays using RSB convention (LENGTH + indexed) [2 SP]
+- [ ] Integrate with bootstrap! macro variants [3 SP]
+
+**TASK 3.1: REPL Support** [20 SP]
 - [ ] Create src/repl/mod.rs module [3 SP]
 - [ ] Implement Repl struct with command processing [5 SP]
 - [ ] Add cmd_to_global() for REPL context [3 SP]
 - [ ] Create repl_dispatch! macro [4 SP]
 - [ ] Implement built-in commands (exit, clear, history) [3 SP]
 - [ ] Add REPL-specific arg macros (cmd_arg!, cmd_argc!) [2 SP]
-
-**TASK 1.7: Flag Commands** [10 SP] ⏳ COMPLETES DISPATCH
-- [ ] Create FlagCommand struct and registry [3 SP]
-- [ ] Implement execute_flag_commands() [3 SP]
-- [ ] Add default --version and --help handlers [2 SP]
-- [ ] Integrate with dispatch! macro [2 SP]
 
 #### PRIORITY 2: OPPORTUNISTIC/BACKLOG
 
@@ -155,10 +157,10 @@
 - [ ] Integration Tests: Cross-feature validation [5 SP]
 - [ ] Documentation Updates: API docs and examples [5 SP]
 
-### FUTURE DEVELOPMENT
-- OsString types introduction (M2)
-- UAT test expansion (M3)
-- Performance optimization (M4)
+### FUTURE DEVELOPMENT & NOTES
+- M2: OsString types introduction
+- M3: UAT test expansion
+- M4: Performance optimization
 
 ### BUGS & QOL 📌
-- [ ] **Fix standalone global clear wrappers** — running `cargo test --test sanity_global_clear` fails because the wrapper re-imports the entire `sanity` suite. Trim the wrapper so only the intended module is compiled, restoring the subprocess probe path.
+- [x] **Fix standalone global clear wrappers** — ensure targeted tests only compile intended modules.

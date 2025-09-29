@@ -27,8 +27,30 @@ macro_rules! appref {
 // --- Options Parsing ---
 #[macro_export]
 macro_rules! options {
+    // Default form: uses strategy from config
     ($args:expr) => {{
-        $crate::cli::options($args);
+        use $crate::cli::OptionsStrategy;
+        let strategy = OptionsStrategy::from_config();
+        let context = $crate::cli::options($args);
+        $args.apply_options_strategy(strategy, &context);
+    }};
+    // Explicit strategy form
+    ($args:expr, strategy: $strat:expr) => {{
+        use $crate::cli::OptionsStrategy;
+        let strategy = OptionsStrategy::from_str($strat);
+        let context = $crate::cli::options($args);
+        $args.apply_options_strategy(strategy, &context);
+    }};
+}
+
+// Extended options macro with strategy selection
+#[macro_export]
+macro_rules! options_ex {
+    // With explicit strategy
+    ($args:expr, $strategy:expr) => {{
+        use $crate::cli::OptionsStrategy;
+        let context = $crate::cli::options($args);
+        $args.apply_options_strategy($strategy, &context);
     }};
 }
 

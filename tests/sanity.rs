@@ -25,6 +25,9 @@ mod host_env;
 #[path = "sanity/host_paths.rs"]
 mod host_paths;
 
+#[path = "sanity/options_cleanup.rs"]
+mod options_cleanup;
+
 #[path = "sanity/threads.rs"]
 mod threads;
 

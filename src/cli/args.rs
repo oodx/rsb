@@ -1,3 +1,4 @@
+use crate::cli::options::{OptionsContext, OptionsStrategy};
 use crate::global::expand_vars;
 use std::collections::HashSet;
 
@@ -151,5 +152,44 @@ impl Args {
         out = out.replace("$@", &rem.join(" "));
         out = out.replace("$#", &rem.len().to_string());
         expand_vars(&out)
+    }
+
+    /// Apply options strategy after processing options
+    pub fn apply_options_strategy(&mut self, strategy: OptionsStrategy, context: &OptionsContext) {
+        // First validate we haven't consumed positional args as flag values
+        if context.has_boundary_issues {
+            eprintln!("Warning: Potential flag/value boundary issue detected");
+        }
+
+        match strategy {
+            OptionsStrategy::Sort => self.sort_flags_last(),
+            OptionsStrategy::Remove => self.remove_flags(&context.processed_flags),
+            OptionsStrategy::Default => {},
+        }
+    }
+
+    /// Sort flags to the end of the argument list
+    fn sort_flags_last(&mut self) {
+        let (mut positionals, mut flags): (Vec<_>, Vec<_>) = self.args
+            .drain(..)
+            .partition(|arg| !arg.starts_with('-'));
+
+        // Keep program name at the beginning if present
+        if !positionals.is_empty() && self.is_program_index(0) {
+            let prog = positionals.remove(0);
+            self.args.push(prog);
+        }
+
+        self.args.append(&mut positionals);
+        self.args.append(&mut flags);
+    }
+
+    /// Remove processed flags from the argument list
+    fn remove_flags(&mut self, processed: &[String]) {
+        self.args.retain(|arg| {
+            !processed.iter().any(|flag| {
+                arg == flag || arg.starts_with(&format!("{}=", flag))
+            })
+        });
     }
 }

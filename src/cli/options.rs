@@ -7,6 +7,51 @@ use crate::cli::Args;
 use crate::global;
 use std::path::Path;
 
+/// Strategy for handling options after processing
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum OptionsStrategy {
+    /// Keep all arguments as-is (current behavior)
+    Default,
+    /// Sort flags to the end of the argument list
+    Sort,
+    /// Remove processed flags from the argument list (BashFX style)
+    Remove,
+}
+
+impl OptionsStrategy {
+    /// Load strategy from environment or config
+    pub fn from_config() -> Self {
+        // 1. Check explicit env var
+        if global::has_var("RSB_OPTIONS_MODE") {
+            return Self::from_str(&global::get_var("RSB_OPTIONS_MODE"));
+        }
+        // 2. Check Cargo.toml rsb section (loaded by bootstrap)
+        if global::has_var("rsb_options_mode") {
+            return Self::from_str(&global::get_var("rsb_options_mode"));
+        }
+        // 3. Default
+        Self::Default
+    }
+
+    /// Parse strategy from string
+    pub fn from_str(s: &str) -> Self {
+        match s.to_lowercase().as_str() {
+            "sort" => Self::Sort,
+            "remove" => Self::Remove,
+            _ => Self::Default,
+        }
+    }
+}
+
+/// Context for tracking parsed options
+#[derive(Debug, Clone, Default)]
+pub struct OptionsContext {
+    /// Options that were processed
+    pub processed_flags: Vec<String>,
+    /// Whether flag boundary issues were detected
+    pub has_boundary_issues: bool,
+}
+
 /// Parse command line options and set global option variables.
 ///
 /// This function processes Args and sets global variables in the format `opt_<name>`
@@ -29,9 +74,16 @@ use std::path::Path;
 /// assert_eq!(rsb::param!("opt_verbose"), "0");
 /// assert_eq!(rsb::param!("opt_config"), "app.conf");
 /// ```
-pub fn options(args: &Args) {
+pub fn options(args: &Args) -> OptionsContext {
+    options_with_context(args)
+}
+
+/// Parse options and return context with processed flags
+pub fn options_with_context(args: &Args) -> OptionsContext {
+    let mut context = OptionsContext::default();
     for arg in args.all() {
         if arg.starts_with("--") {
+            context.processed_flags.push(arg.clone());
             let arg_clean = &arg[2..];
             let (arg_key, _maybe_val) = if let Some(eq_pos) = arg_clean.find('=') {
                 (&arg_clean[..eq_pos], Some(&arg_clean[eq_pos + 1..]))
@@ -89,6 +141,7 @@ pub fn options(args: &Args) {
             }
         } else if arg.starts_with("-") && arg.len() == 2 {
             // Short option
+            context.processed_flags.push(arg.clone());
             let opt_char = &arg[1..2];
             // Rust-native textual boolean
             global::set_var(&format!("opt_{}", opt_char), "true");
@@ -107,6 +160,25 @@ pub fn options(args: &Args) {
             }
         }
     }
+
+    // Check for potential flag boundary issues
+    context.has_boundary_issues = check_flag_boundaries(args);
+
+    context
+}
+
+/// Check for problematic flag/value boundary patterns
+fn check_flag_boundaries(args: &Args) -> bool {
+    let all_args = args.all();
+    for i in 0..all_args.len().saturating_sub(1) {
+        if all_args[i].starts_with("--")
+            && !all_args[i].contains('=')
+            && !all_args[i + 1].starts_with('-') {
+            // Potential space-separated value
+            return true;
+        }
+    }
+    false
 }
 
 /// Check if an option was provided (convenience function).

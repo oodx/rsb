@@ -1,6 +1,6 @@
 # RSB Options (FEATURES_OPTIONS)
 
-Updated: 2025-09-12
+Updated: 2025-09-29
 
 Purpose
 - Document the `options!` macro behavior and the stdopts feature.
@@ -31,13 +31,37 @@ Supported Patterns
 
 Supporting API
 - Functions (`rsb::cli`):
-  - `options(&Args)` — macro backing implementation; returns `()`.
+  - `options(&Args) -> OptionsContext` — macro backing implementation; returns context with processed flags.
   - `has_option(&Args, name)` — check if a parsed option flag is present (after running `options!`).
   - `get_option_value(&Args, name) -> Option<String>` — retrieve the last provided value for a flag.
 - Macros (`rsb::cli::macros`):
-  - `options!(&args)` — front door (documented above).
+  - `options!(&args)` — front door; automatically applies strategy from config.
+  - `options!(&args, strategy: "remove")` — explicit strategy override.
+  - `options_ex!(&args, OptionsStrategy::Sort)` — extended form with enum strategy.
   - `args!()` / `appref!()` — helper accessors for raw `std::env::args()` when writing minimal binaries.
   - `dispatch!({ ... })`, `pre_dispatch!({ ... })` — integrate options parsing with command routing.
+
+Options Cleanup (v0.7.0+)
+- **Problem**: Flags remain in Args after processing, complicating positional argument access
+- **Solution**: OptionsStrategy enum with configurable post-processing behavior
+- **Strategies**:
+  - `Default` — Keep arguments as-is (backward compatible)
+  - `Sort` — Move all flags to end of argument list
+  - `Remove` — Remove processed flags entirely (BashFX style)
+- **Configuration**: Load strategy from `RSB_OPTIONS_MODE` env or `rsb_options_mode` config
+- **Flag Boundary Validation**: Detect problematic `--flag value` patterns (warns about space-separated values)
+- **Usage**:
+  ```rust
+  let mut args = bootstrap!();
+  options!(&mut args);  // Uses strategy from config
+
+  // Explicit strategy
+  options!(&mut args, strategy: "remove");
+  options_ex!(&mut args, OptionsStrategy::Sort);
+
+  // Configuration via environment
+  std::env::set_var("RSB_OPTIONS_MODE", "remove");
+  ```
 
 Not Supported (by design)
 - Combined short flags: `-dq` (use `-d -q`).
