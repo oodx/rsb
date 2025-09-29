@@ -194,6 +194,9 @@ pub use crate::object::{
     get_object, get_hub, get_inf, get_rsb,
 };
 
+// REPL support for interactive command processing
+pub use crate::repl::{Repl, ReplParser, SimpleParser, store_repl_args_global};
+
 // Object-related macros are already exported at crate level via #[macro_export]
 // They don't need to be re-exported here
 

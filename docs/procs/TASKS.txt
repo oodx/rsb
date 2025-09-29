@@ -41,7 +41,7 @@
 **TASK 3.1: REPL Support** [29 SP] - See docs/proposals/REPL_STRATEGY.md
 
 **Phase 0: Module Setup** [1 SP]
-- [ ] REPL-00: Module Structure Setup [1 SP]
+- [x] REPL-00: Module Structure Setup [1 SP] ✅
   - Create src/repl/ directory with proper module structure
   - Create src/repl/mod.rs (orchestrator and re-exports)
   - Create src/repl/parser.rs stub (ReplParser trait)
@@ -54,13 +54,15 @@
   - Follow MODULE_SPEC v3 (docs/tech/development/MODULE_SPEC.md)
 
 **Phase 1: Core Infrastructure** [12 SP]
-- [ ] REPL-01: Core Repl Struct and Read Loop [4 SP]
+- [x] REPL-01: Core Repl Struct and Read Loop [4 SP] ✅
   - Create src/repl/mod.rs module
   - Implement Repl struct (prompt, history fields)
   - Implement read_line() with stdin
   - Implement new() and with_prompt() constructors
   - Prompt configuration: rsb_repl_prompt → RSB_REPL_PROMPT → default "repl> "
   - Implement set_prompt() for dynamic updates
+  - Add Repl to prelude exports
+  - Add sanity tests for Repl struct
 - [ ] REPL-02: Command Tokenization & Parser Trait [4 SP]
   - Create src/repl/parser.rs module
   - Define ReplParser trait (Send + Sync)

@@ -159,31 +159,31 @@ mod tests {
 
     #[test]
     fn test_help_flag_detection() {
-        let args = Args::new(&["prog", "--help"]);
+        let args = Args::from_strs(&["prog", "--help"]);
         assert!(rsb_handle_help_flag(&args).is_some());
 
-        let args = Args::new(&["prog", "-h"]);
+        let args = Args::from_strs(&["prog", "-h"]);
         assert!(rsb_handle_help_flag(&args).is_some());
 
-        let args = Args::new(&["prog", "build"]);
+        let args = Args::from_strs(&["prog", "build"]);
         assert!(rsb_handle_help_flag(&args).is_none());
     }
 
     #[test]
     fn test_version_flag_detection() {
-        let args = Args::new(&["prog", "--version"]);
+        let args = Args::from_strs(&["prog", "--version"]);
         assert!(rsb_handle_version_flag(&args).is_some());
 
-        let args = Args::new(&["prog", "-v"]);
+        let args = Args::from_strs(&["prog", "-v"]);
         assert!(rsb_handle_version_flag(&args).is_some());
 
-        let args = Args::new(&["prog", "build"]);
+        let args = Args::from_strs(&["prog", "build"]);
         assert!(rsb_handle_version_flag(&args).is_none());
     }
 
     #[test]
     fn test_topic_help_detection() {
-        let args = Args::new(&["prog", "build", "--help"]);
+        let args = Args::from_strs(&["prog", "build", "--help"]);
         let result = rsb_handle_help_flag(&args);
         assert!(result.is_some());
         assert_eq!(result.unwrap(), 0);
@@ -191,19 +191,19 @@ mod tests {
 
     #[test]
     fn test_check_flag_commands_help() {
-        let args = Args::new(&["prog", "--help"]);
+        let args = Args::from_strs(&["prog", "--help"]);
         assert_eq!(check_flag_commands(&args), Some(0));
     }
 
     #[test]
     fn test_check_flag_commands_version() {
-        let args = Args::new(&["prog", "--version"]);
+        let args = Args::from_strs(&["prog", "--version"]);
         assert_eq!(check_flag_commands(&args), Some(0));
     }
 
     #[test]
     fn test_check_flag_commands_none() {
-        let args = Args::new(&["prog", "build"]);
+        let args = Args::from_strs(&["prog", "build"]);
         assert_eq!(check_flag_commands(&args), None);
     }
 }
