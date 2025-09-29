@@ -1,0 +1,72 @@
+====
+🚀 RSB / CODEX SESSION STARTER
+====
+
+This repository hosts the RSB (Rebel String-Biased) framework — a string-first Rust toolkit with deep CLI + Bash ergonomics. Use this guide to get productive fast, then dive into the process/docs for full context.
+
+----
+QUICK START CHECKLIST
+----
+1. Read `docs/procs/PROCESS.txt` → meta workflow & rules.
+2. Read `docs/procs/CONTINUE.md` → last handoff + open threads.
+3. Review `docs/procs/TASKS.txt` → live task board (Phase 2 progress, backlog, bugs).
+4. Run `./bin/test.sh lint` → ensure test org still compliant before changing anything.
+
+----
+STATUS SNAPSHOT (2025-09-29)
+----
+- Phase 1 (Foundation Features) ✅ complete.
+- Phase 2 in flight (25 SP total):
+  * ✅ Task 2.2: TOML Snooping (metadata extraction via `rsb::toml`).
+  * ⏳ Task 2.1: Flag Commands (help/version pre-dispatch) — just landed, verify docs/tests.
+- Phase 3 (REPL support) queued; implementation strategy: `docs/proposals/REPL_STRATEGY.md`.
+- Object module QOL + Hub integration tracked in TASKS backlog.
+
+----
+KEY DIRECTIONS & FILES
+----
+Code layout:
+- `src/cli/` → Args/options/dispatch/flags/bootstrap.
+- `src/toml/` → new TomlSnooper (metadata → globals).
+- `src/object/` → Object<T> container + helpers (uses `string::to_snake_case`).
+- `src/string/` → case conversion helpers (snake/pascal/screaming, macros).
+- `tests/sanity.rs`, `tests/uat.rs` → orchestrators; module-specific suites under `tests/sanity/` & `tests/uat/`.
+
+Process & reference docs:
+- `docs/procs/` → START / PROCESS / CONTINUE / TASKS / ROADMAP / SPRINT.
+- `docs/proposals/IDEAS_IMPLEMENTATION_PLAN.md` → phase breakdown & acceptance criteria.
+- `docs/proposals/REPL_STRATEGY.md` → detailed plan for upcoming REPL epic.
+- `docs/tech/features/FEATURES_*.md` → per-feature docs (Options, TOML, CLI, etc.).
+
+Handy references:
+- `RSB_ANALYSIS.md` → ecosystem + architecture summary.
+- `.eggs/` → China/Tina analysis logs (module compliance, object module insights).
+
+----
+TOOLS & COMMANDS
+----
+- `./bin/test.sh` — central test/doc runner (`./bin/test.sh help`).
+  * `./bin/test.sh lint` → enforce test suite organization.
+  * `./bin/test.sh run sanity` / `run uat` → Rust test wrappers.
+  * `./bin/test.sh docs` → quick doc index (targets: rsb, howto, org, features, …).
+- `bin/feat.py` — feature doc helper (see `README_FEATS.md` for usage).
+- `cargo test --test sanity_<module>` → targeted suites (colors, global_clear, toml, …).
+
+----
+TEST & BUILD REMINDERS
+----
+- Always run `./bin/test.sh lint` before/after adding tests.
+- Use new options macros carefully:
+  * `options!(&args)` → legacy (no cleanup).
+  * `options!(mut args)` / `options!(mut args, strategy: "remove")` → OptionsStrategy.
+- TOML snooping caches metadata in globals; re-run `enable_toml_snooping()` after changes to Cargo metadata (stale keys now cleared automatically).
+
+----
+NEXT UP
+----
+- Validate recently merged Flag Commands implementation (sanity/uat suites, docs, integration).
+- Prep for Task 3.1 REPL: confirm design notes in `docs/proposals/REPL_STRATEGY.md`, plan module scaffolding under `src/repl/`.
+- Keep TASKS and CONTINUE updated at session end.
+
+Happy rebelling against the princess compiler. 🏴‍☠️
+====
