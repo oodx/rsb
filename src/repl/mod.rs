@@ -50,7 +50,7 @@ use crate::global::{get_var, has_var};
 /// Provides a read-eval-print loop with:
 /// - Dynamic prompt configuration
 /// - Command history tracking
-/// - Pluggable parser support (future)
+/// - Pluggable parser support
 ///
 /// # Example
 /// ```rust,ignore
@@ -69,6 +69,8 @@ pub struct Repl {
     prompt: String,
     /// Command history (in-memory only for v1)
     history: Vec<String>,
+    /// Pluggable parser for command line tokenization
+    parser: Box<dyn ReplParser>,
 }
 
 impl Repl {
@@ -78,6 +80,8 @@ impl Repl {
     /// 1. TOML: `rsb_repl_prompt` via rsb_config!
     /// 2. Environment: `RSB_REPL_PROMPT`
     /// 3. Default: `"repl> "`
+    ///
+    /// Uses SimpleParser by default.
     pub fn new() -> Self {
         let prompt = if has_var("rsb_repl_prompt") {
             get_var("rsb_repl_prompt")
@@ -90,6 +94,7 @@ impl Repl {
         Self {
             prompt,
             history: Vec::new(),
+            parser: Box::new(SimpleParser),
         }
     }
 
@@ -106,6 +111,27 @@ impl Repl {
         Self {
             prompt: prompt.to_string(),
             history: Vec::new(),
+            parser: Box::new(SimpleParser),
+        }
+    }
+
+    /// Create REPL with custom parser
+    ///
+    /// Allows pluggable parsing strategies for different tokenization needs.
+    ///
+    /// # Arguments
+    /// * `parser` - Custom parser implementation
+    ///
+    /// # Example
+    /// ```rust,ignore
+    /// let parser = Box::new(MyCustomParser);
+    /// let repl = Repl::with_parser(parser);
+    /// ```
+    pub fn with_parser(parser: Box<dyn ReplParser>) -> Self {
+        Self {
+            prompt: "repl> ".to_string(),
+            history: Vec::new(),
+            parser,
         }
     }
 

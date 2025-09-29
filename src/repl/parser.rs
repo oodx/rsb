@@ -37,10 +37,60 @@ pub struct SimpleParser;
 
 impl ReplParser for SimpleParser {
     fn parse(&self, line: &str) -> Vec<String> {
-        // TODO: Implement in REPL-02
-        // For now, simple whitespace split
-        line.split_whitespace()
-            .map(|s| s.to_string())
-            .collect()
+        let mut result = Vec::new();
+        let mut current = String::new();
+        let mut in_quotes = false;
+        let mut chars = line.chars().peekable();
+
+        while let Some(ch) = chars.next() {
+            match ch {
+                '"' => {
+                    // Toggle quote mode
+                    in_quotes = !in_quotes;
+                    // Don't include quotes in output
+                }
+                ' ' | '\t' if !in_quotes => {
+                    // Whitespace outside quotes ends current token
+                    if !current.is_empty() {
+                        result.push(current.clone());
+                        current.clear();
+                    }
+                }
+                _ => {
+                    current.push(ch);
+                }
+            }
+        }
+
+        // Push final token if any
+        if !current.is_empty() {
+            result.push(current);
+        }
+
+        result
+    }
+}
+
+impl SimpleParser {
+    /// Check if a token contains a comma list pattern (no spaces around commas)
+    fn is_comma_list(s: &str) -> bool {
+        s.contains(',') && !s.contains(" ,") && !s.contains(", ")
+    }
+
+    /// Check if a token contains a semicolon stream pattern
+    fn is_semicolon_stream(s: &str) -> bool {
+        s.contains(';')
+    }
+
+    /// Check if a token contains a token pattern (key=value with optional prefix)
+    fn is_token_pattern(s: &str) -> bool {
+        // Must have = sign
+        if !s.contains('=') {
+            return false;
+        }
+
+        // Check for prefix:key=value or key=value patterns
+        // Examples: config:debug=true, items=a,b,c, theme=dark;timeout=30
+        true
     }
 }

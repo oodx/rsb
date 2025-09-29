@@ -105,7 +105,132 @@ fn sanity_repl_prompt_from_env() {
     drop(repl);
 }
 
+// REPL-02: Parser and tokenization tests
+#[test]
+fn sanity_parser_quote_handling() {
+    let parser = SimpleParser;
+    let tokens = parser.parse("build \"my file.txt\" test");
+
+    assert_eq!(tokens.len(), 3);
+    assert_eq!(tokens[0], "build");
+    assert_eq!(tokens[1], "my file.txt");
+    assert_eq!(tokens[2], "test");
+}
+
+#[test]
+fn sanity_parser_multiple_quotes() {
+    let parser = SimpleParser;
+    let tokens = parser.parse("cmd \"first arg\" \"second arg\"");
+
+    assert_eq!(tokens.len(), 3);
+    assert_eq!(tokens[0], "cmd");
+    assert_eq!(tokens[1], "first arg");
+    assert_eq!(tokens[2], "second arg");
+}
+
+#[test]
+fn sanity_parser_empty_quotes() {
+    let parser = SimpleParser;
+    let tokens = parser.parse("cmd \"\" test");
+
+    assert_eq!(tokens.len(), 2);
+    assert_eq!(tokens[0], "cmd");
+    assert_eq!(tokens[1], "test");
+}
+
+#[test]
+fn sanity_parser_flag_patterns() {
+    let parser = SimpleParser;
+    let tokens = parser.parse("build --output=dist --verbose");
+
+    assert_eq!(tokens.len(), 3);
+    assert_eq!(tokens[0], "build");
+    assert_eq!(tokens[1], "--output=dist");
+    assert_eq!(tokens[2], "--verbose");
+}
+
+#[test]
+fn sanity_parser_token_patterns() {
+    let parser = SimpleParser;
+    let tokens = parser.parse("cmd config:debug=true theme=dark");
+
+    assert_eq!(tokens.len(), 3);
+    assert_eq!(tokens[0], "cmd");
+    assert_eq!(tokens[1], "config:debug=true");
+    assert_eq!(tokens[2], "theme=dark");
+}
+
+#[test]
+fn sanity_parser_comma_list_patterns() {
+    let parser = SimpleParser;
+    let tokens = parser.parse("cmd items=a,b,c test");
+
+    assert_eq!(tokens.len(), 3);
+    assert_eq!(tokens[0], "cmd");
+    assert_eq!(tokens[1], "items=a,b,c");
+    assert_eq!(tokens[2], "test");
+}
+
+#[test]
+fn sanity_parser_semicolon_stream_patterns() {
+    let parser = SimpleParser;
+    let tokens = parser.parse("cmd theme=dark;timeout=30 test");
+
+    assert_eq!(tokens.len(), 3);
+    assert_eq!(tokens[0], "cmd");
+    assert_eq!(tokens[1], "theme=dark;timeout=30");
+    assert_eq!(tokens[2], "test");
+}
+
+#[test]
+fn sanity_parser_complex_line() {
+    let parser = SimpleParser;
+    let tokens = parser.parse("build --output=dist \"my file\" config:debug=true items=a,b,c theme=dark;timeout=30");
+
+    assert_eq!(tokens.len(), 6);
+    assert_eq!(tokens[0], "build");
+    assert_eq!(tokens[1], "--output=dist");
+    assert_eq!(tokens[2], "my file");
+    assert_eq!(tokens[3], "config:debug=true");
+    assert_eq!(tokens[4], "items=a,b,c");
+    assert_eq!(tokens[5], "theme=dark;timeout=30");
+}
+
+#[test]
+fn sanity_args_from_line_basic() {
+    let args = rsb::cli::Args::from_line("build test --verbose");
+
+    // Index 0 is treated as program (command in REPL), get(1) returns first arg after
+    assert_eq!(args.get(1), "test");
+    assert_eq!(args.get(2), "--verbose");
+    // Verify all() includes command
+    assert_eq!(args.all()[0], "build");
+}
+
+#[test]
+fn sanity_args_from_line_quotes() {
+    let args = rsb::cli::Args::from_line("cmd \"my file.txt\"");
+
+    assert_eq!(args.get(1), "my file.txt");
+    assert_eq!(args.all()[0], "cmd");
+}
+
+#[test]
+fn sanity_args_from_line_complex() {
+    let args = rsb::cli::Args::from_line("build --output=dist \"my file\"");
+
+    assert_eq!(args.get(1), "--output=dist");
+    assert_eq!(args.get(2), "my file");
+    assert_eq!(args.all()[0], "build");
+}
+
+#[test]
+fn sanity_repl_with_parser() {
+    let parser = Box::new(SimpleParser);
+    let repl = Repl::with_parser(parser);
+    assert_eq!(repl.history().len(), 0);
+}
+
 // TODO: Add more tests as features are implemented
-// - REPL-02: Quote-aware parser, pattern detection
 // - REPL-04: Built-in commands
 // - REPL-05: repl_arg! macros

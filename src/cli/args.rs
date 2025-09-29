@@ -25,6 +25,28 @@ impl Args {
         }
     }
 
+    /// Create Args from a command line string using SimpleParser
+    ///
+    /// Parses the line with quote-aware tokenization and pattern preservation.
+    /// Useful for REPL command processing.
+    ///
+    /// # Example
+    /// ```rust,ignore
+    /// let args = Args::from_line("build --output=dist \"my file\"");
+    /// assert_eq!(args.get(1), "build");
+    /// assert_eq!(args.get(2), "--output=dist");
+    /// assert_eq!(args.get(3), "my file");
+    /// ```
+    pub fn from_line(line: &str) -> Self {
+        use crate::repl::parser::{ReplParser, SimpleParser};
+        let parser = SimpleParser;
+        let tokens = parser.parse(line);
+        Args {
+            args: tokens,
+            processed: HashSet::new(),
+        }
+    }
+
     fn is_program_index(&self, index: usize) -> bool {
         if self.args.is_empty() || index != 0 {
             return false;
