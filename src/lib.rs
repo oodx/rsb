@@ -9,6 +9,7 @@ pub mod bash;
 pub mod date;
 pub mod deps;
 pub mod global;
+pub mod jobs;
 pub mod math;
 pub mod string;
 pub mod utils;

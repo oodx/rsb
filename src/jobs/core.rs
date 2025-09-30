@@ -2,7 +2,7 @@
 //!
 //! Background shell job execution, tracking, and waiting.
 
-use super::super::command::{run_cmd_with_status, CmdResult};
+use crate::hosts::command::{run_cmd_with_status, CmdResult};
 use super::process::{JobHandle, JOB_COUNTER, JOBS};
 use std::sync::{Arc, Mutex};
 use std::thread;

@@ -1,4 +1,4 @@
-# RSB Host (Environment, XDG/RSB Paths, Script Context, Jobs)
+# RSB Host (Environment, XDG/RSB Paths, Script Context)
 
 Updated: 2025-09-30
 
@@ -44,18 +44,6 @@ Core API
   - `hosts::global::hydrate_env_and_configs(&[paths])` — env bootstrap + load config files.
   - `hosts::global::import_env_with_prefix(prefix, strip)` — import only prefixed env vars.
   - Namespace helpers proxy: `hosts::global::{ns_set, ns_get, ns_get_all}`.
-- Jobs (Background Jobs, Process Management, Events, Signals)
-  - `hosts::jobs::sleep_ms(ms: u64)` — sleep for N milliseconds
-  - `hosts::jobs::bench(label, || { ... }) -> Duration` — measure elapsed time, logs info
-  - `hosts::jobs::start_background(cmd: &str) -> u32` — spawn background job (shell command), return job ID
-  - `hosts::jobs::wait(job_id, timeout_secs: Option<u64>) -> Result<i32, String>` — wait for job completion
-  - `hosts::jobs::list_jobs() -> Vec<(u32, String)>` — snapshot of running jobs
-  - `hosts::jobs::pid_of(process: &str) -> Option<u32>` — get PID of process by name
-  - `hosts::jobs::process_exists(process: &str) -> bool` — check if process is running
-  - `hosts::jobs::kill_pid(pid, signal)` / `kill_process(name, signal)` — terminate processes
-  - `hosts::jobs::create_lock(path)` / `remove_lock(path)` — file-based locking
-  - `hosts::jobs::install_signal_handlers()` — setup SIGINT/SIGTERM handlers
-  - Event system: `EVENT_HANDLERS` registry for job lifecycle events
 
 Examples
 ```rust
@@ -72,26 +60,15 @@ fn main() {
     // Script + args context
     println!("SCRIPT_NAME={}", global::get_var("SCRIPT_NAME"));
     println!("ARGC={}", global::get_var("ARGC"));
-
-    // Background jobs
-    let id = job!(background: "sleep 1 && echo done");
-    let status = job!(wait: id);
 }
 ```
 
 Convenience macros (`rsb::hosts::macros`)
 - `get_env!("NAME")`, `hostname!()`, `user!()`, `home_dir!()`, `current_dir!()` — inline accessors powered by the helpers above.
 - `host_bootstrap!()` — macro wrapper that runs the full host bootstrap using `std::env::args()`.
-- Jobs macros (`rsb::hosts::jobs::macros`):
-  - `job!(background: "cmd")` → job id
-  - `job!(wait: id)` → exit status (i32)
-  - `job!(timeout: secs, wait: id)` → exit status
-  - `job!(list)` → prints `[id] cmd` lines
-  - `event!(register name, handler)` / `event!(emit name, k => v, ...)` — event registry
-  - `trap!(handler, on: "SIGINT"|"SIGTERM"|"EXIT"|"COMMAND_ERROR")` — signal handlers
-  - `benchmark!({ ... })` — inline benchmark
-  - `sleep!(secs)` / `sleep!(ms: millis)` — inline sleep
-  - `pid_of!(process)`, `process_exists!(process)`, `kill_pid!(pid)`, `kill_process!(name)` — process management
+- Process management macros (delegate to `rsb::jobs`):
+  - `pid_of!(process)`, `process_exists!(process)` — process queries
+  - `kill_pid!(pid)`, `kill_process!(name)` — terminate processes
   - `lock!(path)`, `unlock!(path)`, `with_lock!(path => { ... })` — file locking
 
 System helpers (`rsb::hosts::system`)

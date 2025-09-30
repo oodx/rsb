@@ -8,7 +8,6 @@ pub use super::command::*;
 pub use super::env::*;
 pub use super::host_global::*;
 pub use super::host_path::*;
-pub use super::jobs::*;
 pub use super::os::*;
 pub use super::rsb_path::*;
 pub use super::xdg_path::*;

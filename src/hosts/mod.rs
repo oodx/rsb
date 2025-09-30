@@ -20,9 +20,6 @@ pub mod os;
 // Command execution (depends on global for expand_vars)
 pub mod command;
 
-// Job control (process mgmt, events, signals, background jobs)
-pub mod jobs;
-
 // Include macros module
 pub mod macros;
 

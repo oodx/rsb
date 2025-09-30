@@ -5,10 +5,10 @@
 #[macro_export]
 macro_rules! job {
     (background: $command:expr) => {{
-        $crate::hosts::jobs::start_background($command)
+        $crate::jobs::start_background($command)
     }};
     (wait: $job_id:expr) => {{
-        match $crate::hosts::jobs::wait($job_id, None) {
+        match $crate::jobs::wait($job_id, None) {
             Ok(status) => status,
             Err(e) => {
                 $crate::utils::stderrx(
@@ -20,7 +20,7 @@ macro_rules! job {
         }
     }};
     (timeout: $timeout:expr, wait: $job_id:expr) => {{
-        match $crate::hosts::jobs::wait($job_id, Some($timeout)) {
+        match $crate::jobs::wait($job_id, Some($timeout)) {
             Ok(status) => status,
             Err(e) => {
                 $crate::utils::stderrx(
@@ -32,7 +32,7 @@ macro_rules! job {
         }
     }};
     (list) => {{
-        let jobs = $crate::hosts::jobs::list_jobs();
+        let jobs = $crate::jobs::list_jobs();
         if jobs.is_empty() {
             $crate::utils::stderrx("info", "No running jobs.");
         }
@@ -45,15 +45,15 @@ macro_rules! job {
 #[macro_export]
 macro_rules! event {
     (register $event:expr, $handler:expr) => {{
-        let mut handlers = $crate::hosts::jobs::EVENT_HANDLERS.lock().unwrap();
+        let mut handlers = $crate::jobs::EVENT_HANDLERS.lock().unwrap();
         let event_handlers = handlers.entry($event.to_string()).or_insert_with(Vec::new);
         event_handlers.push(Box::new($handler));
     }};
     (emit $event:expr, $($key:expr => $value:expr),*) => {{
         let mut data = ::std::collections::HashMap::new();
         $( data.insert($key.to_string(), $value.to_string()); )*
-        let event_data = $crate::hosts::jobs::EventData { event_type: $event.to_string(), data, };
-        if let Some(handlers) = $crate::hosts::jobs::EVENT_HANDLERS.lock().unwrap().get($event) {
+        let event_data = $crate::jobs::EventData { event_type: $event.to_string(), data, };
+        if let Some(handlers) = $crate::jobs::EVENT_HANDLERS.lock().unwrap().get($event) {
             for handler in handlers { handler(&event_data); }
         }
     }};
@@ -65,7 +65,7 @@ macro_rules! trap {
         let sig_name = $signal.to_uppercase();
         match sig_name.as_str() {
             "SIGINT" | "SIGTERM" | "EXIT" | "COMMAND_ERROR" => {
-                $crate::hosts::jobs::install_signal_handlers();
+                $crate::jobs::install_signal_handlers();
                 $crate::event!(register & sig_name, $handler);
             }
             _ => {
