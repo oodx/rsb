@@ -11,7 +11,6 @@ pub mod deps;
 pub mod global;
 pub mod math;
 pub mod string;
-pub mod threads;
 pub mod utils;
 pub mod xcls;
 
