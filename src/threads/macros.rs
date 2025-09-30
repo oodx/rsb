@@ -40,19 +40,19 @@ macro_rules! job {
     }};
 }
 
-// Event and trap macros use the hosts event registry
+// Event and trap macros use the hosts process event registry
 #[macro_export]
 macro_rules! event {
     (register $event:expr, $handler:expr) => {{
-        let mut handlers = $crate::hosts::events::EVENT_HANDLERS.lock().unwrap();
+        let mut handlers = $crate::hosts::process::EVENT_HANDLERS.lock().unwrap();
         let event_handlers = handlers.entry($event.to_string()).or_insert_with(Vec::new);
         event_handlers.push(Box::new($handler));
     }};
     (emit $event:expr, $($key:expr => $value:expr),*) => {{
         let mut data = ::std::collections::HashMap::new();
         $( data.insert($key.to_string(), $value.to_string()); )*
-        let event_data = $crate::hosts::events::EventData { event_type: $event.to_string(), data, };
-        if let Some(handlers) = $crate::hosts::events::EVENT_HANDLERS.lock().unwrap().get($event) {
+        let event_data = $crate::hosts::process::EventData { event_type: $event.to_string(), data, };
+        if let Some(handlers) = $crate::hosts::process::EVENT_HANDLERS.lock().unwrap().get($event) {
             for handler in handlers { handler(&event_data); }
         }
     }};

@@ -1,6 +1,6 @@
-//! Process Management and Job Control
+//! Process Management, Job Control, and Event System
 //!
-//! Process queries, job tracking, and locking mechanisms.
+//! Process queries, job tracking, locking mechanisms, and event registry.
 
 use super::command::{run_cmd, run_cmd_with_status, CmdResult};
 use lazy_static::lazy_static;
@@ -8,6 +8,20 @@ use std::collections::HashMap;
 use std::io::Write;
 use std::sync::{Arc, Mutex};
 use std::thread;
+
+// === Event System ===
+
+#[derive(Debug, Clone)]
+pub struct EventData {
+    pub event_type: String,
+    pub data: HashMap<String, String>,
+}
+
+lazy_static! {
+    // A registry for event handlers.
+    pub static ref EVENT_HANDLERS: Arc<Mutex<HashMap<String, Vec<Box<dyn Fn(&EventData) + Send + Sync>>>>> =
+        Arc::new(Mutex::new(HashMap::new()));
+}
 
 // === Job Control ===
 
