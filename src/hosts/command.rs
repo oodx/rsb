@@ -6,7 +6,7 @@
 use crate::global;
 use lazy_static::lazy_static;
 use std::collections::HashMap;
-use std::process::Command;
+use std::process::{Command, Stdio};
 use std::sync::{Arc, Mutex};
 
 /// The result of a command execution, containing status, stdout, and stderr.
@@ -21,6 +21,40 @@ lazy_static! {
     static ref MOCK_CMDS: Arc<Mutex<HashMap<String, String>>> =
         Arc::new(Mutex::new(HashMap::new()));
 }
+
+
+// === Command Discovery ===
+
+/// Check if a command exists in PATH
+pub fn is_command(cmd: &str) -> bool {
+    // Try which first
+    if Command::new("which")
+        .arg(cmd)
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .status()
+        .map(|s| s.success())
+        .unwrap_or(false)
+    {
+        return true;
+    }
+
+    // Try command -v as fallback
+    if Command::new("command")
+        .arg("-v")
+        .arg(cmd)
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .status()
+        .map(|s| s.success())
+        .unwrap_or(false)
+    {
+        return true;
+    }
+
+    false
+}
+
 
 /// Executes a shell command and returns a `CmdResult`.
 /// Expands global variables in the command string.

@@ -31,34 +31,3 @@ pub fn get_family() -> String {
     std::env::consts::FAMILY.to_string()
 }
 
-// === Command Discovery ===
-
-/// Check if a command exists in PATH
-pub fn is_command(cmd: &str) -> bool {
-    // Try which first
-    if Command::new("which")
-        .arg(cmd)
-        .stdout(Stdio::null())
-        .stderr(Stdio::null())
-        .status()
-        .map(|s| s.success())
-        .unwrap_or(false)
-    {
-        return true;
-    }
-
-    // Try command -v as fallback
-    if Command::new("command")
-        .arg("-v")
-        .arg(cmd)
-        .stdout(Stdio::null())
-        .stderr(Stdio::null())
-        .status()
-        .map(|s| s.success())
-        .unwrap_or(false)
-    {
-        return true;
-    }
-
-    false
-}

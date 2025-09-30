@@ -2,8 +2,7 @@
 //!
 //! Shell-based JSON parsing using jq (if available).
 
-use crate::hosts::command::run_cmd;
-use crate::hosts::os::is_command;
+use crate::hosts::command::{is_command, run_cmd};
 
 /// Extract a value from JSON using jq (if available).
 pub fn jq_get(json_str: &str, path: &str) -> String {
