@@ -2,7 +2,7 @@
 //!
 //! Process queries, job tracking, locking mechanisms, and event registry.
 
-use super::command::{run_cmd, run_cmd_with_status, CmdResult};
+use crate::hosts::command::{run_cmd, run_cmd_with_status, CmdResult};
 use lazy_static::lazy_static;
 use std::collections::HashMap;
 use std::io::Write;

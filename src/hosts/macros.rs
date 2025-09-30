@@ -54,21 +54,21 @@ macro_rules! current_dir {
 #[macro_export]
 macro_rules! pid_of {
     ($process:expr) => {
-        $crate::hosts::process::pid_of($process)
+        $crate::hosts::jobs::pid_of($process)
     };
 }
 
 #[macro_export]
 macro_rules! process_exists {
     ($process:expr) => {
-        $crate::hosts::process::process_exists($process)
+        $crate::hosts::jobs::process_exists($process)
     };
 }
 
 #[macro_export]
 macro_rules! kill_pid {
     ($pid:expr) => {{
-        match $crate::hosts::process::kill_pid($pid, None) {
+        match $crate::hosts::jobs::kill_pid($pid, None) {
             result if result.status == 0 => {
                 $crate::okay!("Process {} terminated", $pid);
             }
@@ -79,7 +79,7 @@ macro_rules! kill_pid {
         }
     }};
     ($pid:expr, signal: $sig:expr) => {{
-        match $crate::hosts::process::kill_pid($pid, Some($sig)) {
+        match $crate::hosts::jobs::kill_pid($pid, Some($sig)) {
             result if result.status == 0 => {
                 $crate::okay!("Process {} terminated with {}", $pid, $sig);
             }
@@ -94,7 +94,7 @@ macro_rules! kill_pid {
 #[macro_export]
 macro_rules! kill_process {
     ($process:expr) => {{
-        match $crate::hosts::process::kill_process($process, None) {
+        match $crate::hosts::jobs::kill_process($process, None) {
             result if result.status == 0 => {
                 $crate::okay!("Killed all {} processes", $process);
             }
@@ -105,7 +105,7 @@ macro_rules! kill_process {
         }
     }};
     ($process:expr, signal: $sig:expr) => {{
-        match $crate::hosts::process::kill_process($process, Some($sig)) {
+        match $crate::hosts::jobs::kill_process($process, Some($sig)) {
             result if result.status == 0 => {
                 $crate::okay!("Killed all {} processes with {}", $process, $sig);
             }
@@ -122,10 +122,10 @@ macro_rules! kill_process {
 #[macro_export]
 macro_rules! with_lock {
     ($lock_path:expr => $body:block) => {{
-        match $crate::hosts::process::create_lock($lock_path) {
+        match $crate::hosts::jobs::create_lock($lock_path) {
             Ok(_) => {
                 let result = $body;
-                $crate::hosts::process::remove_lock($lock_path);
+                $crate::hosts::jobs::remove_lock($lock_path);
                 result
             }
             Err(e) => {
@@ -139,7 +139,7 @@ macro_rules! with_lock {
 #[macro_export]
 macro_rules! lock {
     ($lock_path:expr) => {{
-        match $crate::hosts::process::create_lock($lock_path) {
+        match $crate::hosts::jobs::create_lock($lock_path) {
             Ok(_) => {
                 $crate::okay!("Lock acquired: {}", $lock_path);
             }
@@ -154,7 +154,7 @@ macro_rules! lock {
 #[macro_export]
 macro_rules! unlock {
     ($lock_path:expr) => {
-        $crate::hosts::process::remove_lock($lock_path);
+        $crate::hosts::jobs::remove_lock($lock_path);
         $crate::okay!("Lock released: {}", $lock_path);
     };
 }
