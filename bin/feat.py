@@ -58,6 +58,9 @@ FEATURE_MAP: Dict[str, Sequence[str]] = {
     "host": [
         "src/hosts",
     ],
+    "jobs": [
+        "src/jobs",
+    ],
     "math": [
         "src/math",
     ],
@@ -92,9 +95,6 @@ FEATURE_MAP: Dict[str, Sequence[str]] = {
     "testing": [
         "bin/test.sh",
         "src/macros/test_helpers.rs",
-    ],
-    "threads": [
-        "src/threads",
     ],
     "tokens": [
         "src/token",
