@@ -1,6 +1,6 @@
-//! Internal helper functions for REPL implementation
+//! Curated low-level helpers for REPL functionality
 //!
-//! Provides low-level utilities for REPL functionality:
+//! Public utilities that users may explicitly opt into:
 //! - Global storage for REPL arguments
 //! - Argument extraction and formatting
 
