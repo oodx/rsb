@@ -580,6 +580,9 @@ declare -A TESTS=(
     ["uat-glyphs"]="uat_glyphs"                  # UAT: visible glyphs demo
     ["uat-visual"]="uat_visual"                  # UAT: bg + color + glyphs
     ["uat-prompts"]="uat_prompts"                # UAT: prompts (confirm/ask/select)
+    # REPL
+    ["sanity-repl"]="sanity repl"                # REPL sanity tests (cargo)
+    ["uat-repl"]="uat repl"                      # REPL UAT tests (cargo)
     # Threads & Bash
     ["threads"]="threads_sanity"                 # Threads sanity wrapper
     ["uat-threads"]="uat_threads"               # Threads UAT wrapper

@@ -1,8 +1,8 @@
-//! Random operations sanity tests
+//! Random number generation sanity tests (gx::rand module)
 
 #[cfg(test)]
 mod tests {
-    use rsb::math::random::*;
+    use rsb::gx::rand::*;  // Random number generation (moved from math)
 
     #[test]
     fn test_random_range() {

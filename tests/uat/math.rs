@@ -310,8 +310,8 @@ fn uat_math_random_operations_demo() {
 
     println!("🎲 Random Number Examples:");
     for i in 1..=5 {
-        let random_float = rsb::math::random_range(1.0, 10.0);
-        let random_int = rsb::math::random_int_range(1, 100);
+        let random_float = rsb::gx::rand::random_range(1.0, 10.0);
+        let random_int = rsb::gx::rand::random_int_range(1, 100);
         println!(
             "   Sample {}: float={:.3}, int={}",
             i, random_float, random_int
@@ -319,46 +319,46 @@ fn uat_math_random_operations_demo() {
     }
 
     println!("\n📊 Random List Generation:");
-    let float_list = rsb::math::random_list_float(5, 0.0, 1.0);
+    let float_list = rsb::gx::rand::random_list_float(5, 0.0, 1.0);
     println!("   5 floats (0-1): {:?}", float_list);
 
-    let int_list = rsb::math::random_list_int(5, 1, 10);
+    let int_list = rsb::gx::rand::random_list_int(5, 1, 10);
     println!("   5 ints (1-10):  {:?}", int_list);
 
-    let bool_list = rsb::math::random_list_bool(8);
+    let bool_list = rsb::gx::rand::random_list_bool(8);
     println!("   8 booleans:     {:?}", bool_list);
 
     println!("\n🎯 String-Based Random Generation (RSB Style):");
-    let random_ints = rsb::math::random_list_string("int", 5, Some("1:100"));
+    let random_ints = rsb::gx::rand::random_list_string("int", 5, Some("1:100"));
     match random_ints {
         Ok(s) => println!("   Random ints:    '{}'", s),
         Err(e) => println!("   Random ints:    ERROR: {}", e),
     }
 
-    let random_floats = rsb::math::random_list_string("float", 4, Some("0.0:1.0"));
+    let random_floats = rsb::gx::rand::random_list_string("float", 4, Some("0.0:1.0"));
     match random_floats {
         Ok(s) => println!("   Random floats:  '{}'", s),
         Err(e) => println!("   Random floats:  ERROR: {}", e),
     }
 
-    let random_bools = rsb::math::random_list_string("bool", 6, None);
+    let random_bools = rsb::gx::rand::random_list_string("bool", 6, None);
     match random_bools {
         Ok(s) => println!("   Random bools:   '{}'", s),
         Err(e) => println!("   Random bools:   ERROR: {}", e),
     }
 
     println!("\n🎮 Gaming/Simulation Applications:");
-    println!("   Dice roll (1-6): {}", rsb::math::random_int_range(1, 6));
+    println!("   Dice roll (1-6): {}", rsb::gx::rand::random_int_range(1, 6));
     println!(
         "   Coin flip:       {}",
-        if rsb::math::random_range(0.0, 1.0) > 0.5 {
+        if rsb::gx::rand::random_range(0.0, 1.0) > 0.5 {
             "Heads"
         } else {
             "Tails"
         }
     );
 
-    let damage_roll = rsb::math::random_list_string("int", 3, Some("1:6"));
+    let damage_roll = rsb::gx::rand::random_list_string("int", 3, Some("1:6"));
     match damage_roll {
         Ok(s) => println!("   3d6 damage:      {} (sum would need parsing)", s),
         Err(e) => println!("   3d6 damage:      ERROR: {}", e),

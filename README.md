@@ -15,9 +15,6 @@ RSB is designed for the "too big for bash, too small for Rust" sweet spot — to
 | Dev Guide | How to run tests and use the runner | [HOWTO_TEST.md](docs/tech/development/HOWTO_TEST.md) |
 | Reference | Architecture overview and standards | [RSB_ARCH.md](docs/tech/reference/RSB_ARCH.md) |
 | Reference | REBEL philosophy and principles | [REBEL.md](docs/tech/reference/REBEL.md) |
-- Feature | Booleans (Rust-native + exit codes) | [FEATURES_TRUTH.md](docs/tech/features/FEATURES_TRUTH.md) |
-- Latest Session Notes (what changed, how to resume):
-  - [.session/SESSION_05_progress_integration_and_deps.md](.session/SESSION_05_progress_integration_and_deps.md)
 
 ## The REBEL Philosophy
 
@@ -100,6 +97,7 @@ Index of Feature Modules
 | **Tokens** | Token generation and parsing utilities | [`FEATURES_TOKENS.md`](docs/tech/features/FEATURES_TOKENS.md) |
 | **Object** | JavaScript-like generic object with global store integration | [`FEATURES_OBJECT.md`](docs/tech/features/FEATURES_OBJECT.md) |
 | **TOML** | Cargo.toml metadata extraction and namespace management | [`FEATURES_TOML.md`](docs/tech/features/FEATURES_TOML.md) |
+| **REPL** | Interactive command processing with repl_dispatch! | [`FEATURES_REPL.md`](docs/tech/features/FEATURES_REPL.md) |
 | **Options** | Configuration options and feature flags | [`FEATURES_OPTIONS.md`](docs/tech/features/FEATURES_OPTIONS.md) |
 | **Progress** | Modular progress indicators (spinner/bar/bytes) | [`FEATURES_PROGRESS.md`](docs/tech/features/FEATURES_PROGRESS.md) |
 | **FS** | File system operations and helpers | [`FEATURES_FS.md`](docs/tech/features/FEATURES_FS.md) |

@@ -181,30 +181,30 @@ fn test_aggregator_operations() {
 #[test]
 fn test_random_operations() {
     // Test random range functions
-    let random_float = rsb::math::random_range(1.0, 10.0);
+    let random_float = rsb::gx::rand::random_range(1.0, 10.0);
     assert!(random_float >= 1.0 && random_float <= 10.0);
 
-    let random_int = rsb::math::random_int_range(1, 100);
+    let random_int = rsb::gx::rand::random_int_range(1, 100);
     assert!(random_int >= 1 && random_int <= 100);
 
     // Test random list generation
-    let float_list = rsb::math::random_list_float(5, 0.0, 1.0);
+    let float_list = rsb::gx::rand::random_list_float(5, 0.0, 1.0);
     assert_eq!(float_list.len(), 5);
     for val in &float_list {
         assert!(*val >= 0.0 && *val <= 1.0);
     }
 
-    let int_list = rsb::math::random_list_int(3, 1, 10);
+    let int_list = rsb::gx::rand::random_list_int(3, 1, 10);
     assert_eq!(int_list.len(), 3);
     for val in &int_list {
         assert!(*val >= 1 && *val <= 10);
     }
 
-    let bool_list = rsb::math::random_list_bool(4);
+    let bool_list = rsb::gx::rand::random_list_bool(4);
     assert_eq!(bool_list.len(), 4);
 
     // Test string-based random list generation
-    let random_string = rsb::math::random_list_string("int", 3, Some("1:10"));
+    let random_string = rsb::gx::rand::random_list_string("int", 3, Some("1:10"));
     match random_string {
         Ok(s) => {
             assert!(!s.is_empty());
@@ -213,7 +213,7 @@ fn test_random_operations() {
         Err(e) => panic!("Random string generation failed: {}", e),
     }
 
-    let bool_string = rsb::math::random_list_string("bool", 3, None);
+    let bool_string = rsb::gx::rand::random_list_string("bool", 3, None);
     match bool_string {
         Ok(s) => assert!(!s.is_empty()),
         Err(e) => panic!("Random bool string generation failed: {}", e),

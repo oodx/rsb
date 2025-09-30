@@ -108,7 +108,7 @@ path = "src/lib.rs"
 
 [[bin]]
 name = "dummy-cli"
-path = "src/dummy_cli.rs"
+path = "src/bin/dummy_cli.rs"
 
 [[example]]
 name = "showcase"

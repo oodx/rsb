@@ -82,6 +82,10 @@ FEATURE_MAP: Dict[str, Sequence[str]] = {
         "src/visual/macros.rs",
         "src/visual/utils.rs",
     ],
+    "repl": [
+        "src/repl",
+        "src/cli/args.rs",  # Args::from_line()
+    ],
     "strings": [
         "src/string",
     ],

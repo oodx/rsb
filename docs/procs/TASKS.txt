@@ -11,167 +11,73 @@
 - ✅ **Clear Globals**: Global store cleanup with protected keys [5 SP]
 - ✅ **CLI Args to Global**: Bootstrap integration with 1-based indexing [5 SP]
 - ✅ **Options Cleanup**: OptionsStrategy enum with Default/Sort/Remove strategies [10 SP]
-  - ✅ Create OptionsStrategy enum (Default/Sort/Remove) [2 SP]
-  - ✅ Implement apply_options_strategy() method [3 SP]
-  - ✅ Add flag boundary validation [2 SP]
-  - ✅ Load strategy from RSB config (RSB_OPTIONS_MODE/rsb_options_mode) [2 SP]
-  - ✅ Maintain backward compatibility [1 SP]
-- ✅ **Flag Commands**: Flag command detection system with --version and --help handlers [10 SP]
-  - ✅ Create FlagCommand struct and registry [3 SP]
-  - ✅ Implement execute_flag_commands() [3 SP]
-  - ✅ Add default --version and --help handlers [2 SP]
-  - ✅ Integrate with dispatch! macro [2 SP]
+- ✅ **Flag Commands**: Flag command detection system [10 SP]
 
-### IN PROGRESS - RSB v2.0 Enhancement Suite Phase 2 🔄
+#### RSB v2.0 Enhancement Suite Phase 2 ✅ COMPLETE
+- ✅ **TOML Snooping**: Cargo.toml metadata extraction [15 SP]
 
-#### PRIORITY 1: ACTIVE IMPLEMENTATION
+#### RSB v2.0 Enhancement Suite Phase 3 ✅ COMPLETE
+- ✅ **REPL Support**: Interactive command mode [29 SP]
+  - Complete v1 implementation (42 tests)
+  - Quote-aware parsing with SimpleParser
+  - Built-in commands (exit, quit, clear, history, help)
+  - Integration macros (repl_arg!, repl_argc!, repl_dispatch!)
+  - Documentation: FEATURES_REPL.md
+  - BUG-01 fixed: Test isolation issues
 
-#### RECENTLY COMPLETED ✅
+### IN PROGRESS 🔄
 
-**TASK 2.2: TOML Snooping** [15 SP] ✅ COMPLETE
-- ✅ Create src/toml/mod.rs module with TomlSnooper [3 SP]
-- ✅ Extract [package.metadata.rsb/hub/inf] sections [4 SP]
-- ✅ Store namespace values with snake_case conversion [3 SP]
-- ✅ Handle arrays using RSB convention (LENGTH + indexed) [2 SP]
-- ✅ Integrate with bootstrap! macro variants [3 SP]
-- ✅ Fix stale global values bug (key tracking cleanup) [BONUS]
+#### PRIORITY 1: LEGACY CODE CLEANUP
 
-#### PRIORITY 2: UPCOMING STAKEHOLDER FEATURES (Phase 3)
+**MODULE_SPEC v3 Compliance** - See `docs/procs/LEGACY_UPGRADE_PLAN.md` for details
 
-**TASK 3.1: REPL Support** [29 SP] - See docs/proposals/REPL_STRATEGY.md
+**LEG-01: Audit src/os.rs for Duplicates/Migration** [5 SP]
+- Status: PENDING
+- File: src/os.rs (401 lines, 39 exports)
+- Compare with bash/ module for command execution overlap
+- Check if CmdResult, exec!, cmd! are superseded
+- Create src/os/mod.rs OR delete if superseded
+- Reference: LEGACY_UPGRADE_PLAN.md §LEG-01
 
-**Phase 0: Module Setup** [1 SP]
-- [x] REPL-00: Module Structure Setup [1 SP] ✅
-  - Create src/repl/ directory with proper module structure
-  - Create src/repl/mod.rs (orchestrator and re-exports)
-  - Create src/repl/parser.rs stub (ReplParser trait)
-  - Create src/repl/macros.rs stub
-  - Create src/repl/helpers.rs stub (store_repl_args_global)
-  - Add repl module to src/lib.rs
-  - Add repl to prelude (repl_arg!, repl_dispatch! etc)
-  - Create tests/sanity/repl.rs orchestrator
-  - Create tests/uat/repl.rs orchestrator
-  - Follow MODULE_SPEC v3 (docs/tech/development/MODULE_SPEC.md)
+**LEG-02: Audit src/utils.rs for Duplicates/Distribution** [4 SP]
+- Status: PENDING
+- File: src/utils.rs (290 lines, 17 exports)
+- Compare StringExt with string/ module
+- Check array ops vs math/param modules
+- Compare user interaction with visual/prompts/
+- Distribute unique code to proper modules
+- Reference: LEGACY_UPGRADE_PLAN.md §LEG-02
 
-**Phase 1: Core Infrastructure** [12 SP]
-- [x] REPL-01: Core Repl Struct and Read Loop [4 SP] ✅
-  - Create src/repl/mod.rs module
-  - Implement Repl struct (prompt, history fields)
-  - Implement read_line() with stdin
-  - Implement new() and with_prompt() constructors
-  - Prompt configuration: rsb_repl_prompt → RSB_REPL_PROMPT → default "repl> "
-  - Implement set_prompt() for dynamic updates
-  - Add Repl to prelude exports
-  - Add sanity tests for Repl struct
-- [x] REPL-02: Command Tokenization & Parser Trait [4 SP] ✅
-  - Create src/repl/parser.rs module
-  - Define ReplParser trait (Send + Sync)
-  - Implement SimpleParser: quote-aware, pattern detection (tokens, comma lists, semicolon streams)
-  - Implement Args::from_line() using SimpleParser
-  - Implement Repl::with_parser() for pluggable parsers
-  - 22 comprehensive sanity tests
-  - China validation: 85% confidence
-- [x] REPL-03: Global Storage Integration [2 SP] ✅ (Already complete from REPL-00)
-  - Implement store_repl_args_global() function
-  - Store repl_arg_0..N, repl_argc, repl_args (0-indexed)
-  - Integration with existing global store
-- [x] REPL-04: Built-in Commands [2 SP] ✅
-  - Implement dispatch_builtin() method
-  - exit/quit, clear, history, help commands
-  - ReplResult enum (Exit, Continue, Command, Error)
-  - 7 sanity tests for built-in commands
+**LEG-03: Audit src/random.rs for Superseded Code** [2 SP] ✅ COMPLETE
+- Status: COMPLETE (2025-09-30)
+- Removed src/random.rs (78 lines)
+- All functions superseded by gx/ module
+- rand_range_usize → gx::rand_usize_inclusive (already exists)
+- Updated lib.rs, prelude.rs, tests
+- Fixed Cargo.toml bin path (dummy_cli.rs)
+- All 371 sanity tests passing
+- Reference: LEGACY_UPGRADE_PLAN.md §LEG-03
 
-**Phase 2: Macro System** [4 SP]
-- [x] REPL-05: REPL Argument Macros [2 SP] ✅
-  - Create src/repl/macros.rs
-  - Implement repl_arg!($n), repl_argc!(), repl_args!(), repl_argv!()
-  - Export in prelude
-  - 5 sanity tests for macros
-- [x] REPL-06: repl_dispatch! Macro [2 SP] ✅
-  - Implement repl_dispatch! macro with command matching
-  - Error handling integration
-  - Built-in command detection
-  - Read loop with history tracking
-  - Unknown command handling
+**LEG-04: Review src/_todo/ Directory** [1 SP] ⏸️ DEFERRED TO BACKLOG
+- Status: DEFERRED (low priority)
+- Directory: src/_todo/ (archived dev_* stubs, 510 lines)
+- Not referenced in codebase, safe to delete when time permits
+- Reference: LEGACY_UPGRADE_PLAN.md §LEG-04
 
-**Phase 3: Integration & Error Handling** [4 SP]
-- [x] REPL-07: ReplResult Enum & Error Handling [2 SP] ✅ (Already complete from REPL-04)
-  - ReplResult enum with Exit/Continue/Command/Error variants
-  - Non-fatal error catching in dispatch loop (repl_dispatch! macro)
-  - Handler Result<i32, String> support with automatic error printing
-  - Panic propagation (panics bubble up naturally)
-- [x] REPL-08: dispatch! Integration [2 SP] ✅
-  - Created FEATURES_REPL.md with comprehensive documentation
-  - Created examples/repl_demo.rs with full integration example
-  - Documented all integration patterns and usage
+**LEG-05: Document Prelude Consolidation Decision** [0 SP]
+- Status: DECIDED - Keep as-is
+- Files: src/prelude_dev.rs, src/prelude_ez.rs
+- Working code, minimal benefit to refactor
+- Optional future enhancement only
+- Reference: LEGACY_UPGRADE_PLAN.md §LEG-05
 
-**Phase 4: Testing** [5 SP]
-- [x] REPL-09: Sanity Tests [2 SP] ✅ (Already complete)
-  - 35 sanity tests covering all features
-  - Args::from_line() tokenization tests
-  - Pattern preservation tests (tokens, lists, streams)
-  - Global storage tests (repl_arg_*)
-  - Built-in commands tests
-  - ReplParser trait tests
-  - Macro tests (repl_arg!, repl_argc!, etc.)
-- [x] REPL-10: UAT Tests [3 SP] ✅
-  - 7 UAT tests with visual demonstrations
-  - Pattern preservation demo
-  - REPL macros demo
-  - Built-in commands demo
-  - Dynamic prompts demo
-  - Error handling demo
-  - Global storage demo
-
-**Phase 5: Documentation** [3 SP]
-- [x] REPL-11: Documentation [3 SP] ✅ (Already complete in REPL-08)
-  - Created docs/feats/FEATURES_REPL.md (comprehensive guide)
-  - Created examples/repl_demo.rs (full integration example)
-  - Module docs with examples
-  - Macro usage guide
-  - Integration patterns documented
-
-### BUGS & REGRESSIONS 🐛
-
-**BUG-01: Test Isolation Issues in REPL Tests** [CRITICAL] ✅ FIXED
-- **Status**: FIXED - All test isolation issues resolved
-- **Symptom**: Deterministic test failures when sanity + sanity_cli_args run together
-- **Root Cause**: Tests modified global state (repl_*, cli_*) without proper cleanup
-- **Fix Applied**:
-  - Added cleanup_repl_globals() helper to tests/sanity/repl.rs
-  - Added cleanup_cli_globals() helper to tests/sanity/cli_args.rs
-  - Both helpers use RSB_GLOBAL_RESET + clear_prefix() pattern
-  - Added cleanup calls to all 9 tests in tests/sanity/repl.rs that modify global state
-  - Added cleanup calls to all 9 tests in tests/sanity/cli_args.rs
-  - Added cleanup call to uat_repl_global_storage_demo and uat_repl_macros
-  - Added #[serial] markers to all 9 cli_args tests (they share cli_* globals)
-- **Verification**:
-  - ✅ sanity + sanity_cli_args (--test-threads=4): 380 passed, 0 failed
-  - ✅ All UAT tests: 94 passed, 0 failed
-  - ✅ No more cross-contamination or order-dependent failures
-- **Files Modified**:
-  - tests/sanity/repl.rs: Added cleanup_repl_globals() + 9 cleanup calls
-  - tests/sanity/cli_args.rs: Added cleanup_cli_globals() + 9 cleanup calls + #[serial] markers
-  - tests/uat/repl.rs: Added cleanup_repl_globals() + 2 cleanup calls
-- **Story Points**: 2 SP (as estimated)
-- **Date Fixed**: 2025-09-29
-
-**BUG-02: Unused Code Warnings in REPL Module** [LOW]
-- **Status**: Identified during compilation
-- **Warnings**:
-  1. Unused field `parser` in Repl struct (src/repl/mod.rs:89)
-  2. Unused functions in SimpleParser impl (src/repl/parser.rs:76):
-     - `is_comma_list()`
-     - `is_semicolon_stream()`
-     - `is_token_pattern()`
-- **Root Cause**: Pattern detection helpers defined but not used in v1
-- **Impact**: Code bloat, misleading for future maintainers
-- **Priority**: LOW - Cosmetic, no functional impact
-- **Estimate**: 1 SP
-- **Fix Strategy**:
-  - Option 1: Mark as #[allow(dead_code)] with TODO for future use
-  - Option 2: Remove unused code (preferred)
-  - Option 3: Integrate pattern detection into parser
+**LEG-06: Audit & Consolidate streams/streamable** [DEFERRED]
+- Status: DEFERRED - Complex, needs architectural review
+- Files: src/streams.rs (405 lines) + src/streams/ + src/streamable/
+- Dual modules suggest incomplete migration
+- Requires 8-12 hours for safe consolidation
+- Defer to dedicated refactor sprint
+- Reference: LEGACY_UPGRADE_PLAN.md §LEG-06
 
 #### PRIORITY 2: OPPORTUNISTIC/BACKLOG
 

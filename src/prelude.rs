@@ -50,7 +50,7 @@ pub use crate::string::utils as string_utils;
 pub use crate::string::{str_lower, str_prefix, str_replace, str_sub, str_suffix, str_upper};
 // Unified top-level utils remain available
 pub use crate::math::*;
-pub use crate::random::*;
+// random module removed - use rsb::gx for generators
 pub use crate::utils::*;
 pub use crate::xcls::{xsed, ToXSed, XSed};
 

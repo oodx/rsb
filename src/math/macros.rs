@@ -399,26 +399,26 @@ macro_rules! sum_list {
     };
 }
 
-// === Random Package Macros ===
+// === Random Package Macros (now in gx::rand) ===
 
 #[macro_export]
 macro_rules! random_range {
     ($min:expr, $max:expr) => {
-        $crate::math::random_range($min, $max)
+        $crate::gx::rand::random_range($min, $max)
     };
 }
 
 #[macro_export]
 macro_rules! random_int_range {
     ($min:expr, $max:expr) => {
-        $crate::math::random_int_range($min, $max)
+        $crate::gx::rand::random_int_range($min, $max)
     };
 }
 
 #[macro_export]
 macro_rules! random_list {
     ($count:expr, $type:expr) => {
-        match $crate::math::random_list_string($type, $count, None) {
+        match $crate::gx::rand::random_list_string($type, $count, None) {
             Ok(result) => result,
             Err(e) => {
                 $crate::utils::stderrx("error", &format!("Random list error: {}", e));
@@ -427,7 +427,7 @@ macro_rules! random_list {
         }
     };
     ($count:expr, $type:expr, $range:expr) => {
-        match $crate::math::random_list_string($type, $count, Some($range)) {
+        match $crate::gx::rand::random_list_string($type, $count, Some($range)) {
             Ok(result) => result,
             Err(e) => {
                 $crate::utils::stderrx("error", &format!("Random list error: {}", e));

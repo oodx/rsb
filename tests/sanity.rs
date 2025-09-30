@@ -45,8 +45,8 @@ mod gx_id;
 #[path = "sanity/math/basic.rs"]
 mod math_basic;
 
-#[path = "sanity/math/random.rs"]
-mod math_random;
+#[path = "sanity/gx/rand.rs"]
+mod gx_rand;
 
 #[path = "sanity/math/integers.rs"]
 mod math_integers;

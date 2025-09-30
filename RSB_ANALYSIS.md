@@ -1,7 +1,10 @@
 # RSB Ecosystem Analysis & Discoveries
 
+**Last Updated**: 2025-09-30
+**Status**: RSB v2.0 Enhancement Suite Complete (84 SP delivered)
+
 ## Executive Summary
-RSB (Rebel String-Biased) is a powerful Rust framework that rebels against type complexity in favor of string-first simplicity. It's part of a larger ecosystem including Hub (dependency management), Meteor (object compression/storage), and blade (ecosystem analysis). RSB is used by 13 projects across the ecosystem, making it the most widely adopted component.
+RSB (Rebel String-Biased) is a powerful Rust framework that rebels against type complexity in favor of string-first simplicity. RSB v2.0 delivers major ergonomic improvements including Object<T>, TOML snooping, REPL support, and enhanced CLI/dispatch features.
 
 ## Core Philosophy: The REBEL Manifesto
 

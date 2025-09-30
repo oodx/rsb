@@ -45,7 +45,7 @@ pub mod integers;
 pub mod macros;
 pub mod percentage;
 pub mod predicates;
-pub mod random; // Module-owned macros
+// random moved to gx::rand (generators, not math operations)
 
 // MODULE_SPEC: Curated public surface - re-export key functions
 
@@ -77,10 +77,6 @@ pub use predicates::{is_even, is_negative, is_odd, is_positive, is_zero, modulo,
 // Aggregator operations
 pub use aggregators::{avg, max_list, mean, median, min_list, sum_list};
 
-// Random operations
-pub use random::{
-    random_int_range, random_list_bool, random_list_float, random_list_int, random_list_string,
-    random_range,
-};
+// Random operations moved to gx::rand module
 
 // Note: Macros are exported at crate root via src/macros/mod.rs
