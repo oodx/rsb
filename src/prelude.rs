@@ -14,7 +14,8 @@ pub use crate::global::{
     expand_vars, export_vars, get_var, has_var, is_false, is_token_stream, is_true,
     load_config_file, parse_config_content, save_config_file, set_var, unset_var,
 };
-pub use crate::os::*;
+// OS/host functions now under hosts module
+pub use crate::hosts::*;
 pub use crate::streamable::{
     Base64Decode,
     Base64Encode,

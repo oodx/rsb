@@ -114,7 +114,7 @@ pub fn cp(src: &str, dest: &str) -> bool {
 }
 
 pub fn cp_r(src: &str, dest: &str) -> bool {
-    use crate::os::is_command;
+    use crate::hosts::os::is_command;
     let src_exp = expand_vars(src);
     let dest_exp = expand_vars(dest);
 

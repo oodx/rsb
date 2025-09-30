@@ -24,7 +24,7 @@ pub fn bench<F: FnOnce()>(label: &str, f: F) -> Duration {
 /// Returns a job ID that can be waited on.
 pub fn start_background(command: &str) -> u32 {
     use std::sync::{Arc, Mutex};
-    let mut counter = crate::os::JOB_COUNTER.lock().unwrap();
+    let mut counter = crate::hosts::process::JOB_COUNTER.lock().unwrap();
     *counter += 1;
     let job_id = *counter;
     let cmd_string = command.to_string();
@@ -32,17 +32,17 @@ pub fn start_background(command: &str) -> u32 {
     let cmd_string_for_thread = cmd_string.clone();
 
     let handle = std::thread::spawn(move || {
-        let result = crate::os::run_cmd_with_status(&cmd_string_for_thread);
+        let result = crate::hosts::command::run_cmd_with_status(&cmd_string_for_thread);
         let _ = tx.send(result);
     });
 
-    let job_handle = crate::os::JobHandle {
+    let job_handle = crate::hosts::process::JobHandle {
         id: job_id,
         command: cmd_string,
         handle: Some(handle),
         rx,
     };
-    crate::os::JOBS
+    crate::hosts::process::JOBS
         .lock()
         .unwrap()
         .insert(job_id, Arc::new(Mutex::new(job_handle)));
@@ -53,7 +53,7 @@ pub fn start_background(command: &str) -> u32 {
 /// Wait for a background job by ID. Optional timeout in seconds.
 pub fn wait(job_id: u32, timeout_secs: Option<u64>) -> Result<i32, String> {
     let timeout = timeout_secs.map(Duration::from_secs);
-    match crate::os::wait_on_job(job_id, timeout) {
+    match crate::hosts::process::wait_on_job(job_id, timeout) {
         Ok(result) => Ok(result.status),
         Err(e) => Err(e),
     }
@@ -61,7 +61,7 @@ pub fn wait(job_id: u32, timeout_secs: Option<u64>) -> Result<i32, String> {
 
 /// List current background jobs as (id, command) pairs.
 pub fn list_jobs() -> Vec<(u32, String)> {
-    let jobs = crate::os::JOBS.lock().unwrap();
+    let jobs = crate::hosts::process::JOBS.lock().unwrap();
     let mut out = Vec::new();
     for (id, job_mutex) in jobs.iter() {
         let job = job_mutex.lock().unwrap();

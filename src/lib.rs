@@ -2,7 +2,6 @@ pub mod prelude;
 // args and context modules removed; use cli::Args and hosts bootstrap
 pub mod fs;
 pub mod macros;
-pub mod os;
 pub mod streamable;
 pub mod streams;
 // Time helpers moved into the `date` module

@@ -11,20 +11,31 @@
 pub mod utils;
 pub use utils::*;
 
-// Host-level hydration + namespacing helpers
-pub mod global;
+// Host-level helpers that depend on global (cross-module)
+pub mod host_global;
+
+// Operating system information (pure, no cross-module deps)
+pub mod os;
+
+// Command execution (depends on global for expand_vars)
+pub mod command;
+
+// Process management and job control
+pub mod process;
+
+// Signal handling
+pub mod signal;
+
+// Event system
+pub mod events;
 
 // Include macros module
 pub mod macros;
 
 // Implementation modules (kept private)
+mod bootstrap;
 mod env;
 mod host_path;
-mod paths;
 mod rsb_path;
 mod shell;
-mod system;
-mod virt_path;
 mod xdg_path;
-pub use system::*;
-mod bootstrap;

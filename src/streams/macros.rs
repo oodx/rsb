@@ -40,7 +40,7 @@ macro_rules! run {
     ($($arg:tt)*) => {
         {
             let cmd_str = format!($($arg)*);
-            match $crate::os::shell_exec(&cmd_str, false) {
+            match $crate::hosts::command::shell_exec(&cmd_str, false) {
                 Ok(output) => output,
                 Err(res) => {
                     $crate::event!(emit "COMMAND_ERROR", "source" => "run!", "command" => &cmd_str, "status" => &res.status.to_string(), "stderr" => &res.error);
@@ -59,7 +59,7 @@ macro_rules! run {
         }
     };
     ($($arg:tt)*, silent) => {
-        match $crate::os::shell_exec(&format!($($arg)*), true) {
+        match $crate::hosts::command::shell_exec(&format!($($arg)*), true) {
             Ok(output) => output,
             Err(_) => String::new(),
         }
@@ -71,7 +71,7 @@ macro_rules! shell {
     ($($arg:tt)*) => {
         {
             let cmd_str = format!($($arg)*);
-            $crate::os::run_cmd_with_status(&cmd_str)
+            $crate::hosts::command::run_cmd_with_status(&cmd_str)
         }
     };
 }

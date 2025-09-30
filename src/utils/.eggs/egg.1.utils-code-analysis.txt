@@ -1,0 +1,108 @@
+🐔 CHINA'S UTILS.RS CODE ANALYSIS EGG 🥚
+================================================================================
+Date: 2025-09-30
+Target: /home/xnull/repos/code/rust/oodx/projects/rsb/src/utils.rs
+
+🔍 EXECUTIVE SUMMARY
+-------------------
+Analysis of 17 exports in src/utils.rs reveals a mix of unique and duplicate functions
+that can be migrated, consolidated, or deprecated.
+
+📋 DETAILED EXPORTS CLASSIFICATION
+----------------------------------
+1. should_print_level(level: &str) -> bool
+   - Status: 🔄 UNIQUE
+   - Recommendation: Keep in utils, core logging logic
+
+2. expand_colors_unified(text: &str) -> String
+   - Status: 🔄 UNIQUE
+   - Recommendation: Belongs in colors module, feature-dependent
+
+3. stderrx(level: &str, message: &str)
+   - Status: 🔄 UNIQUE
+   - Recommendation: Belongs in logging/output module, contains complex logic
+
+4. glyph_stderr(level: &str, message: &str)
+   - Status: ❌ DEPRECATED
+   - Recommendation: Delete, already points to stderrx()
+
+5. is_name (re-export from string module)
+   - Status: ✅ DUPLICATE
+   - Recommendation: Remove, already in string module
+
+6. to_f64(s: &str) -> Option<f64>
+   - Status: 🔄 UNIQUE (internal helper)
+   - Recommendation: Move to math/conversion module
+
+7. num_eq(a: &str, b: &str) -> bool
+   - Status: 🔄 UNIQUE
+   - Recommendation: Move to math/comparison module
+
+8. num_lt(a: &str, b: &str) -> bool
+   - Status: 🔄 UNIQUE
+   - Recommendation: Move to math/comparison module
+
+9. num_gt(a: &str, b: &str) -> bool
+   - Status: 🔄 UNIQUE
+   - Recommendation: Move to math/comparison module
+
+10. array_push(key: &str, item: &str)
+    - Status: 🔄 UNIQUE
+    - Recommendation: Move to global/array module
+
+11. array_get(key: &str, index: usize) -> String
+    - Status: 🔄 UNIQUE
+    - Recommendation: Move to global/array module
+
+12. array_length(key: &str) -> usize
+    - Status: 🔄 UNIQUE
+    - Recommendation: Move to global/array module
+
+13. array_contains(key: &str, item: &str) -> bool
+    - Status: 🔄 UNIQUE
+    - Recommendation: Move to global/array module
+
+14. get_array(key: &str) -> Vec<String>
+    - Status: 🔄 UNIQUE
+    - Recommendation: Move to global/array module
+
+15. set_array(key: &str, items: &[&str])
+    - Status: 🔄 UNIQUE
+    - Recommendation: Move to global/array module
+
+16. prompt_user(message: &str, default: Option<&str>) -> String
+    - Status: 🔄 UNIQUE
+    - Recommendation: Move to visual/prompts module
+
+17. confirm_action(message: &str, default: Option<bool>) -> bool
+    - Status: 🔄 UNIQUE
+    - Recommendation: Move to visual/prompts module
+
+18. is_true(key: &str) -> bool
+    - Status: ✅ DUPLICATE
+    - Recommendation: Use global module implementation
+
+19. is_false(key: &str) -> bool
+    - Status: ✅ DUPLICATE
+    - Recommendation: Use global module implementation
+
+🎯 KEY TAKEAWAYS
+----------------
+1. Most functions are unique but scattered
+2. Strong recommendation to create dedicated modules:
+   - Math/Conversion module
+   - Math/Comparison module
+   - Global/Array module
+   - Visual/Prompts module
+
+3. Minimal true duplicates found
+4. Some functions can be consolidated or moved
+
+❗ DISCLAIMER
+------------
+This analysis represents a snapshot of the current codebase.
+Actual implementation and migration should be carefully reviewed
+and tested to ensure no unintended side effects.
+
+🐔 Cluck cluck! Code sorted! 🥚
+================================================================================

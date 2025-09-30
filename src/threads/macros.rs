@@ -40,19 +40,19 @@ macro_rules! job {
     }};
 }
 
-// Event and trap macros still use the OS event registry for now
+// Event and trap macros use the hosts event registry
 #[macro_export]
 macro_rules! event {
     (register $event:expr, $handler:expr) => {{
-        let mut handlers = $crate::os::EVENT_HANDLERS.lock().unwrap();
+        let mut handlers = $crate::hosts::events::EVENT_HANDLERS.lock().unwrap();
         let event_handlers = handlers.entry($event.to_string()).or_insert_with(Vec::new);
         event_handlers.push(Box::new($handler));
     }};
     (emit $event:expr, $($key:expr => $value:expr),*) => {{
         let mut data = ::std::collections::HashMap::new();
         $( data.insert($key.to_string(), $value.to_string()); )*
-        let event_data = $crate::os::EventData { event_type: $event.to_string(), data, };
-        if let Some(handlers) = $crate::os::EVENT_HANDLERS.lock().unwrap().get($event) {
+        let event_data = $crate::hosts::events::EventData { event_type: $event.to_string(), data, };
+        if let Some(handlers) = $crate::hosts::events::EVENT_HANDLERS.lock().unwrap().get($event) {
             for handler in handlers { handler(&event_data); }
         }
     }};
@@ -64,7 +64,7 @@ macro_rules! trap {
         let sig_name = $signal.to_uppercase();
         match sig_name.as_str() {
             "SIGINT" | "SIGTERM" | "EXIT" | "COMMAND_ERROR" => {
-                $crate::os::install_signal_handlers();
+                $crate::hosts::signal::install_signal_handlers();
                 $crate::event!(register & sig_name, $handler);
             }
             _ => {

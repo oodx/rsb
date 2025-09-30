@@ -213,7 +213,7 @@ macro_rules! require_dir {
 #[macro_export]
 macro_rules! require_command {
     ($cmd:expr) => {
-        $crate::validate!($crate::os::is_command($cmd), "Command not found: {}", $cmd);
+        $crate::validate!($crate::hosts::os::is_command($cmd), "Command not found: {}", $cmd);
     };
 }
 

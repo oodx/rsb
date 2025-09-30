@@ -2,7 +2,7 @@
 
 use crate::fs::{append_file, read_file, write_file};
 use crate::global::{expand_vars, get_var, set_var};
-use crate::os::run_cmd;
+use crate::hosts::command::run_cmd;
 use std::collections::HashSet;
 use std::io::Write;
 
