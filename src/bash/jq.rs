@@ -6,7 +6,7 @@ use crate::hosts::command::run_cmd;
 use crate::hosts::os::is_command;
 
 /// Extract a value from JSON using jq (if available).
-pub fn json_get(json_str: &str, path: &str) -> String {
+pub fn jq_get(json_str: &str, path: &str) -> String {
     if !is_command("jq") {
         return String::new();
     }
@@ -20,7 +20,7 @@ pub fn json_get(json_str: &str, path: &str) -> String {
 }
 
 /// Extract a value from JSON file using jq (if available).
-pub fn json_get_file(json_file: &str, path: &str) -> String {
+pub fn jq_get_file(json_file: &str, path: &str) -> String {
     if !is_command("jq") {
         return String::new();
     }

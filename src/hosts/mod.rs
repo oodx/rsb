@@ -37,5 +37,4 @@ mod bootstrap;
 mod env;
 mod host_path;
 mod rsb_path;
-mod shell;
 mod xdg_path;

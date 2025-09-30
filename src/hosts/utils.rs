@@ -12,6 +12,5 @@ pub use super::host_path::*;
 pub use super::os::*;
 pub use super::process::*;
 pub use super::rsb_path::*;
-pub use super::shell::*;
 pub use super::signal::*;
 pub use super::xdg_path::*;

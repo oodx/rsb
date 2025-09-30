@@ -3,12 +3,43 @@
 //! Sequences environment import, XDG/RSB path setup, directory creation,
 //! mode flags, script context, and args context.
 
+use crate::global;
+
 /// Populate ARGC and ARGV_* in Global for convenience when scripting.
 pub fn setup_args_context(args: &[String]) {
-    crate::global::set_var("ARGC", &args.len().to_string());
+    global::set_var("ARGC", &args.len().to_string());
     for (i, a) in args.iter().enumerate() {
-        crate::global::set_var(&format!("ARGV_{}", i), a);
+        global::set_var(&format!("ARGV_{}", i), a);
     }
+}
+
+/// Extract script metadata from argv[0] and current working directory.
+/// Sets Global keys: SCRIPT_NAME, SCRIPT_PATH, SCRIPT_DIR, PWD.
+pub fn setup_execution_context(args: &[String]) {
+    if args.is_empty() {
+        // Still record current directory as PWD for completeness
+        let pwd = std::env::current_dir()
+            .map(|p| p.to_string_lossy().to_string())
+            .unwrap_or_else(|_| ".".to_string());
+        global::set_var("PWD", &pwd);
+        return;
+    }
+    let script_path = &args[0];
+    let script_name = std::path::Path::new(script_path)
+        .file_name()
+        .and_then(|n| n.to_str())
+        .unwrap_or("script");
+    let script_dir = std::path::Path::new(script_path)
+        .parent()
+        .and_then(|p| p.to_str())
+        .unwrap_or(".");
+    global::set_var("SCRIPT_NAME", script_name);
+    global::set_var("SCRIPT_PATH", script_path);
+    global::set_var("SCRIPT_DIR", script_dir);
+    let pwd = std::env::current_dir()
+        .map(|p| p.to_string_lossy().to_string())
+        .unwrap_or_else(|_| ".".to_string());
+    global::set_var("PWD", &pwd);
 }
 
 /// Full host bootstrap; see RSB_BASHFX_ALIGN.md for details.
@@ -29,7 +60,7 @@ pub fn bootstrap(args: &[String]) {
     crate::hosts::setup_standard_modes();
 
     // 6) Script context
-    crate::hosts::setup_execution_context(args);
+    setup_execution_context(args);
 
     // 7) Args context
     setup_args_context(args);
