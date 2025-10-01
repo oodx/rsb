@@ -1,0 +1,23 @@
+# feat2.py configuration
+# Auto-generated on /home/xnull/repos/code/rust/oodx/projects/rsb
+
+features_root = "src"
+docs_root = "docs/features"
+doc_pattern = "FEATURES_{FEATURE}.md"
+languages = ["rust"]
+auto_discover = true
+
+exclude = [
+    "**/tests/**",
+    "**/target/**",
+    "**/__pycache__/**",
+]
+
+# Explicit feature mappings (optional, overrides auto-discovery)
+# Using feat.py naming convention for compatibility
+[features]
+global = ["src/global"]
+bash = ["src/bash"]
+strings = ["src/string"]
+cli = ["src/cli", "src/cli/macros.rs"]
+colors = ["src/colors", "src/utils.rs", "src/visual/macros.rs"]
