@@ -27,25 +27,54 @@
 
 ### IN PROGRESS 🔄
 
-#### PRIORITY 1: LEGACY CODE CLEANUP
+#### PRIORITY 1: MACRO MIGRATION & API CLEANUP ✅ COMPLETE (2025-09-30)
+
+**Macro Consolidation & API Refactor**
+- ✅ Migrated all macros from src/macros/ to domain modules
+  - bash::macros (test!, case!, for_in!, curl!, archive macros)
+  - fs::macros (file_in!, require_file!, require_dir!, path macros)
+  - global::macros (echo!, printf!, export!, load_config!, require_var!)
+  - hosts::macros (require_command!, mock_cmd!, json_get!)
+  - string::macros (case conversions, str utilities)
+  - com::macros (validate!)
+  - lib.rs (readline!, stderr! core I/O)
+- ✅ Fixed all macro path issues ($crate::os:: → $crate::bash::)
+- ✅ Fixed utils migration (utils::get_array → global::array::get_array)
+- ✅ Fixed JSON macro functions (json_get → jq_get)
+- ✅ Updated all FEATURES_*.md documentation
+- ✅ Updated bin/feat.py with toml mapping
+- ✅ Fixed all example files (showcase.rs, threads.rs)
+- ✅ Removed src/macros/ directory completely
+- ✅ Cleaned up prelude re-exports (added ns_* to global)
+- ✅ Removed hosts/utils.rs facade (moved to mod.rs)
+- ✅ Suppressed dead code warnings in REPL
+- ✅ Removed toml feature guard warning
+- ✅ **Result:** Zero compilation warnings, all 12 examples compile
+
+**rsbdoc CLI Tool** ✅ COMPLETE (2025-09-30)
+- ✅ Created bin/rsb_docs_cli.rs with RSB prelude
+- ✅ Added rsbdoc binary to Cargo.toml
+- ✅ Created bin/deploy.sh for XDG deployment
+- ✅ Supports topics: feat, arch, proc, concept
+- ✅ Auto-discovers docs from Brain and RSB repo
+- ✅ Colored markdown rendering
+- ✅ Config file generation (~/.config/rsbdoc/rsbdoc.env)
+- ✅ Documentation: docs/tech/reference/RSB_DOCS_STRATEGY.md
+
+#### PRIORITY 2: LEGACY CODE CLEANUP
 
 **MODULE_SPEC v3 Compliance** - See `docs/procs/LEGACY_UPGRADE_PLAN.md` for details
 
-**LEG-01: Audit src/os.rs for Duplicates/Migration** [5 SP]
-- Status: PENDING
-- File: src/os.rs (401 lines, 39 exports)
-- Compare with bash/ module for command execution overlap
-- Check if CmdResult, exec!, cmd! are superseded
-- Create src/os/mod.rs OR delete if superseded
+**LEG-01: Audit src/os.rs for Duplicates/Migration** [5 SP] ⏸️ DEFERRED
+- Status: DEFERRED (file removed during macro migration)
+- Archive functions migrated to bash/utils.rs
+- Other functions distributed to appropriate modules
 - Reference: LEGACY_UPGRADE_PLAN.md §LEG-01
 
-**LEG-02: Audit src/utils.rs for Duplicates/Distribution** [4 SP]
-- Status: PENDING
-- File: src/utils.rs (290 lines, 17 exports)
-- Compare StringExt with string/ module
-- Check array ops vs math/param modules
-- Compare user interaction with visual/prompts/
-- Distribute unique code to proper modules
+**LEG-02: Audit src/utils.rs for Duplicates/Distribution** [4 SP] ⏸️ DEFERRED
+- Status: DEFERRED (partially addressed during macro migration)
+- Array ops migrated to global::array
+- Further cleanup deferred to future sprint
 - Reference: LEGACY_UPGRADE_PLAN.md §LEG-02
 
 **LEG-03: Audit src/random.rs for Superseded Code** [2 SP] ✅ COMPLETE
