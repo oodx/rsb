@@ -33,6 +33,7 @@ pub struct ProgressEvent {
     pub total: Option<u64>,
     pub message: Option<String>,
     pub state: ProgressState,
+    pub style: Option<crate::progress::styles::ProgressStyle>,
 }
 
 /// Core trait for progress reporting implementations
@@ -76,6 +77,7 @@ struct TaskState {
     state: ProgressState,
     created_at: Instant,
     updated_at: Instant,
+    style: Option<crate::progress::styles::ProgressStyle>,
 }
 
 impl ProgressTask {
@@ -84,6 +86,7 @@ impl ProgressTask {
         id: TaskId,
         title: String,
         total: Option<u64>,
+        style: Option<crate::progress::styles::ProgressStyle>,
         reporters: Vec<Arc<dyn ProgressReporter>>,
     ) -> Self {
         let now = Instant::now();
@@ -94,6 +97,7 @@ impl ProgressTask {
             state: ProgressState::Running,
             created_at: now,
             updated_at: now,
+            style,
         }));
 
         let task = Self {
@@ -241,6 +245,7 @@ impl ProgressTask {
             total: state.total,
             message: Some(state.message.clone()),
             state: state.state,
+            style: state.style.clone(),
         };
         drop(state); // Release lock before calling reporters
 
@@ -255,6 +260,7 @@ impl ProgressTask {
 pub struct TaskBuilder {
     title: String,
     total: Option<u64>,
+    style: Option<crate::progress::styles::ProgressStyle>,
     metadata: HashMap<String, String>,
 }
 
@@ -264,6 +270,7 @@ impl TaskBuilder {
         Self {
             title: title.into(),
             total: None,
+            style: None,
             metadata: HashMap::new(),
         }
     }
@@ -271,6 +278,12 @@ impl TaskBuilder {
     /// Set total progress value for bar-style indicators
     pub fn with_total(mut self, total: u64) -> Self {
         self.total = Some(total);
+        self
+    }
+
+    /// Set the progress style
+    pub fn with_style(mut self, style: crate::progress::styles::ProgressStyle) -> Self {
+        self.style = Some(style);
         self
     }
 
@@ -286,7 +299,7 @@ impl TaskBuilder {
         id: TaskId,
         reporters: Vec<Arc<dyn ProgressReporter>>,
     ) -> ProgressTask {
-        ProgressTask::new(id, self.title, self.total, reporters)
+        ProgressTask::new(id, self.title, self.total, self.style, reporters)
     }
 }
 

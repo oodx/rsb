@@ -66,6 +66,7 @@ struct TaskDisplay {
     start_time: Instant,
     last_current: u64,
     last_update_time: Instant,
+    last_line_count: usize,  // Track how many lines were output last time
 }
 
 impl TerminalReporter {
@@ -140,14 +141,15 @@ impl TerminalReporter {
                 display
             }
             None => {
-                // First time seeing this task - infer style from event
-                let style = self.infer_style(event);
+                // First time seeing this task - use style from event or infer
+                let style = event.style.clone().unwrap_or_else(|| self.infer_style(event));
                 let display = TaskDisplay {
                     style,
                     last_message: event.message.clone().unwrap_or_default(),
                     start_time: event.timestamp,
                     last_current: event.current,
                     last_update_time: event.timestamp,
+                    last_line_count: 0,
                 };
                 task_states.insert(event.task_id, display.clone());
                 display
@@ -182,6 +184,9 @@ impl TerminalReporter {
             ProgressStyle::Counter { total } => self.render_counter(event, display, *total),
             ProgressStyle::Percentage { total } => self.render_percentage(event, display, *total),
             ProgressStyle::Bytes { total_bytes } => self.render_bytes(event, display, *total_bytes),
+            ProgressStyle::Dashboard { total_chunks, chunk_size } => {
+                self.render_dashboard(event, display, *total_chunks, *chunk_size)
+            }
             ProgressStyle::Silent => String::new(),
             ProgressStyle::Custom(format) => self.render_custom(event, display, format),
         }
@@ -453,6 +458,153 @@ impl TerminalReporter {
         }
     }
 
+    /// Render dashboard-style progress (multi-row display for batch/chunk processing)
+    fn render_dashboard(
+        &self,
+        event: &ProgressEvent,
+        display: &TaskDisplay,
+        total_chunks: usize,
+        chunk_size: u64,
+    ) -> String {
+        let total_bytes = (total_chunks as u64) * chunk_size;
+
+        // Calculate which chunk we're currently on
+        let current_chunk = if chunk_size > 0 {
+            (event.current / chunk_size).min(total_chunks as u64 - 1)
+        } else {
+            0
+        };
+        let chunk_progress = if chunk_size > 0 {
+            event.current % chunk_size
+        } else {
+            0
+        };
+
+        let message = event.message.as_deref().unwrap_or("Processing");
+        let elapsed = self.format_duration(display.start_time.elapsed());
+        let eta_str = self.calculate_eta(event.current, total_bytes, display.start_time.elapsed())
+            .unwrap_or_else(|| "calculating...".to_string());
+        let current_bytes_str = self.format_bytes(event.current);
+        let total_bytes_str = self.format_bytes(total_bytes);
+
+        // Row 1: Status indicator + message
+        let status_prefix = match event.state {
+            ProgressState::Running => {
+                if self.config.use_colors {
+                    self.config.color_scheme.colorize_running("▶")
+                } else {
+                    "▶".to_string()
+                }
+            }
+            ProgressState::Complete => {
+                if self.config.use_colors {
+                    self.config.color_scheme.colorize_complete("✓")
+                } else {
+                    "✓".to_string()
+                }
+            }
+            ProgressState::Failed => {
+                if self.config.use_colors {
+                    self.config.color_scheme.colorize_failed("✗")
+                } else {
+                    "✗".to_string()
+                }
+            }
+            ProgressState::Cancelled => {
+                if self.config.use_colors {
+                    self.config.color_scheme.colorize_cancelled("◐")
+                } else {
+                    "◐".to_string()
+                }
+            }
+        };
+
+        let row1 = format!("{} {}", status_prefix,
+            match event.state {
+                ProgressState::Running => "Running",
+                ProgressState::Complete => "Complete",
+                ProgressState::Failed => "Failed",
+                ProgressState::Cancelled => "Cancelled",
+            }
+        );
+
+        // Row 2: File/item info line
+        let row2 = format!(
+            "  Size: {} | Elapsed: {} | ETA: {} | Chunk {}/{}",
+            total_bytes_str, elapsed, eta_str, current_chunk + 1, total_chunks
+        );
+
+        // Row 3: Chunk visualization
+        let mut chunks_display = String::from("  ");
+        for i in 0..total_chunks {
+            if i > 0 {
+                chunks_display.push(' ');
+            }
+
+            if i < current_chunk as usize {
+                // Completed chunk
+                if self.config.use_colors {
+                    chunks_display.push_str(&self.config.color_scheme.colorize_chunk_complete("■"));
+                } else {
+                    chunks_display.push('■');
+                }
+            } else if i == current_chunk as usize {
+                // Current chunk (blinking)
+                if self.config.use_colors {
+                    chunks_display.push_str(&self.config.color_scheme.colorize_chunk_current("█", true));
+                } else {
+                    chunks_display.push('█');
+                }
+            } else {
+                // Pending chunk
+                if self.config.use_colors {
+                    chunks_display.push_str(&self.config.color_scheme.colorize_chunk_pending("□"));
+                } else {
+                    chunks_display.push('□');
+                }
+            }
+        }
+
+        // Row 4: Progress bar for current chunk
+        let bar_style = if self.config.use_unicode {
+            BarStyle::default().with_width(30)
+        } else {
+            BarStyle::simple().with_width(30)
+        };
+
+        let percentage = if chunk_size > 0 {
+            (chunk_progress as f64 / chunk_size as f64) * 100.0
+        } else {
+            0.0
+        };
+
+        let chunk_bar = if chunk_size > 0 {
+            bar_style.render(chunk_progress, chunk_size, None)
+        } else {
+            "No chunk progress".to_string()
+        };
+
+        let row4 = format!("  [{:5.1}%] {}", percentage, chunk_bar);
+
+        // Combine based on state
+        match event.state {
+            ProgressState::Complete => {
+                let final_time = self.format_duration(display.start_time.elapsed());
+                let rate = self.calculate_byte_rate(total_bytes, display.start_time.elapsed());
+                format!(
+                    "{} {}\n  Completed in {} at {} ({}/{})\n{}",
+                    status_prefix, message, final_time, rate, current_bytes_str, total_bytes_str, chunks_display
+                )
+            }
+            ProgressState::Running => {
+                format!("{}\n{}\n{}\n{}", row1, row2, chunks_display, row4)
+            }
+            ProgressState::Failed | ProgressState::Cancelled => {
+                format!("{}\n{}\n{}\n{}", row1, row2, chunks_display, row4)
+            }
+        }
+    }
+
     /// Render custom format
     fn render_custom(&self, event: &ProgressEvent, display: &TaskDisplay, format: &str) -> String {
         let mut result = format.to_string();
@@ -521,6 +673,28 @@ impl TerminalReporter {
         }
     }
 
+    /// Clear N lines (move cursor up and clear each line)
+    fn clear_lines(&self, count: usize) {
+        if count == 0 {
+            return;
+        }
+
+        let mut output = Vec::new();
+        // Move cursor up N lines
+        for _ in 0..count {
+            output.extend_from_slice(b"\x1b[A");  // Move up one line
+            output.extend_from_slice(b"\x1b[2K"); // Clear entire line
+        }
+
+        if self.config.use_stderr {
+            let _ = io::stderr().write_all(&output);
+            let _ = io::stderr().flush();
+        } else {
+            let _ = io::stdout().write_all(&output);
+            let _ = io::stdout().flush();
+        }
+    }
+
     /// Hide cursor for cleaner progress display
     fn hide_cursor(&self) {
         let hide_seq = b"\x1b[?25l";
@@ -571,8 +745,32 @@ impl ProgressReporter for TerminalReporter {
         let formatted = self.format_event(event);
 
         if !formatted.is_empty() {
-            // Use newline for completed/failed/cancelled states, carriage return for running
-            self.write_output_with_ending(&formatted, is_finished);
+            // Count lines in output
+            let line_count = formatted.matches('\n').count() + 1;
+
+            // Get previous line count for this task
+            let mut task_states = self.task_states.lock().unwrap();
+            let prev_line_count = task_states
+                .get(&event.task_id)
+                .map(|d| d.last_line_count)
+                .unwrap_or(0);
+
+            // Update line count for this task
+            if let Some(display) = task_states.get_mut(&event.task_id) {
+                display.last_line_count = line_count;
+            }
+            drop(task_states);
+
+            // For running multi-line displays, clear previous lines first
+            if !is_finished && line_count > 1 && prev_line_count > 0 {
+                self.clear_lines(prev_line_count);
+            }
+
+            // Use newline for multi-line displays or completed/failed/cancelled states
+            // Otherwise use carriage return for single-line running state
+            let has_newlines = formatted.contains('\n');
+            let use_newline = is_finished || has_newlines;
+            self.write_output_with_ending(&formatted, use_newline);
         }
 
         // Show cursor when task finishes

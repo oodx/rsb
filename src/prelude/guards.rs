@@ -40,8 +40,7 @@ pub use crate::colors::simple::is_simple_color;
 #[cfg(feature = "colors-core")]
 pub use crate::colors::status::is_status_color;
 
-// === TOML Guards (toml) ===
-#[cfg(feature = "toml")]
+// === TOML Guards ===
 pub use crate::toml::has_namespace;
 
 // === CLI Option Guards (cli) ===

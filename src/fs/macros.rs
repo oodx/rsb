@@ -109,25 +109,25 @@ macro_rules! wc_chars_file {
 macro_rules! tar {
     (create: $archive:expr, $($path:expr),+) => {{
         let paths = vec![$($path),+];
-        match $crate::os::create_tar($archive, &paths) {
+        match $crate::bash::create_tar($archive, &paths) {
             result if result.status == 0 => { $crate::okay!("Created tar archive: {}", $archive); },
             result => { $crate::error!("Failed to create tar: {}", result.error); std::process::exit(result.status); }
         }
     }};
     (extract: $archive:expr) => {{
-        match $crate::os::extract_tar($archive, None) {
+        match $crate::bash::extract_tar($archive, None) {
             result if result.status == 0 => { $crate::okay!("Extracted tar archive: {}", $archive); },
             result => { $crate::error!("Failed to extract tar: {}", result.error); std::process::exit(result.status); }
         }
     }};
     (extract: $archive:expr, to: $dest:expr) => {{
-        match $crate::os::extract_tar($archive, Some($dest)) {
+        match $crate::bash::extract_tar($archive, Some($dest)) {
             result if result.status == 0 => { $crate::okay!("Extracted tar archive to: {}", $dest); },
             result => { $crate::error!("Failed to extract tar: {}", result.error); std::process::exit(result.status); }
         }
     }};
     (list: $archive:expr) => {{
-        match $crate::os::list_tar($archive) {
+        match $crate::bash::list_tar($archive) {
             result if result.status == 0 => result.output,
             result => { $crate::error!("Failed to list tar: {}", result.error); std::process::exit(result.status); }
         }
@@ -138,7 +138,7 @@ macro_rules! tar {
 macro_rules! tar_gz {
     (create: $archive:expr, $($path:expr),+) => {{
         let paths = vec![$($path),+];
-        match $crate::os::create_tar_gz($archive, &paths) {
+        match $crate::bash::create_tar_gz($archive, &paths) {
             result if result.status == 0 => { $crate::okay!("Created tar.gz archive: {}", $archive); },
             result => { $crate::error!("Failed to create tar.gz: {}", result.error); std::process::exit(result.status); }
         }
@@ -149,25 +149,25 @@ macro_rules! tar_gz {
 macro_rules! zip {
     (create: $archive:expr, $($path:expr),+) => {{
         let paths = vec![$($path),+];
-        match $crate::os::create_zip($archive, &paths) {
+        match $crate::bash::create_zip($archive, &paths) {
             result if result.status == 0 => { $crate::okay!("Created zip archive: {}", $archive); },
             result => { $crate::error!("Failed to create zip: {}", result.error); std::process::exit(result.status); }
         }
     }};
     (extract: $archive:expr) => {{
-        match $crate::os::extract_zip($archive, None) {
+        match $crate::bash::extract_zip($archive, None) {
             result if result.status == 0 => { $crate::okay!("Extracted zip archive: {}", $archive); },
             result => { $crate::error!("Failed to extract zip: {}", result.error); std::process::exit(result.status); }
         }
     }};
     (extract: $archive:expr, to: $dest:expr) => {{
-        match $crate::os::extract_zip($archive, Some($dest)) {
+        match $crate::bash::extract_zip($archive, Some($dest)) {
             result if result.status == 0 => { $crate::okay!("Extracted zip archive to: {}", $dest); },
             result => { $crate::error!("Failed to extract zip: {}", result.error); std::process::exit(result.status); }
         }
     }};
     (list: $archive:expr) => {{
-        match $crate::os::list_zip($archive) {
+        match $crate::bash::list_zip($archive) {
             result if result.status == 0 => result.output,
             result => { $crate::error!("Failed to list zip: {}", result.error); std::process::exit(result.status); }
         }

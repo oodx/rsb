@@ -10,6 +10,23 @@ Purpose
 Feature Flag
 - `progress` — enables the progress module (`rsb::progress`). Not enabled by default.
 
+
+
+Advanced Dashboard Style
+
+  | ▶ running 
+  | Custom Title Description
+  | <batch-encryption.dat> | Size: 100GB | Time: 08m 00s | ETA: 01h 37m 
+  | -----------------------------------------------------------------
+  | Chunk 3 of 8 | ■ ■ █ □ □ □ □ □
+  | 50.0%        | ██░░░░░░░░░░░░░░░░░░░░░░░░ 
+  | Byte:        | 19192819
+  |
+  | Press <ctrl+c> to cancel <ctrl+p> to pause
+  
+
+
+
 Module Layout (SPEC)
 - `src/progress/core.rs` — Core types, events, reporter trait, task lifecycle.
 - `src/progress/styles.rs` — Spinner and bar style definitions and helpers.
@@ -35,8 +52,12 @@ Quick Start
 ```rust
 #[cfg(feature = "progress")]
 {
-    use rsb::progress::{ProgressManager, ProgressStyle};
+    use rsb::progress::{
+        ProgressManager, ProgressStyle,
+        TerminalConfig, ProgressColorScheme
+    };
 
+    // Standard progress bar
     let mut progress = ProgressManager::new();
     let task = progress.start_task("Processing files", ProgressStyle::Bar { total: 10 });
 
@@ -45,6 +66,21 @@ Quick Start
     }
 
     task.complete("All files processed");
+
+    // Color customization example
+    let custom_colors = ProgressColorScheme::new(
+        "magic",   // primary color
+        "complete",// success color
+        "fatal",   // error color
+        "alert"    // warning color
+    );
+
+    let config = TerminalConfig::new()
+        .with_spinner_refresh_ms(60)  // faster spinner
+        .with_colors(custom_colors);
+
+    let mut progress_custom = ProgressManager::new().with_config(config);
+    // Further configuration possible...
 }
 ```
 
@@ -56,6 +92,15 @@ Design Notes
   - Output stream selection (`use_stderr`).
   - Update throttling (`update_interval_ms`).
   - Clear‑on‑complete behavior.
+- Color Customization:
+  - `ProgressColorScheme` allows fine-grained color configuration
+  - Presets: `default()`, `simple()`, `status()`, `none()`
+  - RSB color integration with custom palettes
+  - Raw ANSI code support via `from_ansi()`
+  - Fallback to raw ANSI if RSB color not in registry
+- Spinner Configuration:
+  - Independent spinner animation at ~12 FPS
+  - Configurable refresh rate via `spinner_refresh_ms` (default 80ms)
 - No prelude exports: import explicitly to honor prelude policy.
 - Logging: for non‑visual diagnostics, prefer `utils::stderrx(level, msg)` in adjacent code. Progress module itself writes directly to chosen stream.
 

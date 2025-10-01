@@ -18,6 +18,11 @@ pub enum ProgressStyle {
     Percentage { total: u64 },
     /// Size-based progress (for file operations)
     Bytes { total_bytes: u64 },
+    /// Multi-row dashboard with status, chunk visualization, and progress bar
+    Dashboard {
+        total_chunks: usize,
+        chunk_size: u64,
+    },
     /// Silent mode - no visual output
     Silent,
     /// Custom style with user-defined format
@@ -32,6 +37,10 @@ impl ProgressStyle {
             ProgressStyle::Counter { total } => Some(*total),
             ProgressStyle::Percentage { total } => Some(*total),
             ProgressStyle::Bytes { total_bytes } => Some(*total_bytes),
+            ProgressStyle::Dashboard {
+                total_chunks,
+                chunk_size,
+            } => Some((*total_chunks as u64) * chunk_size),
             _ => None,
         }
     }
@@ -49,6 +58,7 @@ impl ProgressStyle {
                 | ProgressStyle::Counter { .. }
                 | ProgressStyle::Percentage { .. }
                 | ProgressStyle::Bytes { .. }
+                | ProgressStyle::Dashboard { .. }
         )
     }
 }
@@ -61,6 +71,10 @@ impl fmt::Display for ProgressStyle {
             ProgressStyle::Counter { total } => write!(f, "counter({})", total),
             ProgressStyle::Percentage { total } => write!(f, "percentage({})", total),
             ProgressStyle::Bytes { total_bytes } => write!(f, "bytes({})", total_bytes),
+            ProgressStyle::Dashboard {
+                total_chunks,
+                chunk_size,
+            } => write!(f, "dashboard({} chunks, {} bytes)", total_chunks, chunk_size),
             ProgressStyle::Silent => write!(f, "silent"),
             ProgressStyle::Custom(format) => write!(f, "custom({})", format),
         }

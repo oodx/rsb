@@ -2,6 +2,8 @@
 
 // Using the prelude brings all the essential RSB tools into scope.
 use rsb::prelude::*;
+use rsb::prelude::guards::*;
+use rsb::jobs::EventData;
 // Visual/log macros: import explicitly; gate colored under feature
 #[cfg(feature = "visual")]
 use rsb::{colored, debug, error, fatal, info, okay, trace, warn};

@@ -122,3 +122,13 @@ path = "examples/showcase.rs"
 name = "progress_colors_demo"
 path = "examples/progress_colors_demo.rs"
 required-features = ["progress", "colors-core", "colors-simple", "colors-status"]
+
+[[example]]
+name = "progress_dashboard_demo"
+path = "examples/progress_dashboard_demo.rs"
+required-features = ["progress", "colors-core", "colors-simple", "colors-status"]
+
+[[example]]
+name = "dashboard_quick_test"
+path = "examples/dashboard_quick_test.rs"
+required-features = ["progress", "colors-core", "colors-simple", "colors-status"]

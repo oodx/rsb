@@ -77,6 +77,7 @@ impl ProgressManager {
         if let Some(total) = style.total() {
             builder = builder.with_total(total);
         }
+        builder = builder.with_style(style);
 
         let task = Arc::new(builder.build(task_id, reporters));
 
@@ -106,6 +107,7 @@ impl ProgressManager {
         if let Some(total) = style.total() {
             builder = builder.with_total(total);
         }
+        builder = builder.with_style(style);
 
         let task = Arc::new(builder.build(task_id, reporters));
 

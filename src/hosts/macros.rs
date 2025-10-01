@@ -173,14 +173,14 @@ macro_rules! require_command {
 #[macro_export]
 macro_rules! json_get {
     ($json:expr, $path:expr) => {
-        $crate::bash::jq::json_get($json, $path)
+        $crate::bash::jq::jq_get($json, $path)
     };
 }
 
 #[macro_export]
 macro_rules! json_get_file {
     ($file:expr, $path:expr) => {
-        $crate::bash::jq::json_get_file($file, $path)
+        $crate::bash::jq::jq_get_file($file, $path)
     };
 }
 

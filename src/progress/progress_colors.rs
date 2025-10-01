@@ -20,6 +20,12 @@ pub struct ProgressColorScheme {
     pub failed: String,
     /// Color for cancelled state (default: "warning" or "yellow")
     pub cancelled: String,
+    /// Color for completed chunks in Dashboard (default: "green")
+    pub chunk_complete: String,
+    /// Color for current chunk in Dashboard (default: "cyan")
+    pub chunk_current: String,
+    /// Color for pending chunks in Dashboard (default: "grey")
+    pub chunk_pending: String,
 }
 
 impl Default for ProgressColorScheme {
@@ -29,6 +35,9 @@ impl Default for ProgressColorScheme {
             complete: "success".to_string(),
             failed: "error".to_string(),
             cancelled: "warning".to_string(),
+            chunk_complete: "green".to_string(),
+            chunk_current: "cyan".to_string(),
+            chunk_pending: "grey".to_string(),
         }
     }
 }
@@ -53,6 +62,10 @@ impl ProgressColorScheme {
             complete: complete.into(),
             failed: failed.into(),
             cancelled: cancelled.into(),
+            // Use defaults for chunk colors
+            chunk_complete: "green".to_string(),
+            chunk_current: "cyan".to_string(),
+            chunk_pending: "grey".to_string(),
         }
     }
 
@@ -63,6 +76,9 @@ impl ProgressColorScheme {
             complete: "green".to_string(),
             failed: "red".to_string(),
             cancelled: "yellow".to_string(),
+            chunk_complete: "green".to_string(),
+            chunk_current: "cyan".to_string(),
+            chunk_pending: "grey".to_string(),
         }
     }
 
@@ -73,6 +89,9 @@ impl ProgressColorScheme {
             complete: "success".to_string(),
             failed: "error".to_string(),
             cancelled: "warning".to_string(),
+            chunk_complete: "complete".to_string(),
+            chunk_current: "progress".to_string(),
+            chunk_pending: "inactive".to_string(),
         }
     }
 
@@ -83,6 +102,9 @@ impl ProgressColorScheme {
             complete: String::new(),
             failed: String::new(),
             cancelled: String::new(),
+            chunk_complete: String::new(),
+            chunk_current: String::new(),
+            chunk_pending: String::new(),
         }
     }
 
@@ -113,6 +135,10 @@ impl ProgressColorScheme {
             complete: complete.into(),
             failed: failed.into(),
             cancelled: cancelled.into(),
+            // Use defaults for chunk colors
+            chunk_complete: "\x1b[32m".to_string(),  // Green
+            chunk_current: "\x1b[36m".to_string(),    // Cyan
+            chunk_pending: "\x1b[90m".to_string(),    // Grey
         }
     }
 
@@ -247,6 +273,95 @@ impl ProgressColorScheme {
             }
         }
         "\x1b[0m".to_string()
+    }
+
+    /// Colorize text with chunk_complete color
+    pub fn colorize_chunk_complete(&self, text: &str) -> String {
+        #[cfg(feature = "colors-core")]
+        {
+            let result = colorize(text, &self.chunk_complete);
+            if result != text {
+                return result;
+            }
+        }
+        let code = self.chunk_complete_code();
+        if code.is_empty() {
+            text.to_string()
+        } else {
+            format!("{}{}{}", code, text, self.reset_code())
+        }
+    }
+
+    /// Colorize text with chunk_current color (with blink)
+    pub fn colorize_chunk_current(&self, text: &str, blink: bool) -> String {
+        #[cfg(feature = "colors-core")]
+        {
+            let result = colorize(text, &self.chunk_current);
+            if result != text {
+                if blink {
+                    return format!("\x1b[5m{}\x1b[25m", result);  // Add blink
+                }
+                return result;
+            }
+        }
+        let code = self.chunk_current_code();
+        if code.is_empty() {
+            text.to_string()
+        } else if blink {
+            format!("\x1b[5m{}{}{}\x1b[25m", code, text, self.reset_code())
+        } else {
+            format!("{}{}{}", code, text, self.reset_code())
+        }
+    }
+
+    /// Colorize text with chunk_pending color
+    pub fn colorize_chunk_pending(&self, text: &str) -> String {
+        #[cfg(feature = "colors-core")]
+        {
+            let result = colorize(text, &self.chunk_pending);
+            if result != text {
+                return result;
+            }
+        }
+        let code = self.chunk_pending_code();
+        if code.is_empty() {
+            text.to_string()
+        } else {
+            format!("{}{}{}", code, text, self.reset_code())
+        }
+    }
+
+    fn chunk_complete_code(&self) -> String {
+        #[cfg(feature = "colors-core")]
+        {
+            let code = color(&self.chunk_complete);
+            if !code.is_empty() {
+                return code.to_string();
+            }
+        }
+        self.chunk_complete.clone()
+    }
+
+    fn chunk_current_code(&self) -> String {
+        #[cfg(feature = "colors-core")]
+        {
+            let code = color(&self.chunk_current);
+            if !code.is_empty() {
+                return code.to_string();
+            }
+        }
+        self.chunk_current.clone()
+    }
+
+    fn chunk_pending_code(&self) -> String {
+        #[cfg(feature = "colors-core")]
+        {
+            let code = color(&self.chunk_pending);
+            if !code.is_empty() {
+                return code.to_string();
+            }
+        }
+        self.chunk_pending.clone()
     }
 }
 

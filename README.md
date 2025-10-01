@@ -105,7 +105,7 @@ Index of Feature Modules
 | **TOML** | Cargo.toml metadata extraction and namespace management | [`FEATURES_TOML.md`](docs/tech/features/FEATURES_TOML.md) |
 | **REPL** | Interactive command processing with repl_dispatch! | [`FEATURES_REPL.md`](docs/tech/features/FEATURES_REPL.md) |
 | **Options** | Configuration options and feature flags | [`FEATURES_OPTIONS.md`](docs/tech/features/FEATURES_OPTIONS.md) |
-| **Progress** | Modular progress indicators (spinner/bar/bytes) | [`FEATURES_PROGRESS.md`](docs/tech/features/FEATURES_PROGRESS.md) |
+| **Progress** | Modular progress indicators (spinner/bar/bytes) with color customization | [`FEATURES_PROGRESS.md`](docs/tech/features/FEATURES_PROGRESS.md) |
 | **FS** | File system operations and helpers | [`FEATURES_FS.md`](docs/tech/features/FEATURES_FS.md) |
 
 ## Cargo Features

@@ -97,6 +97,9 @@ FEATURE_MAP: Dict[str, Sequence[str]] = {
     "tokens": [
         "src/token",
     ],
+    "toml": [
+        "src/toml",
+    ],
     "truth": [
         "src/com",
     ],

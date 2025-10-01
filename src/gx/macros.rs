@@ -54,14 +54,14 @@ macro_rules! rand_range {
 #[macro_export]
 macro_rules! rand_dict {
     ($arr_name:expr) => {
-        $crate::gx::collection::get_rand_from_slice(&$crate::utils::get_array($arr_name))
+        $crate::gx::collection::get_rand_from_slice(&$crate::global::array::get_array($arr_name))
             .unwrap_or_default()
     };
     ($arr_name:expr, $n:expr) => {
         $crate::rand_dict!($arr_name, $n, " ")
     };
     ($arr_name:expr, $n:expr, $delim:expr) => {{
-        let words = $crate::utils::get_array($arr_name);
+        let words = $crate::global::array::get_array($arr_name);
         if words.is_empty() {
             String::new()
         } else {
@@ -91,6 +91,6 @@ macro_rules! gen_dict {
             words.push(word);
         }
         let word_strs: Vec<&str> = words.iter().map(|s| s.as_str()).collect();
-        $crate::utils::set_array($arr_name, &word_strs);
+        $crate::global::array::set_array($arr_name, &word_strs);
     }};
 }
