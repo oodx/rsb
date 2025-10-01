@@ -1,4 +1,3 @@
-pub mod prelude;
 // args and context modules removed; use cli::Args and hosts bootstrap
 pub mod fs;
 pub mod macros;
@@ -16,15 +15,13 @@ pub mod utils;
 pub mod xcls;
 
 pub mod gx;
-// Dev/testing namespace (aggregated low-level helpers)
-pub mod prelude_dev;
 
 // Host discovery namespace (env/paths/script awareness)
 pub mod cli;
 pub mod hosts;
 
-// EZ prelude for rapid prototyping
-pub mod prelude_ez;
+// Preludes module (main, guards, dev, ez)
+pub mod prelude;
 
 // Standalone colors package - behind feature flags
 #[cfg(feature = "colors-core")]

@@ -1,9 +1,19 @@
-// src/prelude.rs
+// src/prelude/mod.rs
 
-//! The RSB prelude.
+//! The RSB prelude module.
 //!
-//! This module re-exports all the common traits, functions, and macros
+//! Contains multiple prelude variants for different use cases:
+//! - `prelude::*` (this module) - Standard prelude for production
+//! - `prelude::guards::*` - All is_* and has_* guard functions
+//! - `prelude::dev::*` - Development and testing helpers
+//! - `prelude::ez::*` - Everything (convenience prelude)
+//!
+//! The standard prelude re-exports all the common traits, functions, and macros
 //! for easy importing into user code via `use rsb::prelude::*;`.
+
+pub mod dev;
+pub mod ez;
+pub mod guards;
 
 // Re-export all public structs and functions.
 pub use crate::cli::Args;
