@@ -57,6 +57,6 @@ fn main() {
     println!("\nYou should have seen:");
     println!("  • Status indicator (▶ Running)");
     println!("  • Size, elapsed time, ETA, chunk count");
-    println!("  • Chunk blocks: ■ complete, █ current (blinking), □ pending");
+    println!("  • Chunk blocks: ■ complete (green), ■ current (white, blinking), □ pending (grey)");
     println!("  • Progress bar showing current chunk progress");
 }

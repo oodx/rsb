@@ -23,6 +23,7 @@ pub use crate::global::{
     clear_all, clear_pattern, clear_prefix, clear_suffix,
     expand_vars, export_vars, get_var, has_var, is_false, is_token_stream, is_true,
     load_config_file, parse_config_content, save_config_file, set_var, unset_var,
+    ns_get, ns_get_all, ns_set,
 };
 // OS/host functions now under hosts module
 pub use crate::hosts::*;

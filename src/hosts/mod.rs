@@ -3,13 +3,9 @@
 //!
 //! Clean orchestrator pattern — host discovers environment, global stores it,
 //! CLI builds interfaces. MODULE_SPEC alignment: keep implementation modules
-//! private, expose curated surface via `hosts::utils` and at module root.
+//! private, expose curated surface at module root.
 //!
 //! RSB Philosophy: host discovers → global stores → cli builds
-
-// Public curated surface
-pub mod utils;
-pub use utils::*;
 
 // Host-level helpers that depend on global (cross-module)
 pub mod host_global;
@@ -29,3 +25,13 @@ mod env;
 mod host_path;
 mod rsb_path;
 mod xdg_path;
+
+// Curated surface - re-export stable host helpers
+pub use bootstrap::*;
+pub use command::*;
+pub use env::*;
+pub use host_global::*;
+pub use host_path::*;
+pub use os::*;
+pub use rsb_path::*;
+pub use xdg_path::*;

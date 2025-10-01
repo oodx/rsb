@@ -47,6 +47,7 @@ pub struct Repl {
     /// Command history (in-memory only for v1)
     history: Vec<String>,
     /// Pluggable parser for command line tokenization
+    #[allow(dead_code)]
     parser: Box<dyn ReplParser>,
 }
 

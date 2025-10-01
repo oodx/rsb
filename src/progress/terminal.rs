@@ -576,9 +576,10 @@ impl TerminalReporter {
                 // Current chunk - blink ON/OFF when running
                 if blink_visible {
                     if self.config.use_colors {
-                        chunks_display.push_str(&self.config.color_scheme.colorize_chunk_current("█", false));
+                        // Use white color for blinking chunk with normal block size
+                        chunks_display.push_str("\x1b[97m■\x1b[0m");
                     } else {
-                        chunks_display.push('█');
+                        chunks_display.push('■');
                     }
                 } else {
                     // Blink off - show empty/pending chunk

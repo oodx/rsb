@@ -73,16 +73,19 @@ impl ReplParser for SimpleParser {
 
 impl SimpleParser {
     /// Check if a token contains a comma list pattern (no spaces around commas)
+    #[allow(dead_code)]
     fn is_comma_list(s: &str) -> bool {
         s.contains(',') && !s.contains(" ,") && !s.contains(", ")
     }
 
     /// Check if a token contains a semicolon stream pattern
+    #[allow(dead_code)]
     fn is_semicolon_stream(s: &str) -> bool {
         s.contains(';')
     }
 
     /// Check if a token contains a token pattern (key=value with optional prefix)
+    #[allow(dead_code)]
     fn is_token_pattern(s: &str) -> bool {
         // Must have = sign
         if !s.contains('=') {
