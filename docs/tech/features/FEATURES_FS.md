@@ -26,13 +26,16 @@ Public API (curated)
   - files: `wc_file!(path)`, `wc_lines_file!`, `wc_words_file!`, `wc_chars_file!`
   - functions: `count_lines_str`, `count_words_str`, `count_chars_str` (string input) as well as `count_lines_file`, `count_words_file`, `count_chars_file`, and their streaming counterparts (`count_lines_file_stream`, `count_words_file_stream`, `count_chars_file_stream`). Tuple helpers (`wc_tuple_str`, `wc_tuple_file`, `wc_tuple_file_stream`) and render helpers (`wc_string`, `wc_file_string`, `wc_file_string_stream`) give you structured or preformatted output.
 
-Macros (curated)
-- Files/temp: `chmod!`, `backup!`, `tmp!`, `cap_stream!`, `subst!`
-- Sed (string-based): `sed_lines!`, `sed_around!`, `sed_insert!`, `sed_template!`, `sed_replace!`
-- Sed (file-based): `sed_lines_file!`, `sed_around_file!`, `sed_insert_file!`, `sed_template_file!`
-- Archives: `tar!`, `tar_gz!`, `zip!`, `pack!`, `unpack!`
-- Path/meta: `path_canon!`, `path_split!`, `meta_keys!`
-- Dictionaries: `dict!("ARR", from: "path/to/file")`
+Macros (module-owned: `fs::macros`)
+- **Files/temp**: `chmod!`, `backup!`, `tmp!`, `cap_stream!`, `subst!`
+- **Sed (string-based)**: `sed_lines!`, `sed_around!`, `sed_insert!`, `sed_template!`, `sed_replace!`
+- **Sed (file-based)**: `sed_lines_file!`, `sed_around_file!`, `sed_insert_file!`, `sed_template_file!`
+- **Archives**: `tar!`, `tar_gz!`, `zip!`, `pack!`, `unpack!` (also re-exported in `bash::macros`)
+- **Path/meta**: `path_canon!`, `path_split!`, `meta_keys!`
+- **Dictionaries**: `dict!("ARR", from: "path/to/file")`
+- **Validation**: `require_file!(path)`, `require_dir!(path)` — validates file/directory existence
+- **Iteration**: `file_in!(item in "dir" => { body })` — iterate over files in directory
+  - `file_in!(path, content in "dir" => { body })` — iterate with file content loaded
 
 Usage Examples
 ```rust

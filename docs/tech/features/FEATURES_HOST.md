@@ -63,13 +63,30 @@ fn main() {
 }
 ```
 
-Convenience macros (`rsb::hosts::macros`)
-- `get_env!("NAME")`, `hostname!()`, `user!()`, `home_dir!()`, `current_dir!()` — inline accessors powered by the helpers above.
-- `host_bootstrap!()` — macro wrapper that runs the full host bootstrap using `std::env::args()`.
-- Process management macros (delegate to `rsb::jobs`):
+Macros (module-owned: `hosts::macros`)
+- **Host Information**:
+  - `get_env!()` — import environment variables into global store
+  - `hostname!()` — get system hostname
+  - `user!()` — get current username
+  - `home_dir!()` — get home directory path
+  - `current_dir!()` — get current working directory
+  - `host_bootstrap!()` — full host bootstrap using `std::env::args()`
+
+- **Process Management** (delegate to `rsb::jobs`):
   - `pid_of!(process)`, `process_exists!(process)` — process queries
   - `kill_pid!(pid)`, `kill_process!(name)` — terminate processes
   - `lock!(path)`, `unlock!(path)`, `with_lock!(path => { ... })` — file locking
+
+- **JSON Utilities** (jq-backed):
+  - `json_get!(json, path)` — extract value from JSON string
+  - `json_get_file!(file, path)` — extract value from JSON file
+
+- **Validation**:
+  - `require_command!(cmd)` — validates command exists in PATH
+
+- **Testing**:
+  - `mock_cmd!({ "cmd" => "output", ... })` — mock command outputs for testing
+  - `mock_cmd!(clear)` — clear all mocked commands
 
 System helpers (`rsb::hosts::system`)
 - `hosts::get_hostname()`, `get_username()`, `get_arch()`, `get_os()` — machine metadata.

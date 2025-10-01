@@ -1,9 +1,10 @@
 # Bash Utilities (FEATURES_BASH)
 
-Updated: 2025-09-13
+Updated: 2025-09-30
 
 Scope
 - Curated wrappers and macros for common bash-style commands (curl, tar, zip).
+- Bash-style control flow macros (test!, case!, for_in!) for scripting.
 - String-first, process-oriented helpers that delegate to the OS shell.
 
 Module
@@ -22,22 +23,51 @@ Safety
 - These wrappers call `sh -c` via `os::run_cmd_with_status` and return `CmdResult` (no panic).
 
 Macros (module-owned)
-- `curl!(url)` → String (stdout) or exits on failure
-- `curl!(url, options: "-I")` → String
-- `curl!(post: url, data: payload)` → String
-- `get!(url, ...)` — shortcut alias for the `curl!` macro
-- Archive macros (defined at crate level; re-exported under `bash::macros`):
+- **Network:**
+  - `curl!(url)` → String (stdout) or exits on failure
+  - `curl!(url, options: "-I")` → String
+  - `curl!(post: url, data: payload)` → String
+  - `get!(url, ...)` — shortcut alias for the `curl!` macro
+
+- **Archives** (defined at crate level; re-exported under `bash::macros`):
   - `tar!(create: "a.tar", "file")`, `tar!(extract: "a.tar", to: "dest/")`, `tar!(list: "a.tar")`
   - `tar_gz!(create: "a.tar.gz", "file")`
   - `zip!(create: "a.zip", "dir")`, `zip!(extract: "a.zip", to: "dest/")`, `zip!(list: "a.zip")`
   - `pack!("archive.ext", paths...)` auto-detects format by extension
 
+- **Bash-style Control Flow:**
+  - `test!(-f path)` — filesystem tests: `-f`, `-d`, `-e`, `-L`, `-r`, `-w`, `-x`, `-s`
+  - `test!(-n str)`, `test!(-z str)` — string tests
+  - `test!(a, ==, b)`, `test!(a, !=, b)`, `test!(a, =~, regex)` — string comparisons
+  - `test!(a, -eq, b)`, `test!(a, -lt, b)`, `test!(a, -gt, b)`, etc. — numeric comparisons
+  - `case!(value, { "pattern" => { body }, _ => { default } })` — pattern matching with regex
+  - `for_in!(item in "array_name" => { body })` — iterate over global arrays
+  - `for_in!(i, item in "array_name" => { body })` — indexed iteration
+
 Examples
 ```rust
 use rsb::prelude::*;
+
+// Network
 let body = curl!("https://example.com");
 let head = curl!("https://example.com", options: "-I");
 let resp = curl!(post: "https://example.com", data: "a=1&b=2");
+
+// Control flow
+if test!(-f "/etc/passwd") {
+    println!("File exists");
+}
+
+case!("production", {
+    "prod.*" => { println!("Production environment") },
+    "dev.*" => { println!("Development environment") },
+    _ => { println!("Unknown environment") }
+});
+
+set_array("items", &["a", "b", "c"]);
+for_in!(item in "items" => {
+    println!("Item: {}", get_var("item"));
+});
 ```
 
 Testing

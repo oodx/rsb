@@ -32,7 +32,6 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 FEATURE_MAP: Dict[str, Sequence[str]] = {
     "global": [
         "src/global",
-        "src/macros/control_validation.rs",  # export!/src! live here
     ],
     "bash": [
         "src/bash",
@@ -94,7 +93,6 @@ FEATURE_MAP: Dict[str, Sequence[str]] = {
     ],
     "testing": [
         "bin/test.sh",
-        "src/macros/test_helpers.rs",
     ],
     "tokens": [
         "src/token",

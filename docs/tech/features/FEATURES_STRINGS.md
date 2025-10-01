@@ -101,12 +101,25 @@ Related
   - Charset variants (STANDARD/NUMBERS/LOWERCASE/URL)
   - Consider asc100 for advanced pipelines or optional interop
 
-Macros (exported at crate root; re-exported via prelude)
-- `str_in!(needle, in: haystack)` — substring containment.
-- `str_explode!(string, on: delim, into: "ARR")` — splits into global-context array keys.
-- `str_trim!("VAR")` — trims value fetched from context.
-- `str_len!("VAR")` — length of value fetched from context (bytes count of resulting `String`).
-- `str_line!(ch, n)` — string of `n` repeated characters.
+Macros (module-owned: `string::macros`)
+- **String Utilities**:
+  - `str_in!(needle, in: haystack)` — substring containment
+  - `str_explode!(string, on: delim, into: "ARR")` — splits into global-context array keys
+  - `str_trim!("VAR")` — trims value fetched from context
+  - `str_len!("VAR")` — length of value fetched from context (bytes count of resulting `String`)
+  - `str_line!(ch, n)` — string of `n` repeated characters
+  - `to_number!(text)` — parse string to i32 (returns 0 on error)
+  - `to_number!(text, default: val)` — parse with custom default
+
+- **Case Conversion Macros** (value forms):
+  - `snake!(str)`, `kebab!(str)`, `slug!(str)`, `dot!(str)`, `space!(str)`
+  - `camel!(str)`, `pascal!(str)`, `screaming!(str)`
+
+- **Case Conversion Macros** (context variable forms):
+  - `snake_var!("VAR")`, `kebab_var!("VAR")`, `slug_var!("VAR")`, `dot_var!("VAR")`
+  - `space_var!("VAR")`, `camel_var!("VAR")`, `pascal_var!("VAR")`, `screaming_var!("VAR")`
+
+Note: `case!` macro moved to `bash::macros` (bash-style pattern matching)
 
 Unicode behavior
 - Scalar-safety: `str_sub` iterates with `chars()`, so it won’t split inside a code point.

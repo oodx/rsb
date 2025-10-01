@@ -1,6 +1,6 @@
 # RSB Global (Store, Expansion, Config, Introspection)
 
-Updated: 2025-09-12
+Updated: 2025-09-30
 
 Purpose
 - Provide a simple, bash-like global store for strings used across your app.
@@ -175,16 +175,26 @@ Guidance
 - Use the host adapter when you also want standard mode flags and, later, XDG/script awareness and colors env parsing.
 - For namespace operations, see the dedicated "Namespace Operations" section above which covers all namespace features including styles, overlay operations, and use cases.
 
-Macros
-- Config/IO
-  - `export!()` — write all global variables (or `$RSB_EXPORT`) as shell exports.
-  - `load_config!("path1", "path2")` — convenience front-end for `global::load_config_file`.
-  - `src!(...)` — alias for `load_config!` maintained for legacy call sites.
-- Validation/requirements (paired with Global + `error!` reporting)
-  - `validate!(condition, message...)` — fail-fast guard (exit in prod, panic in tests).
-  - `test!("name" => { ... })` — lightweight macro to wrap doc-style tests without pulling in the test harness.
-  - `require_file!`, `require_dir!`, `require_command!`, `require_var!` — specialized `validate!` wrappers.
-  - Iteration helpers such as `for_in!`, `file_in!`, and `case!` expose loop variables through Global for scripted validations.
+Macros (module-owned: `global::macros`)
+- **Output** (variable expansion wrappers):
+  - `echo!("text with $VAR")` — println with variable expansion
+  - `printf!("text with $VAR")` — print (no newline) with variable expansion
+
+- **Config/Export**:
+  - `export!()` — write all global variables (or `$RSB_EXPORT`) as shell exports
+  - `export!(path)` — write to specific file
+  - `load_config!("path1", "path2")` — convenience front-end for `global::load_config_file`
+  - `src!(...)` — alias for `load_config!` maintained for legacy call sites
+
+- **Validation**:
+  - `require_var!("KEY")` — validates that global variable exists (uses `validate!` from `com::macros`)
+
+Note: `validate!`, `test!`, `case!`, `for_in!` macros moved to other modules:
+- `validate!` → `com::macros` (command/validation logic)
+- `test!`, `case!`, `for_in!` → `bash::macros` (bash-style control flow)
+- `require_file!`, `require_dir!` → `fs::macros` (filesystem validation)
+- `require_command!` → `hosts::macros` (command validation)
+- `file_in!` → `fs::macros` (filesystem iteration)
 
 <!-- feat:global -->
 
