@@ -362,15 +362,37 @@ class Discovery:
 
     def discover(self) -> Dict[str, Feature]:
         """Build feature map from config or auto-discovery."""
-        # If explicit features defined, use them
-        if self.config.features:
-            return self._features_from_config()
+        features = {}
 
-        # Otherwise auto-discover
+        # Start with auto-discovered features if enabled
         if self.config.auto_discover:
-            return self._auto_discover()
+            features = self._auto_discover()
 
-        return {}
+        # Merge/override with explicit features from config
+        if self.config.features:
+            explicit = self._features_from_config()
+
+            # Build map of paths used by explicit features
+            explicit_paths = set()
+            for feature in explicit.values():
+                explicit_paths.update(feature.paths)
+
+            # Remove auto-discovered features that conflict with explicit mappings
+            to_remove = []
+            for auto_name, auto_feature in features.items():
+                # Check if any of this auto-discovered feature's paths are used by explicit mappings
+                for auto_path in auto_feature.paths:
+                    if auto_path in explicit_paths:
+                        to_remove.append(auto_name)
+                        break
+
+            for name in to_remove:
+                del features[name]
+
+            # Add explicit mappings
+            features.update(explicit)
+
+        return features
 
     def _features_from_config(self) -> Dict[str, Feature]:
         """Build features from explicit config."""

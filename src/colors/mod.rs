@@ -6,8 +6,9 @@
 //!
 //! ## Package Structure:
 //! - **simple**: Basic 8-16 colors sufficient for prompts and basic styling
-//! - **named**: Extended named colors from boxy (includes simple colors)  
+//! - **named**: Extended named colors from boxy (includes simple colors)
 //! - **status**: Status-specific colors for logging and messaging
+//! - **macros**: Color expansion macros (colored!)
 //!
 //! ## Dependencies:
 //! - colors-named includes colors-simple automatically
@@ -22,6 +23,8 @@ pub mod named;
 
 #[cfg(feature = "colors-status")]
 pub mod status;
+
+pub mod macros;
 
 // Progressive enhancement runtime registry and ergonomic API
 mod registry;

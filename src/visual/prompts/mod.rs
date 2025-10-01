@@ -7,6 +7,7 @@
 //! - `mod.rs` - Orchestrator and curated public surface (this file)
 //! - `interactive.rs` - Core prompt function implementations
 //! - `utils.rs` - Curated timeout functions (exposed via `visual::utils`)
+//! - `macros.rs` - Prompt macros (confirm!, ask!, select!, etc.)
 //!
 //! ## Global Context Integration
 //! - `opt_yes` → All confirmations return `true`
@@ -34,6 +35,7 @@
 
 // MODULE_SPEC: Implementation modules
 pub mod interactive;
+pub mod macros;
 pub mod utils; // Curated functions - exposed via visual::utils
 
 // MODULE_SPEC: Curated public surface - re-export core functions

@@ -11,13 +11,31 @@ exclude = [
     "**/tests/**",
     "**/target/**",
     "**/__pycache__/**",
+    "src/_*",        # Exclude _todo, etc.
+    "src/bin",       # Internal bin module
+    "src/dev",       # Dev utilities
+    "src/dev_ns",    # Dev namespace utilities
 ]
 
 # Explicit feature mappings (optional, overrides auto-discovery)
-# Using feat.py naming convention for compatibility
+# Use this to map feature names to their source paths when they differ
+# from directory names (e.g., "generators" -> "src/gx")
 [features]
-global = ["src/global"]
-bash = ["src/bash"]
+# Naming overrides (feature name != directory name)
 strings = ["src/string"]
+tokens = ["src/token"]
+visuals = ["src/visual"]
+params = ["src/param"]
+host = ["src/hosts"]
+generators = ["src/gx"]
+
+# Multi-path features
 cli = ["src/cli", "src/cli/macros.rs"]
-colors = ["src/colors", "src/utils.rs", "src/visual/macros.rs"]
+colors = ["src/colors"]
+prompts = ["src/visual/prompts"]
+options = ["src/cli/options.rs", "src/cli/macros.rs"]
+repl = ["src/repl", "src/cli/args.rs"]
+truth = ["src/com"]
+
+# Single-path features can be auto-discovered
+# (bash, date, fs, global, jobs, math, object, parse, progress, toml, etc.)
