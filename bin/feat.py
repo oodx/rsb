@@ -1016,6 +1016,12 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
         type=pathlib.Path,
         help="Repository root directory (default: auto-detect)"
     )
+    parser.add_argument(
+        "--paths",
+        nargs="+",
+        type=pathlib.Path,
+        help="Direct file/directory paths for ad-hoc inspection (creates 'adhoc' feature)"
+    )
 
     subparsers = parser.add_subparsers(dest="command", help="Commands")
 
@@ -1048,6 +1054,65 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
+def cmd_paths(paths: List[pathlib.Path], config: Config, repo: RepoContext) -> int:
+    """Directly scan specified paths without modifying config."""
+    # Convert paths to relative strings from repo root
+    rel_paths = []
+    for p in paths:
+        abs_path = p if p.is_absolute() else (pathlib.Path.cwd() / p).resolve()
+        try:
+            rel_path = abs_path.relative_to(repo.root)
+            rel_paths.append(str(rel_path))
+        except ValueError:
+            # Path outside repo, use as-is
+            rel_paths.append(str(p))
+
+    # Create ephemeral feature for scanning
+    feature = Feature(name="adhoc", paths=rel_paths)
+
+    collector = Collector(config, repo)
+    items = collector.collect_items(feature)
+
+    # Render output
+    print(f"== {feature.name.upper()} ==")
+    print(f"paths: {', '.join(feature.paths)}")
+    print()
+
+    if not items:
+        print("(no public items found)")
+        return 0
+
+    categories = {
+        "fn": "Functions",
+        "struct": "Structs",
+        "enum": "Enums",
+        "trait": "Traits",
+        "type": "Type Aliases",
+        "use": "Re-exports",
+        "macro": "Exported Macros",
+    }
+
+    grouped: Dict[str, List[Item]] = {key: [] for key in categories}
+    for item in items:
+        grouped.setdefault(item.kind, []).append(item)
+
+    for key, title in categories.items():
+        bucket = grouped.get(key) or []
+        if not bucket:
+            continue
+        print(f"{title}:")
+        for entry in sorted(bucket, key=lambda it: (str(it.location), it.line, it.name)):
+            if entry.extra:
+                desc = f"{entry.name} [{entry.extra}]"
+            else:
+                desc = entry.name
+            rel = entry.location.relative_to(repo.root)
+            print(f"- {desc} ({rel}:{entry.line})")
+        print()
+
+    return 0
+
+
 def main(argv: List[str]) -> int:
     """Main entry point."""
     args = parse_args(argv)
@@ -1060,6 +1125,11 @@ def main(argv: List[str]) -> int:
         config_path = args.config
     else:
         config_path = repo.root / ".feat.toml"
+
+    # Handle --paths shortcut (ad-hoc inspection)
+    if hasattr(args, 'paths') and args.paths:
+        config = Config.load(config_path)
+        return cmd_paths(args.paths, config, repo)
 
     config = Config.load(config_path)
 
