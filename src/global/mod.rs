@@ -21,4 +21,7 @@ pub use ns::*;
 pub mod registry;
 pub use registry::*;
 
+mod array;
+pub use array::*;
+
 // No module-owned macros at the moment; functions are the primary interface.

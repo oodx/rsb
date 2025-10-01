@@ -40,6 +40,7 @@
 pub mod aggregators;
 pub mod base;
 pub mod basic;
+pub mod comparison;
 pub mod expressions;
 pub mod integers;
 pub mod macros;
@@ -76,6 +77,9 @@ pub use predicates::{is_even, is_negative, is_odd, is_positive, is_zero, modulo,
 
 // Aggregator operations
 pub use aggregators::{avg, max_list, mean, median, min_list, sum_list};
+
+// Comparison operations (string-to-number comparisons)
+pub use comparison::{num_eq, num_gt, num_lt};
 
 // Random operations moved to gx::rand module
 

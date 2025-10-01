@@ -5,7 +5,7 @@
 
 use std::io::{self, Write};
 
-use crate::global::{get_var, is_true};
+use crate::global::{expand_vars, get_var, is_true};
 use crate::utils::expand_colors_unified;
 
 fn stdin_is_tty() -> bool {
@@ -168,5 +168,63 @@ pub fn default_from(key: &str, fallback: &str) -> String {
         fallback.to_string()
     } else {
         v
+    }
+}
+
+/// Simple prompt for user input with optional default (from utils.rs migration)
+pub fn prompt_user(message: &str, default: Option<&str>) -> String {
+    let default_text = if let Some(def) = default {
+        format!(" [{}]", def)
+    } else {
+        String::new()
+    };
+
+    print!("{}{}: ", expand_vars(message), default_text);
+    io::stdout().flush().unwrap();
+
+    let mut input = String::new();
+    io::stdin()
+        .read_line(&mut input)
+        .expect("Failed to read input");
+
+    let trimmed = input.trim();
+    if trimmed.is_empty() && default.is_some() {
+        default.unwrap().to_string()
+    } else {
+        trimmed.to_string()
+    }
+}
+
+/// Simple yes/no confirmation with optional default (from utils.rs migration)
+pub fn confirm_action(message: &str, default: Option<bool>) -> bool {
+    if is_true("opt_yes") {
+        return true;
+    }
+
+    let default_text = match default {
+        Some(true) => " [Y/n]",
+        Some(false) => " [y/N]",
+        None => " [y/n]",
+    };
+
+    loop {
+        print!("{}{}: ", expand_vars(message), default_text);
+        io::stdout().flush().unwrap();
+
+        let mut input = String::new();
+        io::stdin()
+            .read_line(&mut input)
+            .expect("Failed to read input");
+
+        match input.trim().to_lowercase().as_str() {
+            "y" | "yes" => return true,
+            "n" | "no" => return false,
+            "" => {
+                if let Some(def) = default {
+                    return def;
+                }
+            }
+            _ => continue,
+        }
     }
 }
