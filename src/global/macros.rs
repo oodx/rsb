@@ -36,24 +36,6 @@ macro_rules! load_config {
     ($($path:expr),+) => { $( $crate::global::load_config_file($path); )+ };
 }
 
-// --- Array Iteration Macros ---
-#[macro_export]
-macro_rules! for_in {
-    ($var:ident in $array_name:expr => $body:block) => {
-        for item in $crate::global::array::get_array($array_name) {
-            $crate::global::set_var(stringify!($var), &item);
-            $body
-        }
-    };
-    ($index:ident, $var:ident in $array_name:expr => $body:block) => {
-        for (i, item) in $crate::global::array::get_array($array_name).iter().enumerate() {
-            $crate::global::set_var(stringify!($index), &i.to_string());
-            $crate::global::set_var(stringify!($var), item);
-            $body
-        }
-    };
-}
-
 // --- Validation Macros ---
 #[macro_export]
 macro_rules! require_var {
@@ -67,4 +49,4 @@ macro_rules! require_var {
 }
 
 // Namespaced re-exports for selective imports
-pub use crate::{echo, export, for_in, load_config, printf, require_var, src};
+pub use crate::{echo, export, load_config, printf, require_var, src};
