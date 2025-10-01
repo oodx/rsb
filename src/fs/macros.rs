@@ -243,3 +243,123 @@ macro_rules! meta_keys {
         $crate::fs::parse_meta_keys($path, $name);
     }};
 }
+
+// --- Filesystem Validation Macros ---
+#[macro_export]
+macro_rules! require_file {
+    ($path:expr) => {
+        $crate::validate!($crate::fs::is_file($path), "File does not exist: {}", $path);
+    };
+}
+
+#[macro_export]
+macro_rules! require_dir {
+    ($path:expr) => {
+        $crate::validate!(
+            $crate::fs::is_dir($path),
+            "Directory does not exist: {}",
+            $path
+        );
+    };
+}
+
+// --- Test Macro (bash-style conditionals) ---
+#[macro_export]
+macro_rules! test {
+    (-e $path:expr) => {
+        $crate::fs::is_entity($path)
+    };
+    (-f $path:expr) => {
+        $crate::fs::is_file($path)
+    };
+    (-d $path:expr) => {
+        $crate::fs::is_dir($path)
+    };
+    (-L $path:expr) => {
+        $crate::fs::is_link($path)
+    };
+    (-r $path:expr) => {
+        $crate::fs::is_readable($path)
+    };
+    (-w $path:expr) => {
+        $crate::fs::is_writable($path)
+    };
+    (-x $path:expr) => {
+        $crate::fs::is_executable($path)
+    };
+    (-s $path:expr) => {
+        $crate::fs::is_nonempty_file($path)
+    };
+    (-n $str:expr) => {
+        !$str.is_empty()
+    };
+    (-z $str:expr) => {
+        $str.is_empty()
+    };
+    ($a:expr, ==, $b:expr) => {
+        $crate::string::str_equals($a, $b)
+    };
+    ($a:expr, !=, $b:expr) => {
+        !$crate::string::str_equals($a, $b)
+    };
+    ($a:expr, =~, $b:expr) => {
+        $crate::string::str_matches($a, $b)
+    };
+    ($a:expr, <, $b:expr) => {
+        $a < $b
+    };
+    ($a:expr, >, $b:expr) => {
+        $a > $b
+    };
+    ($a:expr, -eq, $b:expr) => {
+        $crate::math::comparison::num_eq($a, $b)
+    };
+    ($a:expr, -ne, $b:expr) => {
+        !$crate::math::comparison::num_eq($a, $b)
+    };
+    ($a:expr, -lt, $b:expr) => {
+        $crate::math::comparison::num_lt($a, $b)
+    };
+    ($a:expr, -le, $b:expr) => {
+        $crate::math::comparison::num_lt($a, $b) || $crate::math::comparison::num_eq($a, $b)
+    };
+    ($a:expr, -gt, $b:expr) => {
+        $crate::math::comparison::num_gt($a, $b)
+    };
+    ($a:expr, -ge, $b:expr) => {
+        $crate::math::comparison::num_gt($a, $b) || $crate::math::comparison::num_eq($a, $b)
+    };
+}
+
+// --- Filesystem Iteration Macro ---
+#[macro_export]
+macro_rules! file_in {
+    ($file_var:ident in $dir:expr => $body:block) => {
+        if let Ok(entries) = std::fs::read_dir($crate::global::expand_vars($dir)) {
+            for entry in entries {
+                if let Ok(entry) = entry {
+                    if let Some(path_str) = entry.path().to_str() {
+                        $crate::global::set_var(stringify!($file_var), path_str);
+                        $body
+                    }
+                }
+            }
+        }
+    };
+    ($file_var:ident, $content_var:ident in $dir:expr => $body:block) => {
+        if let Ok(entries) = std::fs::read_dir($crate::global::expand_vars($dir)) {
+            for entry in entries {
+                if let Ok(entry) = entry {
+                    if let Some(path_str) = entry.path().to_str() {
+                        if entry.path().is_file() {
+                            $crate::global::set_var(stringify!($file_var), path_str);
+                            let content = $crate::fs::read_file(path_str);
+                            $crate::global::set_var(stringify!($content_var), &content);
+                            $body
+                        }
+                    }
+                }
+            }
+        }
+    };
+}

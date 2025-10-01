@@ -221,9 +221,7 @@ pub use crate::repl::{Repl, ReplParser, ReplResult, SimpleParser, store_repl_arg
 
 // Re-export macro groups for selective imports via the prelude.
 pub mod macros {
-    // Legacy grouped macros (core, text, fs_data, etc.)
-    pub use crate::macros::*;
-    // Module-owned macros not in crate::macros
+    // Module-owned macros (now distributed across domain modules)
     pub use crate::{
         camel,
         camel_var,

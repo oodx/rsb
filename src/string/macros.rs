@@ -23,7 +23,7 @@ macro_rules! str_in {
 macro_rules! str_explode {
     ($string:expr, on: $delim:expr, into: $arr_name:expr) => {{
         let items: Vec<&str> = $string.split($delim).collect();
-        $crate::utils::set_array($arr_name, &items);
+        $crate::global::array::set_array($arr_name, &items);
     }};
 }
 
@@ -146,5 +146,25 @@ macro_rules! pascal_var {
 macro_rules! screaming_var {
     ($name:expr) => {
         $crate::string::to_screaming_snake_case(&$crate::global::get_var($name))
+    };
+}
+
+// --- Control Flow Macros ---
+#[macro_export]
+macro_rules! case {
+    ($value:expr, { $($pattern:expr => $body:block),* $(, _ => $default:block)? }) => {
+        {
+            let val_to_match = $value;
+            let mut matched = false;
+            $(
+                if !matched && $crate::string::str_matches(val_to_match, $pattern) {
+                    matched = true;
+                    $body
+                }
+            )*
+            $(
+                if !matched { $default }
+            )?
+        }
     };
 }

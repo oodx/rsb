@@ -1,6 +1,5 @@
 // args and context modules removed; use cli::Args and hosts bootstrap
 pub mod fs;
-pub mod macros;
 pub mod streamable;
 pub mod streams;
 // Time helpers moved into the `date` module
@@ -60,3 +59,36 @@ pub mod toml;
 
 // REPL (Read-Eval-Print-Loop) support for interactive command processing
 pub mod repl;
+
+// === Core I/O Macros ===
+// Basic input/output macros that don't belong to a specific domain module
+
+#[macro_export]
+macro_rules! readline {
+    () => {{
+        let mut input = String::new();
+        match std::io::stdin().read_line(&mut input) {
+            Ok(_) => input.trim().to_string(),
+            Err(_) => String::new(),
+        }
+    }};
+    ($prompt:expr) => {{
+        eprint!("{}", $prompt);
+        let _ = std::io::stderr().flush();
+        let mut input = String::new();
+        match std::io::stdin().read_line(&mut input) {
+            Ok(_) => input.trim().to_string(),
+            Err(_) => String::new(),
+        }
+    }};
+}
+
+#[macro_export]
+macro_rules! stderr {
+    ($($arg:tt)*) => {
+        {
+            let msg = format!($($arg)*);
+            eprintln!("{}", msg);
+        }
+    };
+}

@@ -1,7 +1,7 @@
 use rsb::prelude::*;
 
 #[test]
-fn sanity_threads_sleep_and_bench() {
+fn sanity_jobs_sleep_and_bench() {
     // Sleep briefly to ensure the function is callable
     rsb::jobs::sleep_ms(5);
 
@@ -12,7 +12,7 @@ fn sanity_threads_sleep_and_bench() {
 }
 
 #[test]
-fn sanity_threads_job_background_wait_list() {
+fn sanity_jobs_background_wait_list() {
     // Start a background job and wait with timeout
     let jid = rsb::jobs::start_background("echo 'sanity job'");
     let status = rsb::jobs::wait(jid, Some(2)).unwrap();

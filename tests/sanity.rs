@@ -31,6 +31,9 @@ mod options_cleanup;
 #[path = "sanity/threads.rs"]
 mod threads;
 
+#[path = "sanity/prelude.rs"]
+mod prelude;
+
 // NEW: GX module subdirectory
 #[path = "sanity/gx/string.rs"]
 mod gx_string;

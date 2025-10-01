@@ -159,6 +159,15 @@ macro_rules! unlock {
     };
 }
 
+// === Validation Macros ===
+
+#[macro_export]
+macro_rules! require_command {
+    ($cmd:expr) => {
+        $crate::validate!($crate::hosts::command::is_command($cmd), "Command not found: {}", $cmd);
+    };
+}
+
 // === JSON Macros (jq-backed helpers) ===
 
 #[macro_export]
@@ -173,4 +182,17 @@ macro_rules! json_get_file {
     ($file:expr, $path:expr) => {
         $crate::bash::jq::json_get_file($file, $path)
     };
+}
+
+// === Test Helpers ===
+
+#[macro_export]
+macro_rules! mock_cmd {
+    ({ $($cmd:expr => $out:expr),* $(,)? }) => {{
+        let pairs: &[(&str, &str)] = &[ $( ($cmd, $out) ),* ];
+        $crate::hosts::command::set_mock_cmds(pairs);
+    }};
+    (clear) => {{
+        $crate::hosts::command::clear_mock_cmds();
+    }};
 }
