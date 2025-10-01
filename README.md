@@ -67,7 +67,13 @@ RSB's design is heavily inspired by the mature **BashFX architecture**, incorpor
 ## Features
 
 - **Bash-like Syntax:** Write scripts that feel like shell scripts, but with the power and safety of Rust.
-- **Rich Macro DSL:** A powerful set of macros (`echo!`, `cmd!`, `cat!`, `test!`, `validate!`, `param!`, etc.) forms the core of the scripting experience.
+- **Rich Macro DSL:** Powerful macros distributed across domain modules:
+  - `bash` macros for control flow (`test!`, `case!`, `for_in!`, `curl!`, `get!`)
+  - `fs` macros for filesystem operations (`file_in!`, `require_file!`, `require_dir!`, `chmod!`, `tar!`, `zip!`)
+  - `global` macros for variable/config operations (`echo!`, `printf!`, `export!`, `load_config!`, `require_var!`)
+  - `hosts` macros for host/command operations (`require_command!`, `mock_cmd!`, `hostname!`, `user!`)
+  - `string` macros for string operations (case conversions, `str_in!`, `str_explode!`)
+  - `com` macros for validation (`validate!`, `is_true!`, `is_false!`)
 - **Fluent Stream Processing:** Chain commands together to process text and data, just like Unix pipes.
 - **Integrated Argument Parsing:** A simple yet powerful argument parser built-in.
 - **Config File Loading:** Easily load `.env` or `.conf` style configuration files.
@@ -286,6 +292,17 @@ $ cargo run -- hello RSB
 
 ## API Reference
 
+### Macro Organization
+
+Macros are now organized into domain-specific modules:
+- `use rsb::bash::macros::*` for bash-style control flow
+- `use rsb::fs::macros::*` for filesystem operations
+- `use rsb::global::macros::*` for global variable and config operations
+- `use rsb::hosts::macros::*` for host and command utilities
+- `use rsb::string::macros::*` for string manipulation
+- `use rsb::com::macros::*` for validation macros
+
+All macros are re-exported via `rsb::prelude::*` for convenience.
 
 ### Core & Bootstrap
 
