@@ -1,6 +1,6 @@
 [package]
 name = "rsb"
-version = "0.9.0"
+version = "0.9.1"
 description = "The official implementation of REBEL philosophy of developer ergonomics and productivity focus, framework/library"
 license = "AGPL-3.0"                 
 repository = "https://github.com/oodx/rsb"
@@ -131,4 +131,9 @@ required-features = ["progress", "colors-core", "colors-simple", "colors-status"
 [[example]]
 name = "dashboard_quick_test"
 path = "examples/dashboard_quick_test.rs"
+required-features = ["progress", "colors-core", "colors-simple", "colors-status"]
+
+[[example]]
+name = "dashboard_failure_test"
+path = "examples/dashboard_failure_test.rs"
 required-features = ["progress", "colors-core", "colors-simple", "colors-status"]

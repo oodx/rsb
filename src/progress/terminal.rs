@@ -184,8 +184,8 @@ impl TerminalReporter {
             ProgressStyle::Counter { total } => self.render_counter(event, display, *total),
             ProgressStyle::Percentage { total } => self.render_percentage(event, display, *total),
             ProgressStyle::Bytes { total_bytes } => self.render_bytes(event, display, *total_bytes),
-            ProgressStyle::Dashboard { total_chunks, chunk_size } => {
-                self.render_dashboard(event, display, *total_chunks, *chunk_size)
+            ProgressStyle::Dashboard { total_chunks, chunk_size, title } => {
+                self.render_dashboard(event, display, *total_chunks, *chunk_size, title.as_deref())
             }
             ProgressStyle::Silent => String::new(),
             ProgressStyle::Custom(format) => self.render_custom(event, display, format),
@@ -465,6 +465,7 @@ impl TerminalReporter {
         display: &TaskDisplay,
         total_chunks: usize,
         chunk_size: u64,
+        title: Option<&str>,
     ) -> String {
         let total_bytes = (total_chunks as u64) * chunk_size;
 
@@ -536,24 +537,59 @@ impl TerminalReporter {
 
         // Row 3: Chunk visualization
         let mut chunks_display = String::from("  ");
+
+        // Use spinner frame to determine blink state (true = visible, false = invisible)
+        let frame = *self.spinner_frame.lock().unwrap();
+        let blink_visible = (frame / 4) % 2 == 0; // Toggle every 4 frames
+
+        // Determine if state is error/cancelled - if so, show all chunks in red
+        let is_error_state = matches!(event.state, ProgressState::Failed | ProgressState::Cancelled);
+
         for i in 0..total_chunks {
             if i > 0 {
                 chunks_display.push(' ');
             }
 
-            if i < current_chunk as usize {
+            if is_error_state {
+                // For error/cancelled states, show all chunks in red
+                if i <= current_chunk as usize {
+                    if self.config.use_colors {
+                        chunks_display.push_str(&self.config.color_scheme.colorize_failed("■"));
+                    } else {
+                        chunks_display.push('■');
+                    }
+                } else {
+                    if self.config.use_colors {
+                        chunks_display.push_str(&self.config.color_scheme.colorize_chunk_pending("□"));
+                    } else {
+                        chunks_display.push('□');
+                    }
+                }
+            } else if i < current_chunk as usize {
                 // Completed chunk
                 if self.config.use_colors {
                     chunks_display.push_str(&self.config.color_scheme.colorize_chunk_complete("■"));
                 } else {
                     chunks_display.push('■');
                 }
-            } else if i == current_chunk as usize {
-                // Current chunk (blinking)
-                if self.config.use_colors {
-                    chunks_display.push_str(&self.config.color_scheme.colorize_chunk_current("█", true));
+            } else if i == current_chunk as usize && event.state == ProgressState::Running {
+                // Current chunk - blink ON/OFF when running
+                if blink_visible {
+                    if self.config.use_colors {
+                        chunks_display.push_str(&self.config.color_scheme.colorize_chunk_current("█", false));
+                    } else {
+                        chunks_display.push('█');
+                    }
                 } else {
-                    chunks_display.push('█');
+                    // Blink off - show empty/pending chunk
+                    chunks_display.push(' ');
+                }
+            } else if i == current_chunk as usize {
+                // Current chunk when complete - show solid green
+                if self.config.use_colors {
+                    chunks_display.push_str(&self.config.color_scheme.colorize_chunk_complete("■"));
+                } else {
+                    chunks_display.push('■');
                 }
             } else {
                 // Pending chunk
@@ -584,23 +620,68 @@ impl TerminalReporter {
             "No chunk progress".to_string()
         };
 
-        let row4 = format!("  [{:5.1}%] {}", percentage, chunk_bar);
+        // Bar already includes percentage, no need to duplicate
+        let row4 = format!("  {}", chunk_bar);
 
         // Combine based on state
         match event.state {
             ProgressState::Complete => {
+                // Success message with status info - previous lines will be cleared by report()
                 let final_time = self.format_duration(display.start_time.elapsed());
                 let rate = self.calculate_byte_rate(total_bytes, display.start_time.elapsed());
-                format!(
-                    "{} {}\n  Completed in {} at {} ({}/{})\n{}",
-                    status_prefix, message, final_time, rate, current_bytes_str, total_bytes_str, chunks_display
-                )
+                let full_message = format!(
+                    "✓ {} | Completed: {} | Rate: {} | Size: {}",
+                    message, final_time, rate, total_bytes_str
+                );
+                if self.config.use_colors {
+                    self.config.color_scheme.colorize_complete(&full_message)
+                } else {
+                    full_message
+                }
             }
             ProgressState::Running => {
-                format!("{}\n{}\n{}\n{}", row1, row2, chunks_display, row4)
+                // Include title line if provided (only when running)
+                if let Some(title_text) = title {
+                    format!("{}\n{}\n{}\n{}\n{}", title_text, row1, row2, chunks_display, row4)
+                } else {
+                    format!("{}\n{}\n{}\n{}", row1, row2, chunks_display, row4)
+                }
             }
-            ProgressState::Failed | ProgressState::Cancelled => {
-                format!("{}\n{}\n{}\n{}", row1, row2, chunks_display, row4)
+            ProgressState::Failed => {
+                // Error message with status info on separate line - previous lines will be cleared by report()
+                let final_time = self.format_duration(display.start_time.elapsed());
+                let rate = self.calculate_byte_rate(event.current, display.start_time.elapsed());
+                let current_bytes_str = self.format_bytes(event.current);
+
+                let error_line = format!("✗ Failed {}", message);
+                let status_line = format!("  Time: {} | Rate: {} | Progress: {}/{} | Chunk {}/{}",
+                    final_time, rate, current_bytes_str, total_bytes_str, current_chunk + 1, total_chunks
+                );
+
+                let full_message = format!("{}\n{}", error_line, status_line);
+                if self.config.use_colors {
+                    self.config.color_scheme.colorize_failed(&full_message)
+                } else {
+                    full_message
+                }
+            }
+            ProgressState::Cancelled => {
+                // Cancelled message with status info on separate line - previous lines will be cleared by report()
+                let final_time = self.format_duration(display.start_time.elapsed());
+                let rate = self.calculate_byte_rate(event.current, display.start_time.elapsed());
+                let current_bytes_str = self.format_bytes(event.current);
+
+                let cancel_line = format!("◐ Cancelled {}", message);
+                let status_line = format!("  Time: {} | Rate: {} | Progress: {}/{} | Chunk {}/{}",
+                    final_time, rate, current_bytes_str, total_bytes_str, current_chunk + 1, total_chunks
+                );
+
+                let full_message = format!("{}\n{}", cancel_line, status_line);
+                if self.config.use_colors {
+                    self.config.color_scheme.colorize_cancelled(&full_message)
+                } else {
+                    full_message
+                }
             }
         }
     }
@@ -761,8 +842,10 @@ impl ProgressReporter for TerminalReporter {
             }
             drop(task_states);
 
-            // For running multi-line displays, clear previous lines first
-            if !is_finished && line_count > 1 && prev_line_count > 0 {
+            // Clear previous lines for multi-line displays
+            // - When running and redrawing (normal case)
+            // - When finishing and had multi-line display before (transition to single-line status)
+            if prev_line_count > 0 && (line_count > 1 || is_finished) {
                 self.clear_lines(prev_line_count);
             }
 

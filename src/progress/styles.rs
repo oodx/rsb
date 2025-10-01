@@ -22,6 +22,7 @@ pub enum ProgressStyle {
     Dashboard {
         total_chunks: usize,
         chunk_size: u64,
+        title: Option<String>,
     },
     /// Silent mode - no visual output
     Silent,
@@ -40,6 +41,7 @@ impl ProgressStyle {
             ProgressStyle::Dashboard {
                 total_chunks,
                 chunk_size,
+                ..
             } => Some((*total_chunks as u64) * chunk_size),
             _ => None,
         }
@@ -74,7 +76,14 @@ impl fmt::Display for ProgressStyle {
             ProgressStyle::Dashboard {
                 total_chunks,
                 chunk_size,
-            } => write!(f, "dashboard({} chunks, {} bytes)", total_chunks, chunk_size),
+                title,
+            } => {
+                if let Some(t) = title {
+                    write!(f, "dashboard({} chunks, {} bytes, title: {})", total_chunks, chunk_size, t)
+                } else {
+                    write!(f, "dashboard({} chunks, {} bytes)", total_chunks, chunk_size)
+                }
+            }
             ProgressStyle::Silent => write!(f, "silent"),
             ProgressStyle::Custom(format) => write!(f, "custom({})", format),
         }

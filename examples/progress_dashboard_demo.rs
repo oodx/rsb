@@ -27,6 +27,7 @@ fn main() {
         ProgressStyle::Dashboard {
             total_chunks,
             chunk_size,
+            title: None,
         },
     );
 
@@ -62,6 +63,7 @@ fn main() {
         ProgressStyle::Dashboard {
             total_chunks: total_chunks2,
             chunk_size: chunk_size2,
+            title: None,
         },
     );
 
@@ -95,6 +97,7 @@ fn main() {
         ProgressStyle::Dashboard {
             total_chunks: total_chunks3,
             chunk_size: chunk_size3,
+            title: None,
         },
     );
 
