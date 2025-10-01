@@ -1,6 +1,6 @@
 [package]
 name = "rsb"
-version = "0.8.1"
+version = "0.9.0"
 description = "The official implementation of REBEL philosophy of developer ergonomics and productivity focus, framework/library"
 license = "AGPL-3.0"                 
 repository = "https://github.com/oodx/rsb"
