@@ -1,0 +1,116 @@
+================================================================================
+ 🐔 CHINA'S DASHBOARD USAGE GUIDE EGG #2 🥚
+================================================================================
+
+SUMMARY DETAILS:
+---------------
+- Date: 2025-09-30
+- Target: Progress Dashboard Usage Guide
+- Status: ✅ COMPLETE
+
+================================================================================
+📘 QUICK START: USING THE PROGRESS DASHBOARD
+================================================================================
+
+### Basic Usage
+```rust
+use rsb::progress::{ProgressTask, TaskBuilder, ProgressColorScheme};
+
+// Create a task with default dashboard
+let task = ProgressTask::new("Processing large file")
+    .with_total_chunks(8)  // Set total chunks
+    .start();
+
+// Progress through chunks
+for chunk in 0..8 {
+    task.update_progress(chunk, chunk_size);
+    // Do work...
+    task.complete_chunk();
+}
+
+task.finish();
+```
+
+================================================================================
+🎨 CUSTOMIZATION OPTIONS
+================================================================================
+
+1. Custom Color Scheme
+```rust
+let custom_colors = ProgressColorScheme {
+    chunk_complete: "bright_green",
+    chunk_current: "bright_blue",
+    chunk_pending: "dark_grey",
+    // ... other color options
+};
+
+let task = ProgressTask::new("Custom Colored Task")
+    .with_color_scheme(custom_colors)
+    .start();
+```
+
+2. Optional Title
+```rust
+let task = ProgressTask::new("Background Job")
+    .with_title("Large Data Migration")  // Optional custom title
+    .with_total_chunks(10)
+    .start();
+```
+
+================================================================================
+🚦 STATE MANAGEMENT
+================================================================================
+
+### Task States
+- `Running`: Active processing
+- `Complete`: Successful finish
+- `Failed`: Processing encountered errors
+- `Cancelled`: Manually stopped
+
+```rust
+// Handling different states
+let task = ProgressTask::new("Risky Operation")
+    .on_failure(|error| {
+        println!("Operation failed: {}", error);
+    })
+    .on_cancel(|reason| {
+        println!("Cancelled because: {}", reason);
+    });
+```
+
+================================================================================
+⚙️ CONFIGURATION OPTIONS
+================================================================================
+
+Future `DashboardConfig` (Planned):
+```rust
+pub struct DashboardConfig {
+    pub show_title: bool,        // Display optional title
+    pub show_size: bool,         // Show processed size
+    pub show_time: bool,         // Show elapsed time
+    pub show_eta: bool,          // Show estimated time
+    pub show_separator: bool,    // Visual separator line
+    pub show_percentage: bool,   // Show overall progress %
+    pub show_byte_count: bool,   // Show bytes processed
+    pub show_controls: bool,     // Show interactive controls
+    pub chunk_label: String,     // Customize chunk label
+}
+```
+
+================================================================================
+🔍 BEST PRACTICES
+================================================================================
+1. Always set total chunks for accurate visualization
+2. Call `update_progress()` and `complete_chunk()` regularly
+3. Handle potential errors with `.on_failure()`
+4. Use color schemes to match your application's UI
+
+================================================================================
+⚠️ DISCLAIMER
+================================================================================
+Dashboard rendering depends on terminal capabilities. Some features might
+vary across different terminal emulators.
+
+================================================================================
+ 🐔 CHINA'S EGG CERTIFIED: DASHBOARD USAGE INSIGHTS HATCHED! 🥚
+================================================================================
