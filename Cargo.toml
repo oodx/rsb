@@ -110,6 +110,15 @@ path = "src/lib.rs"
 name = "dummy-cli"
 path = "src/bin/dummy_cli.rs"
 
+[[bin]]
+name = "rsbdoc"
+path = "bin/rsb_docs_cli.rs"
+
 [[example]]
 name = "showcase"
 path = "examples/showcase.rs"
+
+[[example]]
+name = "progress_colors_demo"
+path = "examples/progress_colors_demo.rs"
+required-features = ["progress", "colors-core", "colors-simple", "colors-status"]

@@ -10,6 +10,7 @@ use std::thread;
 use std::time::{Duration, Instant};
 
 use super::core::{ProgressEvent, ProgressReporter, ProgressState};
+use super::progress_colors::ProgressColorScheme;
 #[allow(unused_imports)]
 use super::styles::{BarStyle, MessagePosition, ProgressStyle, SpinnerStyle};
 
@@ -18,12 +19,16 @@ use super::styles::{BarStyle, MessagePosition, ProgressStyle, SpinnerStyle};
 pub struct TerminalConfig {
     /// Whether to use colors
     pub use_colors: bool,
+    /// Color scheme for progress states (uses RSB color names)
+    pub color_scheme: ProgressColorScheme,
     /// Whether to use Unicode characters
     pub use_unicode: bool,
     /// Whether output goes to stderr instead of stdout
     pub use_stderr: bool,
     /// Minimum interval between updates (to avoid flooding)
     pub update_interval_ms: u64,
+    /// Auto-refresh rate for spinners in milliseconds (0 = disabled)
+    pub spinner_refresh_ms: u64,
     /// Whether to clear completed tasks
     pub clear_on_complete: bool,
     /// Maximum width for progress display
@@ -34,9 +39,11 @@ impl Default for TerminalConfig {
     fn default() -> Self {
         Self {
             use_colors: true,
+            color_scheme: ProgressColorScheme::default(),
             use_unicode: true,
             use_stderr: false,
             update_interval_ms: 50,
+            spinner_refresh_ms: 80,  // ~12 FPS for smooth spinner animation
             clear_on_complete: false,
             max_width: None,
         }
@@ -78,13 +85,14 @@ impl TerminalReporter {
             cursor_hidden: Arc::new(Mutex::new(false)),
         };
 
-        // Start spinner animation thread
-        if use_unicode {
+        // Start background spinner animation thread if enabled
+        if reporter.config.spinner_refresh_ms > 0 {
             let spinner_frame = reporter.spinner_frame.clone();
+            let refresh_ms = reporter.config.spinner_refresh_ms;
             thread::spawn(move || loop {
-                thread::sleep(Duration::from_millis(80));
+                thread::sleep(Duration::from_millis(refresh_ms));
                 let mut frame = spinner_frame.lock().unwrap();
-                *frame = (*frame + 1) % 10;
+                *frame = (*frame + 1) % 10;  // 10 frames for dots spinner
             });
         }
 
@@ -95,6 +103,7 @@ impl TerminalReporter {
     pub fn simple() -> Self {
         Self::with_config(TerminalConfig {
             use_colors: false,
+            color_scheme: ProgressColorScheme::none(),
             use_unicode: false,
             ..Default::default()
         })
@@ -186,34 +195,35 @@ impl TerminalReporter {
             SpinnerStyle::simple()
         };
 
+        // Read current frame from background thread
         let frame = *self.spinner_frame.lock().unwrap();
         let spinner_char = spinner_style.current_char(frame);
 
         let prefix = match event.state {
             ProgressState::Running => {
                 if self.config.use_colors {
-                    format!("\x1b[36m{}\x1b[0m", spinner_char) // Cyan
+                    self.config.color_scheme.colorize_running(&spinner_char.to_string())
                 } else {
                     spinner_char.to_string()
                 }
             }
             ProgressState::Complete => {
                 if self.config.use_colors {
-                    "\x1b[32m✓\x1b[0m".to_string() // Green checkmark
+                    self.config.color_scheme.colorize_complete("✓")
                 } else {
                     "✓".to_string()
                 }
             }
             ProgressState::Failed => {
                 if self.config.use_colors {
-                    "\x1b[31m✗\x1b[0m".to_string() // Red X
+                    self.config.color_scheme.colorize_failed("✗")
                 } else {
                     "✗".to_string()
                 }
             }
             ProgressState::Cancelled => {
                 if self.config.use_colors {
-                    "\x1b[33m◐\x1b[0m".to_string() // Yellow
+                    self.config.color_scheme.colorize_cancelled("◐")
                 } else {
                     "◐".to_string()
                 }
@@ -241,21 +251,21 @@ impl TerminalReporter {
             ProgressState::Complete => {
                 let elapsed = self.format_duration(display.start_time.elapsed());
                 if self.config.use_colors {
-                    format!("\x1b[32m{}\x1b[0m ({})", bar_display, elapsed)
+                    format!("{} ({})", self.config.color_scheme.colorize_complete(&bar_display), elapsed)
                 } else {
                     format!("{} ({})", bar_display, elapsed)
                 }
             }
             ProgressState::Failed => {
                 if self.config.use_colors {
-                    format!("\x1b[31m{}\x1b[0m", bar_display)
+                    self.config.color_scheme.colorize_failed(&bar_display)
                 } else {
                     bar_display
                 }
             }
             ProgressState::Cancelled => {
                 if self.config.use_colors {
-                    format!("\x1b[33m{}\x1b[0m", bar_display)
+                    self.config.color_scheme.colorize_cancelled(&bar_display)
                 } else {
                     bar_display
                 }
@@ -280,14 +290,16 @@ impl TerminalReporter {
             ProgressState::Complete => {
                 let elapsed = self.format_duration(display.start_time.elapsed());
                 if self.config.use_colors {
-                    format!("\x1b[32m✓\x1b[0m {} {} ({})", counter, message, elapsed)
+                    format!("{} {} {} ({})",
+                        self.config.color_scheme.colorize_complete("✓"),
+                        counter, message, elapsed)
                 } else {
                     format!("✓ {} {} ({})", counter, message, elapsed)
                 }
             }
             ProgressState::Failed => {
                 if self.config.use_colors {
-                    format!("\x1b[31m✗ {} {}\x1b[0m", counter, message)
+                    self.config.color_scheme.colorize_failed(&format!("✗ {} {}", counter, message))
                 } else {
                     format!("✗ {} {}", counter, message)
                 }
@@ -297,7 +309,7 @@ impl TerminalReporter {
             }
             ProgressState::Cancelled => {
                 if self.config.use_colors {
-                    format!("\x1b[33m◐ {} {}\x1b[0m", counter, message)
+                    self.config.color_scheme.colorize_cancelled(&format!("◐ {} {}", counter, message))
                 } else {
                     format!("◐ {} {}", counter, message)
                 }
@@ -324,14 +336,16 @@ impl TerminalReporter {
             ProgressState::Complete => {
                 let elapsed = self.format_duration(display.start_time.elapsed());
                 if self.config.use_colors {
-                    format!("\x1b[32m✓\x1b[0m 100.0% {} ({})", message, elapsed)
+                    format!("{} 100.0% {} ({})",
+                        self.config.color_scheme.colorize_complete("✓"),
+                        message, elapsed)
                 } else {
                     format!("✓ 100.0% {} ({})", message, elapsed)
                 }
             }
             ProgressState::Failed => {
                 if self.config.use_colors {
-                    format!("\x1b[31m✗ {:.1}% {}\x1b[0m", percentage, message)
+                    self.config.color_scheme.colorize_failed(&format!("✗ {:.1}% {}", percentage, message))
                 } else {
                     format!("✗ {:.1}% {}", percentage, message)
                 }
@@ -341,7 +355,7 @@ impl TerminalReporter {
             }
             ProgressState::Cancelled => {
                 if self.config.use_colors {
-                    format!("\x1b[33m◐ {:.1}% {}\x1b[0m", percentage, message)
+                    self.config.color_scheme.colorize_cancelled(&format!("◐ {:.1}% {}", percentage, message))
                 } else {
                     format!("◐ {:.1}% {}", percentage, message)
                 }
@@ -372,7 +386,8 @@ impl TerminalReporter {
                 let rate = self.calculate_byte_rate(total_bytes, elapsed);
                 if self.config.use_colors {
                     format!(
-                        "\x1b[32m✓\x1b[0m {} {} ({}, {})",
+                        "{} {} {} ({}, {})",
+                        self.config.color_scheme.colorize_complete("✓"),
                         total_str,
                         message,
                         self.format_duration(elapsed),
@@ -390,10 +405,10 @@ impl TerminalReporter {
             }
             ProgressState::Failed => {
                 if self.config.use_colors {
-                    format!(
-                        "\x1b[31m✗ {}/{} ({:.1}%) {}\x1b[0m",
+                    self.config.color_scheme.colorize_failed(&format!(
+                        "✗ {}/{} ({:.1}%) {}",
                         current_str, total_str, percentage, message
-                    )
+                    ))
                 } else {
                     format!(
                         "✗ {}/{} ({:.1}%) {}",
@@ -424,10 +439,10 @@ impl TerminalReporter {
             }
             ProgressState::Cancelled => {
                 if self.config.use_colors {
-                    format!(
-                        "\x1b[33m◐ {}/{} ({:.1}%) {}\x1b[0m",
+                    self.config.color_scheme.colorize_cancelled(&format!(
+                        "◐ {}/{} ({:.1}%) {}",
                         current_str, total_str, percentage, message
-                    )
+                    ))
                 } else {
                     format!(
                         "◐ {}/{} ({:.1}%) {}",

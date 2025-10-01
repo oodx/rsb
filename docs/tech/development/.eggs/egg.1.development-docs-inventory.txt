@@ -1,0 +1,31 @@
+================================================================================
+ 🐔 CHINA'S RSB DEVELOPMENT DOCUMENTATION INVENTORY EGG 🥚
+================================================================================
+
+📅 Generated: 2025-09-30
+📂 Location: /home/xnull/repos/code/rust/oodx/projects/rsb/docs/tech/development/
+
+🔍 DOCUMENTATION INVENTORY
+--------------------------------------------------------------------------------
+| Filename               | Primary Topic          | Last Updated | Status   | Recommended Mapping       |
+|------------------------|------------------------|--------------|----------|---------------------------|
+| AST_CONSIDERATIONS.md  | AST/IR Design          | 2025-09-14   | CURRENT  | rsbdoc arch ast-ir        |
+| FEATURES_GATING_PLAN.md| Module Feature Gating  | 2025-09-28   | CURRENT  | rsbdoc arch features      |
+| HOWTO_TEST.md          | Testing Procedures     | 2025-09-16   | CURRENT  | rsbdoc proc testing       |
+| HOWTO_UPDATE_RSB.md    | Project Update Guide   | 2025-09-28   | CURRENT  | rsbdoc proc update        |
+| MODULE_SPEC.md         | Module Specification   | 2025-09-28   | CURRENT  | rsbdoc arch module-spec   |
+| PRELUDE_POLICY.md      | Prelude Design Policy  | 2025-09-28   | CURRENT  | rsbdoc arch prelude       |
+| TEST_ORGANIZATION.md   | Test Organizational    | 2025-09-16   | CURRENT  | rsbdoc proc test-org      |
+--------------------------------------------------------------------------------
+
+🧠 BRAIN SYSTEM MAPPING RECOMMENDATIONS
+- Move each document to the corresponding section in ~/repos/docs/brain/dev/
+- Use rsbdoc CLI for consistent organization
+
+❗ DISCLAIMER
+This inventory reflects the documentation state as of 2025-09-30.
+Always verify the most current status and content of documents.
+
+================================================================================
+🐔 Cluck-tastic Documentation Inventory Complete! 🥚
+================================================================================

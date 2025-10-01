@@ -29,10 +29,14 @@ pub mod manager;
 pub mod styles;
 pub mod terminal;
 
+// Cross-module adapter for RSB colors integration
+pub mod progress_colors;
+
 // Re-exports for convenience
 pub use core::{ProgressEvent, ProgressReporter, ProgressState, ProgressTask};
 pub use manager::ProgressManager;
-pub use styles::{BarStyle, ProgressStyle, SpinnerStyle};
+pub use progress_colors::ProgressColorScheme;
+pub use styles::{BarStyle, MessagePosition, ProgressStyle, SpinnerStyle};
 pub use terminal::{TerminalConfig, TerminalReporter};
 
 /// Quick-start progress creation functions

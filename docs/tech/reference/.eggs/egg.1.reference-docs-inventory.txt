@@ -1,0 +1,42 @@
+================================================================================
+ 🐔 CHINA'S DOCUMENTATION INVENTORY EGG #1 🥚
+================================================================================
+
+DATE: 2025-09-30
+LOCATION: /home/xnull/repos/code/rust/oodx/projects/rsb/docs/tech/reference/
+
+🔍 DOCUMENTATION INVENTORY SUMMARY
+-----------------------------------
+
+| Filename               | Primary Topic/Purpose                   | Last Updated | Status   | Recommended Mapping            |
+|------------------------|----------------------------------------|--------------|----------|--------------------------------|
+| BASHFX-v3.md           | BashFX Framework v3 Documentation      | 2025-09-14   | CURRENT  | rsbdoc arch bashfx             |
+| HOWTO_HUB.md           | Project Hub Usage Guide                | 2025-09-28   | CURRENT  | rsbdoc proc hub-usage          |
+| REBEL.md               | REBEL Framework Documentation          | 2025-09-15   | CURRENT  | rsbdoc concept rebel           |
+| RSB_ARCH.md            | RSB Architecture Overview              | 2025-09-16   | CURRENT  | rsbdoc arch rsb                |
+| RSB_BASHFX_ALIGN.md    | BashFX and RSB Alignment Specification | 2025-09-14   | CURRENT  | rsbdoc arch bashfx-integration |
+| RSB_DOCS_STRATEGY.md   | Documentation Strategy for RSB         | 2025-09-30   | CURRENT  | rsbdoc proc docs-strategy      |
+| RSB_QUICK_REFERENCE.md | Quick Reference Guide                  | 2025-09-15   | CURRENT  | rsbdoc feat quick-reference    |
+| RSB_TEST_RUNNER.md     | Test Runner Documentation              | 2025-09-28   | CURRENT  | rsbdoc feat test-runner        |
+| RSB_TESTSH_INTEGRATION.md | Test Shell Integration Guide        | 2025-09-28   | CURRENT  | rsbdoc proc test-integration   |
+| RSB_V2.md              | RSB Version 2 Brief                    | 2025-09-16   | TEMPORAL | rsbdoc concept version-history |
+
+🧠 BRAIN MAPPING INSIGHTS
+-------------------------
+- Most documents are CURRENT and well-maintained
+- Strong focus on architecture, processes, and feature documentation
+- Recommended to reorganize into the new rsbdoc system for better categorization
+
+❓ QUESTIONS FOR REVIEW
+----------------------
+1. Are all these documents still relevant for the latest RSB version?
+2. Should temporal documents like RSB_V2.md be archived or updated?
+
+🚨 DISCLAIMER
+-------------
+This inventory reflects the documentation status as of 2025-09-30.
+Actual document relevance and maintenance should be confirmed by the project team.
+
+================================================================================
+ 🐔 CHINA'S EGG HATCHED SUCCESSFULLY! 🥚
+================================================================================
